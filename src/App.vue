@@ -1,8 +1,25 @@
 <script setup></script>
 
 <template>
-  <main class="p-4">
-    <RouterView/>
-  </main>
+  <RouterView v-slot="{ Component }" class="p-4">
+    <Transition name="fade" mode="out-in">
+      <component :is="Component"/>
+    </Transition>
+  </RouterView>
 </template>
 
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-leave-to{
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>
