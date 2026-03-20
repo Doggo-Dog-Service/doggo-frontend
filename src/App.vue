@@ -1,6 +1,8 @@
 <script setup></script>
 
 <template>
-  <RouterView/>
+  <main class="p-4">
+    <RouterView/>
+  </main>
 </template>
 
