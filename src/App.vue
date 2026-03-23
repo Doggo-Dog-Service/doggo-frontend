@@ -1,6 +1,10 @@
-<script setup></script>
+<script setup>
+import AppHeader from './components/layouts/AppHeader.vue';
+
+</script>
 
 <template>
+  <AppHeader/>
   <RouterView v-slot="{ Component }" class="p-4">
     <Transition name="fade" mode="out-in">
       <component :is="Component"/>
