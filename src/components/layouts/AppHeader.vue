@@ -53,7 +53,7 @@ getLocation()
       <RouterLink to="/">
         <img class="w-25 mr-3" src="/logo.png" alt="">
       </RouterLink>
-      <div class="flex" v-if="loading">
+      <div class="flex items-center" v-if="loading">
         <span class="text-doggo-green">
           <i class="mdi mdi-map-marker"></i>
         </span>
@@ -66,7 +66,7 @@ getLocation()
       </div>
       <div v-else-if="cityName" class="flex gap-1 items-center">
         <span class="text-doggo-green">
-          <i class="mdi mdi-map-marker"></i>
+          <span class="mdi mdi-map-marker"></span>
         </span>
         <h1 class="text-doggo-black font-semibold text-sm">{{ cityName }}</h1>
         <h1 class="text-gray-400 text-sm">,</h1>
@@ -75,8 +75,8 @@ getLocation()
     </div>
 
     <RouterLink to="/notificacoes">
-      <span class="text-2xl border border-border-light text-doggo-green rounded-xl px-1.5 pb-0.5">
-        <i class="mdi mdi-bell-outline"></i>
+      <span class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
+        <span class="mdi mdi-bell-outline"></span>
       </span>
     </RouterLink>
   </div>
