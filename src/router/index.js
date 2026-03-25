@@ -4,9 +4,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      paht: '/',
+      path: '/',
       name: 'home-view',
-      component: () => import('@/views/HomeView.vue')
+      component: () => import('@/views/HomeView.vue'),
+      meta: {
+        title: 'Home',
+        icon: 'mdi mdi-home-outline',
+        isView: true
+      }
     }
   ],
 })

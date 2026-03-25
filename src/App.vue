@@ -1,5 +1,6 @@
 <script setup>
 import AppHeader from './components/layouts/AppHeader.vue';
+import MobileNavBar from './components/layouts/MobileNavBar.vue';
 
 </script>
 
@@ -10,6 +11,7 @@ import AppHeader from './components/layouts/AppHeader.vue';
       <component :is="Component"/>
     </Transition>
   </RouterView>
+  <MobileNavBar/>
 </template>
 
 <style scoped>
