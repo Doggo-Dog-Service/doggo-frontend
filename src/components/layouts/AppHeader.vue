@@ -74,10 +74,10 @@ getLocation()
       </div>
     </div>
 
-    <RouterLink to="/notificacoes">
+    <!-- <RouterLink to="/notificacoes">
       <span class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
         <span class="mdi mdi-bell-outline"></span>
       </span>
-    </RouterLink>
+    </RouterLink> -->
   </div>
 </template>
