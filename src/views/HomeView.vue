@@ -88,7 +88,7 @@ onMounted(() => {
           @event="providerStore.getProvidersByService('boarding')"
         />
       </div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 h-110 overflow-y-auto">
         <UserCard v-for="(provider, index) of providerStore.providers" :key="index"
           :id="provider.id"
           :full_name="provider.full_name"
