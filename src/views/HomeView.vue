@@ -37,7 +37,7 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div class="flex flex-col gap-5 text-doggo-black md:grid md:grid-cols-2 md:gap-10 md:items-end">
+  <div class="flex flex-col gap-5 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen">
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
         <h1 class="text-2xl font-bold">Olá André 👋</h1>
@@ -88,7 +88,7 @@ onMounted(() => {
           @event="providerStore.getProvidersByService('boarding')"
         />
       </div>
-      <div class="flex flex-col gap-2 h-110 overflow-y-auto">
+      <div class="flex flex-col gap-2 h-110 md: overflow-y-auto">
         <UserCard v-for="(provider, index) of providerStore.providers" :key="index"
           :id="provider.id"
           :full_name="provider.full_name"
