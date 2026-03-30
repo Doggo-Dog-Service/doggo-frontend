@@ -13,7 +13,6 @@ import MobileNavBar from './components/layouts/MobileNavBar.vue';
       </Transition>
     </RouterView>
   </div>
-
   <MobileNavBar/>
 </template>
 
