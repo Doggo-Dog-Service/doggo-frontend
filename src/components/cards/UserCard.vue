@@ -73,8 +73,7 @@ const props = defineProps({
         </div>
         <span
           class="bg-doggo-light-green/30 border-2 border-doggo-light-green text-doggo-green min-w-20 text-center rounded-full py-1"
-          >{{ props.service_type.name }}</span
-        >
+        >{{ props.service_type.name }}</span>
       </div>
     </div>
     <div class="flex justify-between items-center">
@@ -82,7 +81,7 @@ const props = defineProps({
         <span class="mdi mdi-star text-amber-300 text-lg"></span>
         <p class="text-doggo-black font-semibold text-lg">{{ props.classification.toFixed(1).replace('.', ',') }}</p>
       </div>
-      <AppButton text="Agendar" mode="outline"/>
+      <AppButton text="Agendar" mode="outline" @event="console.log('sensação de butão apertado')"/>
     </div>
   </RouterLink>
 </template>

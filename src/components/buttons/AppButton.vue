@@ -32,7 +32,7 @@ const props = defineProps({
           : 'border-doggo-green bg-doggo-green text-white'
         : ''
     ]"
-    @click="emits('event')"
+    @click.stop.prevent="emits('event')"
   >
     {{ props.text }}
   </button>
