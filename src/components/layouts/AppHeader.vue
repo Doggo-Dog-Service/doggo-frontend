@@ -48,7 +48,7 @@ getLocation()
 </script>
 
 <template>
-  <div class="flex justify-between items-center px-2.5 py-5">
+  <div class="flex justify-between items-center p-4 md:p-6">
     <div class="flex items-center">
       <RouterLink to="/">
         <img class="w-25 mr-3" src="/logo.png" alt="">
@@ -74,10 +74,10 @@ getLocation()
       </div>
     </div>
 
-    <RouterLink to="/notificacoes">
+    <!-- <RouterLink to="/notificacoes">
       <span class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
         <span class="mdi mdi-bell-outline"></span>
       </span>
-    </RouterLink>
+    </RouterLink> -->
   </div>
 </template>

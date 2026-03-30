@@ -5,7 +5,7 @@ import AppHeader from './components/layouts/AppHeader.vue';
 
 <template>
   <AppHeader/>
-  <RouterView v-slot="{ Component }" class="p-4">
+  <RouterView v-slot="{ Component }" class="p-4 md:p-6">
     <Transition name="fade" mode="out-in">
       <component :is="Component"/>
     </Transition>
