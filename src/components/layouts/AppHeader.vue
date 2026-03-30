@@ -48,7 +48,7 @@ getLocation()
 </script>
 
 <template>
-  <div class="flex justify-between items-center px-2.5 py-5">
+  <div class="flex justify-between items-center p-4 md:p-6">
     <div class="flex items-center">
       <RouterLink to="/">
         <img class="w-25 mr-3" src="/logo.png" alt="">

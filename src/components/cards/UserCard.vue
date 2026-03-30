@@ -1,4 +1,6 @@
 <script setup>
+import AppButton from '../buttons/AppButton.vue';
+
 const props = defineProps({
   id: {
     type: Number,
@@ -37,39 +39,50 @@ const props = defineProps({
 </script>
 
 <template>
-  <RouterLink class="border-2 border-doggo-gray p-4 rounded-xl" to="/">
-    <div class="flex gap-5">
-      <img
-        v-if="props.profile_photo"
-        class="w-20 h-20"
-        :src="props.profile_photo"
-        :alt="`${props.full_name}-profile_photo`"
-      />
-      <div
-        v-else
-        class="text-white text-xl bg-doggo-light-green w-15 h-15 rounded-xl flex items-center justify-center"
-      >
-        {{ props.full_name.charAt(0) }}
-      </div>
-      <div class="flex justify-between w-3/4">
-        <div class="flex flex-col items-start gap-1">
-          <h3 class="font-semibold text-lg">{{ props.full_name }}</h3>
-          <div class="flex">
+  <RouterLink
+    class="w-full flex flex-col gap-2 border-2 border-doggo-gray p-4 rounded-xl transition-all duration-200 active:scale-98"
+    to="/"
+  >
+    <div class="w-full flex justify-between items-center border-b-2 border-doggo-gray pb-4">
+      <div class="flex gap-5">
+        <img
+          v-if="props.profile_photo"
+          class="h-15 w-15 rounded-xl"
+          :src="props.profile_photo"
+          :alt="`${props.full_name.toLowerCase()}-photo`"
+        />
+        <div
+          v-else
+          class="flex flex-col items-center justify-center h-15 w-15 rounded-xl bg-doggo-light-green"
+        >
+          <p class="text-white text-xl">{{ props.full_name.charAt() }}</p>
+        </div>
+        <div class="flex flex-col">
+          <h3 class="text-doggo-black text-lg font-semibold">{{ props.full_name }}</h3>
+          <p>
             <span class="mdi mdi-map-marker text-doggo-green"></span>
-            <p>{{ props.location.latitude }} km</p>
-          </div>
+            {{ location.latitude }} km
+            <!--substituir por função de cálculo de quilometragem -->
+          </p>
         </div>
-        <div class="flex flex-col gap-1">
-          <p v-if="props.price_per_hour" class="text-doggo-green font-bold">R$ {{ props.price_per_hour }}/h</p>
-          <p v-else class="text-doggo-green font-bold">R$ {{ props.price_per_day }}/dia</p>
-          <span
-            class="bg-doggo-light-green/20 border-2 border-doggo-light-green text-doggo-green px-2 rounded-xl"
-          >
-            {{ props.service_type.name }}
-          </span>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="text-doggo-green text-lg font-bold">
+          <p v-if="props.price_per_hour" >R$ {{ props.price_per_hour }}/h</p>
+          <p v-else >R$ {{ props.price_per_day }}/d</p>
         </div>
+        <span
+          class="bg-doggo-light-green/30 border-2 border-doggo-light-green text-doggo-green min-w-20 text-center rounded-full py-1"
+          >{{ props.service_type.name }}</span
+        >
       </div>
     </div>
-    <div></div>
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="mdi mdi-star text-amber-300 text-lg"></span>
+        <p class="text-doggo-black font-semibold text-lg">{{ props.classification.toFixed(1).replace('.', ',') }}</p>
+      </div>
+      <AppButton text="Agendar" mode="outline"/>
+    </div>
   </RouterLink>
 </template>

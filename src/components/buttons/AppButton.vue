@@ -8,7 +8,7 @@ const props = defineProps({
   mode: {
     type: String,
     default: 'default',
-    validator: (value) => ['default'].includes(value),
+    validator: (value) => ['default', 'outline'].includes(value),
   },
   selected: {
     type: Boolean,
@@ -26,6 +26,11 @@ const props = defineProps({
           ? 'bg-doggo-green text-white border-doggo-green'
           : 'border-doggo-gray bg-white text-zinc-400'
         : '',
+      props.mode === 'outline'
+        ? props.selected
+          ? 'bg-white border-doggo-green text-doggo-green'
+          : 'border-doggo-green bg-doggo-green text-white'
+        : ''
     ]"
     @click="emits('event')"
   >
