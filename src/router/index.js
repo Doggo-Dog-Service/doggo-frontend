@@ -12,7 +12,7 @@ const router = createRouter({
         icon: 'mdi mdi-home-outline',
         isView: true
       }
-    }
+    },
   ],
 })
 
