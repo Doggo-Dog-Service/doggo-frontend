@@ -1,15 +1,19 @@
 <script setup>
 import AppHeader from './components/layouts/AppHeader.vue';
+import MobileNavBar from './components/layouts/MobileNavBar.vue';
 
 </script>
 
 <template>
   <AppHeader/>
-  <RouterView v-slot="{ Component }" class="p-4 md:p-6">
-    <Transition name="fade" mode="out-in">
-      <component :is="Component"/>
-    </Transition>
-  </RouterView>
+  <div class="pb-20">
+    <RouterView v-slot="{ Component }" class="p-4">
+      <Transition name="fade" mode="out-in">
+        <component :is="Component"/>
+      </Transition>
+    </RouterView>
+  </div>
+  <MobileNavBar/>
 </template>
 
 <style scoped>
