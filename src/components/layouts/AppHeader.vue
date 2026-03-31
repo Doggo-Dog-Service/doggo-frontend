@@ -75,9 +75,9 @@ getLocation()
     </div>
 
     <RouterLink to="/notifications">
-      <span class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
+      <div class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
         <span class="mdi mdi-bell-outline"></span>
-      </span>
+      </div>
     </RouterLink>
   </div>
 </template>
