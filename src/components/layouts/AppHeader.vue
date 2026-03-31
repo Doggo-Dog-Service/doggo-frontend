@@ -37,8 +37,8 @@ async function getLocation() {
       stateAbbr.value = stateAbbreviations[state] || state
       loading.value = false
     },
-    (err) => {
-      error.value = `Não foi possível obter a localização: ${err.message}`
+    () => {
+      error.value = `Não foi possível obter a localização`
       loading.value = false
     }
   )
