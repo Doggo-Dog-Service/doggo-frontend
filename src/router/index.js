@@ -13,6 +13,16 @@ const router = createRouter({
         isView: true
       }
     },
+    {
+      path: '/provider/:id',
+      name: 'provider-view',
+      component: () => import('@/views/ProviderView.vue'),
+      meta: {
+        title: 'Provider',
+        icon: 'mdi mdi-provider-outline',
+        isView: true
+      }
+    },
   ],
 })
 
