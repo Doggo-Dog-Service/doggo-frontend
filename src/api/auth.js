@@ -5,9 +5,9 @@ export const accessTokenRequest = (data) => {
 }
 
 export const refreshTokenRequest = (refreshToken) => {
-    return api.post('/refresh/')
+    return api.post('/token/refresh/')
 }
 
 export const meRequest = () => {
-    return api.post('/users/me/')
+    return api.get('/users/me/')
 }

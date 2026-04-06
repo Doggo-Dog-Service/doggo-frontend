@@ -11,7 +11,7 @@ const router = createRouter({
       meta: {
         title: 'Home',
         icon: 'mdi mdi-home-outline',
-        isView: true
+        isView: true,
       }
     },
   ],
