@@ -6,16 +6,11 @@ export const login = async (credentials) => {
 
   if (refreshToken) {
     try {
-      const response = await refreshTokenRequest(refreshToken)
-      const accessToken = response.data.access
+      const { data } = await refreshTokenRequest(refreshToken)
+      const accessToken = data.access
 
       if (accessToken) {
         setAccessToken(accessToken)
-      }
-
-      return {
-        type: 'refresh',
-        response,
       }
     } catch (error) {
       console.log(error)
@@ -23,18 +18,13 @@ export const login = async (credentials) => {
   }
 
   try {
-    const response = await accessTokenRequest(credentials)
+    const { data } = await accessTokenRequest(credentials)
 
-    const { access, refresh } = response.data
+    const { access, refresh } = data
 
     if (access && refresh) {
       setAccessToken(access)
       setRefreshToken(refresh)
-
-      return {
-        type: 'access',
-        response,
-      }
     }
   } catch (error) {
     console.log(error)
