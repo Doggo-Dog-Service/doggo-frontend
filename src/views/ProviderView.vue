@@ -2,14 +2,15 @@
 const user = {
   id: 1,
   full_name: 'Luiz Roberto',
-  profile_photo: 'https://cdn.pixabay.com/photo/2020/10/04/10/43/horse-5625922_640.jpg'
+  profile_photo: 'https://cdn.pixabay.com/photo/2020/10/04/10/43/horse-5625922_640.jpg',
+  location_home: 'Rua Antônio-Joiville-473',
 }
 </script>
 
 <template>
  <img src="/public/imgBanner.png" alt="banner" class="w-full h-full object-cover z-0">
 
- <img 
+ <img
  v-if="user.profile_photo"
  class="h-22 w-22 rounded-2xl z-1 border-white border-4 -translate-y-16 translate-x-8"
  :src="user.profile_photo"
@@ -21,6 +22,10 @@ v-else
 class="flex flex-col items-center justify-center h-22 w-22 rounded-2xl bg-linear-to-r from-doggo-green to-doggo-light-green z-1 border-white border-2 -translate-y-16 translate-x-8"
 >
 <p class="text-white text-xl">{{ user.full_name.charAt() }}</p>
-<p>{{ user.full_name }}</p>
+</div>
+<p class="text-black -translate-y-22 ml-35 text-2xl font-bold  ">{{ user.full_name }}</p>
+<div class="flex">
+<p></p>
+
 </div>
 </template>
