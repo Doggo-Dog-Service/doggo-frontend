@@ -1,8 +1,12 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import { useToast } from "vue-toast-notification";
 import * as authService from '@/services/authService'
 
 export const useAuthStore = defineStore('authStore', () => {
+
+    const $toast = useToast();
+
     const user = ref(null);
     const loading = ref(false);
 
@@ -17,7 +21,11 @@ export const useAuthStore = defineStore('authStore', () => {
             await authService.login(credentials);
             user.value = await authService.getMe();
         } catch(error) {
-            console.log('Erro ao logar');
+            $toast.error(error.message, {
+                type: 'error',
+                duration: 3000,
+                position: 'top-right'
+            })
         } finally {
             loading.value = false
         }
@@ -28,7 +36,11 @@ export const useAuthStore = defineStore('authStore', () => {
             loading.value = true;
             user.value = await authService.getMe();
         } catch(error) {
-            console.log('Erro ao buscar usuário logado:');
+            $toast.error(error.message, {
+                type: 'error',
+                duration: 3000,
+                position: 'top-right'
+            })
             user.value = null;
         } finally {
             loading.value = false;
@@ -38,6 +50,11 @@ export const useAuthStore = defineStore('authStore', () => {
     const logout = () => {
         authService.logout();
         user.value = null;
+        $toast.error('Logout realizado!', {
+            type: 'error',
+            duration: 3000,
+            position: 'top-right'
+        })
     }
 
     return {
