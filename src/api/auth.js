@@ -9,5 +9,5 @@ export const refreshTokenRequest = (refreshToken) => {
 }
 
 export const meRequest = () => {
-    return api.get('/users/me/')
+    return api.get('/profile/')
 }

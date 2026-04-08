@@ -13,7 +13,10 @@ export const login = async (credentials) => {
         setAccessToken(accessToken)
       }
     } catch (error) {
-      console.log(error)
+      throw {
+        message: error.response?.data?.detail || 'Erro ao fazer login',
+        status: error.response?.status
+      }
     }
   }
 
@@ -27,12 +30,23 @@ export const login = async (credentials) => {
       setRefreshToken(refresh)
     }
   } catch (error) {
-    console.log(error)
+    throw {
+      message: error.response?.data?.detail || 'Erro ao fazer login',
+      status: error.response?.status
+    }
   }
 }
 
 export const getMe = async () => {
-  return await meRequest()
+  try {
+    const { data } = await meRequest();
+    return data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.datail || 'Erro ao buscar perfil',
+      status: error.response?.status
+    }
+  }
 }
 
 export const logout = () => {

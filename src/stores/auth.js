@@ -7,19 +7,17 @@ export const useAuthStore = defineStore('authStore', () => {
     const loading = ref(false);
 
     const isAuthenticated = computed(() => !!user.value);
-    const isProvider = computed(() => user.value.provider_profile)
-    const isClient = computed(() => user.value.client_profile)
+    const isProvider = computed(() => user.value.provider_profile);
+    const isClient = computed(() => user.value.client_profile);
 
     const login = async(credentials) => {
         try {
             loading.value = true;
 
             await authService.login(credentials);
-            const response = await authService.getMe();
-
-            user.value = response.data
+            user.value = await authService.getMe();
         } catch(error) {
-            console.log('Erro ao logar' + error);
+            console.log('Erro ao logar');
         } finally {
             loading.value = false
         }
@@ -28,12 +26,10 @@ export const useAuthStore = defineStore('authStore', () => {
     const fetchUser = async() => {
         try {
             loading.value = true;
-
-            const response = await authService.getMe();
-            user.value = response.data;
+            user.value = await authService.getMe();
         } catch(error) {
-            console.log('Erro ao buscar usuário logado:' + error);
-            user.value = null
+            console.log('Erro ao buscar usuário logado:');
+            user.value = null;
         } finally {
             loading.value = false;
         }
@@ -41,7 +37,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
     const logout = () => {
         authService.logout();
-        user.value = null
+        user.value = null;
     }
 
     return {
