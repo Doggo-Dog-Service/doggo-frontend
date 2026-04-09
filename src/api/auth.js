@@ -11,3 +11,7 @@ export const refreshTokenRequest = (refreshToken) => {
 export const meRequest = () => {
     return api.get('/profile/')
 }
+
+export const deleteUser = (id) => {
+    return api.delete(`/users/${id}/`)
+}

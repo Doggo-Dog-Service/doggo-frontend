@@ -1,4 +1,4 @@
-import { accessTokenRequest, refreshTokenRequest, meRequest } from '@/api/auth'
+import { accessTokenRequest, refreshTokenRequest, meRequest, deleteUser } from '@/api/auth'
 import { getRefreshToken, setAccessToken, setRefreshToken, clearTokens } from '@/utils/token'
 
 export const login = async (credentials) => {
@@ -43,7 +43,7 @@ export const getMe = async () => {
     return data
   } catch (error) {
     throw {
-      message: error.response?.data?.datail || 'Erro ao buscar perfil',
+      message: error.response?.data?.detail || 'Erro ao buscar perfil',
       status: error.response?.status
     }
   }
@@ -51,4 +51,16 @@ export const getMe = async () => {
 
 export const logout = () => {
   clearTokens()
+}
+
+export const deleteUserById = async (id) => {
+  try {
+    const { data } = await deleteUser(id)
+    return data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail || 'Erro ao deletar usuário',
+      status: error.response?.status
+    }
+  }
 }
