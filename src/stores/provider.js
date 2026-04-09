@@ -62,11 +62,32 @@ export const useProviderStore = defineStore('providerStore', () => {
     }
   }
 
+  const deleteProvider = async (id) => {
+    try {
+      loading.value = true;
+      providerService.deleteProvider(id);
+      $toast.success('Perfil deletado com sucesso!', {
+        type: 'success',
+        duration: 3000,
+        position: 'top-right'
+      });
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right'
+      })
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
     providers,
     currentService,
     fetchProviders,
     fetchProvider,
-    createProvider
+    createProvider,
+    deleteProvider
   }
 })
