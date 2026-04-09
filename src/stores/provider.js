@@ -6,7 +6,7 @@ import * as providerService from '@/services/providerService'
 export const useProviderStore = defineStore('providerStore', () => {
   const $toast = useToast()
 
-  const providers = ref([]);
+  const providers = ref([])
   const currentService = ref(0)
   const loading = ref(false)
 
@@ -14,12 +14,12 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       const response = await providerService.fetchProviders(params)
-      providers.value = response.results;
+      providers.value = response.results
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
     } finally {
       loading.value = false
@@ -28,14 +28,14 @@ export const useProviderStore = defineStore('providerStore', () => {
 
   const fetchProvider = async (id) => {
     try {
-      loading.value = true;
-      const provider = await providerService.fetchProvider(id);
-      return provider;
+      loading.value = true
+      const provider = await providerService.fetchProvider(id)
+      return provider
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
     } finally {
       loading.value = false
@@ -44,18 +44,20 @@ export const useProviderStore = defineStore('providerStore', () => {
 
   const createProvider = async (data) => {
     try {
-      loading.value = true;
+      loading.value = true
       const newProvider = await providerService.createProvider(data)
-      $toast.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`, {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right'
-      })
+      if (newProvider) {
+        $toast.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`, {
+          type: 'success',
+          duration: 3000,
+          position: 'top-right',
+        })
+      }
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
     } finally {
       loading.value = false
@@ -64,30 +66,31 @@ export const useProviderStore = defineStore('providerStore', () => {
 
   const deleteProvider = async (id) => {
     try {
-      loading.value = true;
-      providerService.deleteProvider(id);
+      loading.value = true
+      await providerService.deleteProvider(id)
       $toast.success('Perfil deletado com sucesso!', {
         type: 'success',
         duration: 3000,
-        position: 'top-right'
-      });
+        position: 'top-right',
+      })
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
     } finally {
-      loading.value = false;
+      loading.value = false
     }
   }
 
   return {
+    loading,
     providers,
     currentService,
     fetchProviders,
     fetchProvider,
     createProvider,
-    deleteProvider
+    deleteProvider,
   }
 })
