@@ -21,9 +21,20 @@ async function handleLogin() {
 </script>
 
 <template>
-  <form @submit.prevent>
-    <AppInput label="Email" placeholder="seu@email.com" v-model="data.email"/>
-    <AppInput label="Password" placeholder="sua senha" v-model="data.password"/>
-    <AppButton @event="handleLogin" :text="authStore.loading ? '...' : 'Entrar'" mode="outline" :disabled="authStore.loading"/>
-  </form>
+  <div class="p-4">
+    <section class="flex flex-col">
+      <h1 class="text-doggo-black text-2xl">Bem-vindo de volta</h1>
+      <p class="text-zinc-400">Entre na sua conta para continuar</p>
+    </section>
+    <form @submit.prevent>
+      <AppInput label="Email" placeholder="seu@email.com" v-model="data.email" />
+      <AppInput label="Password" placeholder="sua senha" v-model="data.password" />
+      <AppButton
+        @event="handleLogin"
+        :text="authStore.loading ? '...' : 'Entrar'"
+        mode="outline"
+        :disabled="authStore.loading"
+      />
+    </form>
+  </div>
 </template>
