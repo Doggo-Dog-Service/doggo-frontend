@@ -1,10 +1,16 @@
 <script setup>
-import { useRoute } from 'vue-router';
-import AltHeader from './components/layouts/AltHeader.vue';
+import { onMounted } from 'vue';
 import AppHeader from './components/layouts/AppHeader.vue';
+import AltHeader from './components/layouts/AltHeader.vue';
 import MobileNavBar from './components/layouts/MobileNavBar.vue';
+import { useAuthStore } from './stores/auth';
+const authStore = useAuthStore();
 
 const route = useRoute();
+ 
+onMounted(async() => {
+  await authStore.fetchUser();
+});
 </script>
 
 <template>

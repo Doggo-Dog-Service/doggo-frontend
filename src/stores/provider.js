@@ -1,221 +1,96 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-
-const STATIC_PROVIDERS = [
-   {
-    id: 1,
-    profile_photo: '',
-    full_name: 'Lucas Almeida',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3040, longitude: -48.8450 },
-    price_per_hour: 35,
-    price_per_day: 0,
-    classification: 4.2,
-  },
-  {
-    id: 2,
-    profile_photo: '',
-    full_name: 'Mariana Souza',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.3065, longitude: -48.8472 },
-    price_per_hour: 30,
-    price_per_day: 120,
-    classification: 4.8,
-  },
-  {
-    id: 3,
-    profile_photo: '',
-    full_name: 'Pedro Santos',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.3078, longitude: -48.8441 },
-    price_per_hour: 0,
-    price_per_day: 150,
-    classification: 4.6,
-  },
-  {
-    id: 4,
-    profile_photo: '',
-    full_name: 'Ana Oliveira',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3022, longitude: -48.8435 },
-    price_per_hour: 45,
-    price_per_day: 0,
-    classification: 4.9,
-  },
-  {
-    id: 5,
-    profile_photo: '',
-    full_name: 'Carlos Pereira',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.3090, longitude: -48.8490 },
-    price_per_hour: 25,
-    price_per_day: 100,
-    classification: 4.1,
-  },
-  {
-    id: 6,
-    profile_photo: '',
-    full_name: 'Fernanda Costa',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.3015, longitude: -48.8420 },
-    price_per_hour: 0,
-    price_per_day: 180,
-    classification: 4.7,
-  },
-  {
-    id: 7,
-    profile_photo: '',
-    full_name: 'Bruno Rocha',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3080, longitude: -48.8480 },
-    price_per_hour: 40,
-    price_per_day: 0,
-    classification: 4.3,
-  },
-  {
-    id: 8,
-    profile_photo: '',
-    full_name: 'Juliana Martins',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.3055, longitude: -48.8465 },
-    price_per_hour: 32,
-    price_per_day: 110,
-    classification: 4.4,
-  },
-  {
-    id: 9,
-    profile_photo: '',
-    full_name: 'Rafael Lima',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.3030, longitude: -48.8410 },
-    price_per_hour: 0,
-    price_per_day: 160,
-    classification: 4.6,
-  },
-  {
-    id: 10,
-    profile_photo: '',
-    full_name: 'Patricia Gomes',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3100, longitude: -48.8500 },
-    price_per_hour: 38,
-    price_per_day: 0,
-    classification: 4.5,
-  },
-  {
-    id: 11,
-    profile_photo: '',
-    full_name: 'Thiago Ribeiro',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.2990, longitude: -48.8405 },
-    price_per_hour: 28,
-    price_per_day: 95,
-    classification: 4.0,
-  },
-  {
-    id: 12,
-    profile_photo: '',
-    full_name: 'Camila Freitas',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.3110, longitude: -48.8510 },
-    price_per_hour: 0,
-    price_per_day: 170,
-    classification: 4.8,
-  },
-  {
-    id: 13,
-    profile_photo: '',
-    full_name: 'Eduardo Mendes',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3005, longitude: -48.8425 },
-    price_per_hour: 36,
-    price_per_day: 0,
-    classification: 4.2,
-  },
-  {
-    id: 14,
-    profile_photo: '',
-    full_name: 'Larissa Barbosa',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.3068, longitude: -48.8478 },
-    price_per_hour: 34,
-    price_per_day: 115,
-    classification: 4.7,
-  },
-  {
-    id: 15,
-    profile_photo: '',
-    full_name: 'Diego Carvalho',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.3125, longitude: -48.8520 },
-    price_per_hour: 0,
-    price_per_day: 155,
-    classification: 4.3,
-  },
-  {
-    id: 16,
-    profile_photo: '',
-    full_name: 'Aline Teixeira',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.2975, longitude: -48.8395 },
-    price_per_hour: 42,
-    price_per_day: 0,
-    classification: 4.6,
-  },
-  {
-    id: 17,
-    profile_photo: '',
-    full_name: 'Gabriel Nunes',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.3130, longitude: -48.8530 },
-    price_per_hour: 29,
-    price_per_day: 105,
-    classification: 4.1,
-  },
-  {
-    id: 18,
-    profile_photo: '',
-    full_name: 'Beatriz Lopes',
-    service_type: { id: 3, name: 'boarding' },
-    location: { latitude: -26.2985, longitude: -48.8385 },
-    price_per_hour: 0,
-    price_per_day: 165,
-    classification: 4.9,
-  },
-  {
-    id: 19,
-    profile_photo: '',
-    full_name: 'Ricardo Alves',
-    service_type: { id: 1, name: 'walker' },
-    location: { latitude: -26.3140, longitude: -48.8540 },
-    price_per_hour: 37,
-    price_per_day: 0,
-    classification: 4.4,
-  },
-  {
-    id: 20,
-    profile_photo: '',
-    full_name: 'Vanessa Duarte',
-    service_type: { id: 2, name: 'sitter' },
-    location: { latitude: -26.2960, longitude: -48.8370 },
-    price_per_hour: 31,
-    price_per_day: 108,
-    classification: 4.5,
-  },
-]
+import { useToast } from 'vue-toast-notification'
+import * as providerService from '@/services/providerService'
 
 export const useProviderStore = defineStore('providerStore', () => {
-  const providers = ref([]);
-  const currentService = ref("");
+  const $toast = useToast()
 
-  function getProvidersByService(serviceName) {
-    currentService.value = serviceName;
-    providers.value = STATIC_PROVIDERS.filter((provider) => provider.service_type.name === currentService.value);
+  const providers = ref([])
+  const currentService = ref(0)
+  const loading = ref(false)
+
+  const fetchProviders = async (params) => {
+    try {
+      loading.value = true
+      const response = await providerService.fetchProviders(params)
+      providers.value = response.results
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right',
+      })
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const fetchProvider = async (id) => {
+    try {
+      loading.value = true
+      const provider = await providerService.fetchProvider(id)
+      return provider
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right',
+      })
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const createProvider = async (data) => {
+    try {
+      loading.value = true
+      const newProvider = await providerService.createProvider(data)
+      if (newProvider) {
+        $toast.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`, {
+          type: 'success',
+          duration: 3000,
+          position: 'top-right',
+        })
+      }
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right',
+      })
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deleteProvider = async (id) => {
+    try {
+      loading.value = true
+      await providerService.deleteProvider(id)
+      $toast.success('Perfil deletado com sucesso!', {
+        type: 'success',
+        duration: 3000,
+        position: 'top-right',
+      })
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right',
+      })
+    } finally {
+      loading.value = false
+    }
   }
 
   return {
+    loading,
     providers,
     currentService,
-    getProvidersByService
+    fetchProviders,
+    fetchProvider,
+    createProvider,
+    deleteProvider,
   }
 })
