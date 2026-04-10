@@ -22,7 +22,7 @@ onMounted(async() => {
     <AltHeader/>
   </header>
   <div class="pb-20">
-    <RouterView v-slot="{ Component }" class="p-4">
+    <RouterView v-slot="{ Component }" class="">
       <Transition name="fade" mode="out-in">
         <component :is="Component"/>
       </Transition>
