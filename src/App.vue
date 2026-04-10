@@ -3,6 +3,7 @@ import { onMounted } from 'vue';
 import AppHeader from './components/layouts/AppHeader.vue';
 import AltHeader from './components/layouts/AltHeader.vue';
 import MobileNavBar from './components/layouts/MobileNavBar.vue';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from './stores/auth';
 const authStore = useAuthStore();
 

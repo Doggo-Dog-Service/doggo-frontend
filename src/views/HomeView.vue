@@ -32,12 +32,14 @@ const services = [
   },
 ]
 
-onMounted(() => {
-  providerStore.getProvidersByService('walker')
+onMounted(async () => {
+  providerStore.fetchProviders()
 })
 </script>
 <template>
-  <div class="flex flex-col gap-5 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen">
+  <div
+    class="flex flex-col gap-5 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
+  >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
         <h1 class="text-2xl font-bold">Olá André 👋</h1>
@@ -72,24 +74,17 @@ onMounted(() => {
     <section class="flex flex-col gap-4">
       <h2 class="text-lg font-bold">Perto de você</h2>
       <div class="flex gap-2">
-        <AppButton
-          text="Walkers"
-          :selected="providerStore.currentService === 'walker'"
-          @event="providerStore.getProvidersByService('walker')"
-        />
-        <AppButton
-          text="Sitters"
-          :selected="providerStore.currentService === 'sitter'"
-          @event="providerStore.getProvidersByService('sitter')"
-        />
-        <AppButton
-          text="Boarding"
-          :selected="providerStore.currentService === 'boarding'"
-          @event="providerStore.getProvidersByService('boarding')"
-        />
+        <AppButton text="Walkers" :selected="providerStore.currentService === 'walker'" />
+        <AppButton text="Sitters" :selected="providerStore.currentService === 'sitter'" />
+        <AppButton text="Boarding" :selected="providerStore.currentService === 'boarding'" />
       </div>
-      <div class="flex flex-col gap-2 h-110 md: overflow-y-auto">
-        <UserCard v-for="(provider, index) of providerStore.providers" :key="index"
+      <div
+        class="flex flex-col gap-2 h-110 md:overflow-y-auto"
+        v-if="providerStore.providers.length > 0"
+      >
+        <UserCard
+          v-for="(provider, index) of providerStore.providers"
+          :key="index"
           :id="provider.id"
           :full_name="provider.full_name"
           :service_type="provider.service_type"
@@ -99,6 +94,11 @@ onMounted(() => {
           :profile_photo="provider.profile_photo"
           :classification="provider.classification"
         />
+      </div>
+      <div class="text-center h-110 flex flex-col items-center justify-center">
+        <p class="text-xl text-doggo-green font-semibold md:text-base">
+          Não conseguimos encontrar nenhum provedor perto da sua região
+        </p>
       </div>
     </section>
   </div>
