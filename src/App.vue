@@ -1,11 +1,19 @@
 <script setup>
+import { useRoute } from 'vue-router';
+import AltHeader from './components/layouts/AltHeader.vue';
 import AppHeader from './components/layouts/AppHeader.vue';
 import MobileNavBar from './components/layouts/MobileNavBar.vue';
 
+const route = useRoute();
 </script>
 
 <template>
-  <AppHeader/>
+  <header v-if="route.path === '/'">
+    <AppHeader/>
+  </header>
+  <header v-else>
+    <AltHeader/>
+  </header>
   <div class="pb-20">
     <RouterView v-slot="{ Component }" class="p-4">
       <Transition name="fade" mode="out-in">
