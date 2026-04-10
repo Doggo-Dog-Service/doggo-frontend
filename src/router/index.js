@@ -14,17 +14,12 @@ const router = createRouter({
         isView: true,
       }
     },
+    {
+      path: '/login',
+      name: 'login-view',
+      component: () => import('@/views/LoginView.vue'),
+    },
   ],
-})
-
-router.beforeEach((to, from) => {
-  const isAuthenticated = !!getAccessToken();
-
-  if(to.meta.requiresAuth && !isAuthenticated) {
-    return '/login'
-  }
-
-  return true
 })
 
 export default router

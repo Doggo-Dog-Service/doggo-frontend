@@ -14,22 +14,26 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false
+  }
 })
 </script>
 
 <template>
-  <button
+  <button :disabled="props.disabled"
     :class="[
-      'text-center px-4 py-2 rounded-full border-2 transition-all duration-200 active:bg-doggo-green active:text-white cursor-pointer',
+      'text-center px-4 py-2 rounded-full border-2 transition-all duration-200 cursor-pointer w-full',
       props.mode === 'default'
         ? props.selected
-          ? 'bg-doggo-green text-white border-doggo-green'
-          : 'border-doggo-gray bg-white text-zinc-400'
+          ? 'bg-doggo-green text-white border-doggo-green '
+          : 'border-doggo-gray bg-white text-zinc-400 active:bg-doggo-green active:text-white '
         : '',
       props.mode === 'outline'
         ? props.selected
           ? 'bg-white border-doggo-green text-doggo-green'
-          : 'border-doggo-green bg-doggo-green text-white'
+          : 'border-doggo-green bg-doggo-green text-white active:scale-98 active:opacity-80'
         : ''
     ]"
     @click.stop.prevent="emits('event')"

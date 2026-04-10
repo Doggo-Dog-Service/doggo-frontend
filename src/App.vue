@@ -10,7 +10,7 @@ const authStore = useAuthStore();
 const route = useRoute();
  
 onMounted(async() => {
-  await authStore.fetchUser();
+  await authStore.fetchUser()
 });
 </script>
 
