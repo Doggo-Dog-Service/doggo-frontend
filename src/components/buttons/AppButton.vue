@@ -1,6 +1,11 @@
 <script setup>
 const emits = defineEmits(['event'])
 const props = defineProps({
+  type: {
+    type: String,
+    default: 'button',
+    validator: (value) => ['button', 'submit', 'reset'].includes(value),
+  },
   text: {
     type: String,
     required: true,
@@ -16,13 +21,15 @@ const props = defineProps({
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 </script>
 
 <template>
-  <button :disabled="props.disabled"
+  <button
+    :disabled="props.disabled"
+    :type="props.type"
     :class="[
       'text-center px-4 py-2 rounded-full border-2 transition-all duration-200 cursor-pointer w-full',
       props.mode === 'default'
@@ -34,9 +41,9 @@ const props = defineProps({
         ? props.selected
           ? 'bg-white border-doggo-green text-doggo-green'
           : 'border-doggo-green bg-doggo-green text-white active:scale-98 active:opacity-80'
-        : ''
+        : '',
     ]"
-    @click.stop.prevent="emits('event')"
+    @click="emits('event')"
   >
     {{ props.text }}
   </button>
