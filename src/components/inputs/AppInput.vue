@@ -18,12 +18,12 @@ const props = defineProps({
       <span
         v-if="icon"
         :class="icon"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl"
+        class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 text-xl"
       ></span>
 
       <input
-        class="w-full text-base border-2 border-doggo-gray rounded-xl py-2 pr-4"
-        :class="icon ? 'pl-10' : 'pl-4'"
+        class="w-full text-base border-2 border-doggo-gray rounded-xl py-3 pr-6"
+        :class="icon ? 'pl-14' : 'pl-4'"
         :type="props.type"
         :placeholder="props.placeholder"
         v-model="model"
