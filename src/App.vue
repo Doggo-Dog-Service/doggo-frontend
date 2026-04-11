@@ -11,13 +11,16 @@ const route = useRoute()
 
 const isAppHeader = computed(() => {
   if (route.path === '/') return true
-
   return false
 })
 
-const isLoginRoute = computed(() => {
+const isLoginView = computed(() => {
   if (route.path === '/login') return true
+  return false
+})
 
+const isRegisterView = computed(() => {
+  if (route.path === '/register') return true
   return false
 })
 
@@ -28,11 +31,11 @@ onMounted(async () => {
 
 <template>
   <header>
-    <AppHeader v-if="isAppHeader && !isLoginRoute" />
-    <AltHeader v-if="!isAppHeader && !isLoginRoute" />
+    <AppHeader v-if="isAppHeader && !isLoginView" />
+    <AltHeader v-if="!isAppHeader && !isLoginView" />
   </header>
-  <main class="">
-    <RouterView class="p-4"/>
+  <main>
+    <RouterView/>
   </main>
-  <MobileNavBar />
+  <MobileNavBar v-if="!isLoginView && !isRegisterView" />
 </template>
