@@ -12,6 +12,10 @@ export const meRequest = () => {
     return api.get('/profile/')
 }
 
+export const createUser = (data) => {
+    return api.post('/users/', data)
+}
+
 export const deleteUser = (id) => {
     return api.delete(`/users/${id}/`)
 }

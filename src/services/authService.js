@@ -1,4 +1,4 @@
-import { accessTokenRequest, refreshTokenRequest, meRequest, deleteUser } from '@/api/auth'
+import { accessTokenRequest, refreshTokenRequest, meRequest, createUser, deleteUser } from '@/api/auth'
 import {
   getRefreshToken,
   getAccessToken,
@@ -68,6 +68,18 @@ export const getMe = async () => {
     console.error(error)
     throw {
       message: error.response?.data?.detail || 'Erro inesperado ao buscar perfil',
+      status: error.response?.status,
+    }
+  }
+}
+
+export const createBaseUser = async (payload) => {
+  try {
+    const { data } = await createUser(payload);
+    return data
+  } catch(error) {
+    throw {
+      message: error.response?.data?.detail || 'Erro ao criar usuário',
       status: error.response?.status,
     }
   }

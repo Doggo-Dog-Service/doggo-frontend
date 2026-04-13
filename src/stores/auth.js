@@ -54,6 +54,22 @@ export const useAuthStore = defineStore('authStore', () => {
     })
   }
 
+  const createUser = async (data) => {
+    try {
+      loading.value = true
+      const userData = await authService.createBaseUser(data)
+      return userData
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right'
+      })
+    } finally {
+      loading.value = false
+    }
+  }
+
   const deleteUser = async (id) => {
     try {
       loading.value = true
@@ -80,6 +96,7 @@ export const useAuthStore = defineStore('authStore', () => {
     isProvider,
     login,
     fetchUser,
+    createUser,
     logout,
     deleteUser
   }
