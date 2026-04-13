@@ -1,4 +1,24 @@
 <script setup>
+import gsap from "gsap";
+import { onMounted } from "vue";
+
+onMounted(() => {
+  const blobs = gsap.utils.toArray('.blob');
+
+  blobs.forEach((blob, i) => {
+    gsap.to(blob, {
+      x: () => gsap.utils.random(-400, 400),
+      y: () => gsap.utils.random(-200, 200),
+      scale: () => gsap.utils.random(0.8, 1.4),
+      duration: () => gsap.utils.random(6, 12),
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: i * 0.5
+    })
+  })
+})
+
 const user = {
   id: 1,
   full_name: 'Luiz Roberto',
@@ -7,7 +27,14 @@ const user = {
 }
 </script>
 <template>
-  <img src="/public/imgBanner.png" alt="banner" class="w-full h-full object-cover z-0" />
+  <div class="bg-doggo-green h-80 relative overflow-hidden">
+    <div class="absolute inset-0">
+      <div :class="['blob', 'absolute top-0 left-0 w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
+      <div :class="['blob', 'absolute top-0 right-0 -translate-x-1/2 -translate-y-1/2 w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
+      <div :class="['blob', 'absolute bottom-0 left-0 w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
+      <div :class="['blob', 'absolute bottom-0 right-0 w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
+    </div>
+  </div>
   <img
     v-if="user.profile_photo"
     class="h-22 w-22 rounded-2xl z-1 border-white border-4 -translate-y-16 translate-x-8"
