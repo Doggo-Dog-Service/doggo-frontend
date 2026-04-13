@@ -13,7 +13,7 @@ const data = reactive({
   password: '',
 })
 
-async function handleLogin() {
+const handleLogin = async () => {
   await authStore.login(data)
   if (authStore.isAuthenticated) {
     router.push('/')
@@ -39,7 +39,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col bg-doggo-green min-h-screen">
+  <div class="flex flex-col bg-linear-to-b from-doggo-green to-doggo-light-green min-h-screen">
     <div class="fixed flex flex-col items-center justify-center inset-0 overflow-hidden h-1/3 z-0">
       <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
       <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>

@@ -13,7 +13,7 @@ export const meRequest = () => {
 }
 
 export const createUser = (data) => {
-    return api.post('/users/', data)
+    return api.post('/register/', data)
 }
 
 export const deleteUser = (id) => {

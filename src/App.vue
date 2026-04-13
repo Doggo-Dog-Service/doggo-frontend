@@ -25,7 +25,7 @@ onMounted(async () => {
     <AppHeader v-if="isAppHeader && !isLoginView" />
     <AltHeader v-if="!isAppHeader && !isLoginView" />
   </header>
-  <main>
+  <main class="text-doggo-black">
     <RouterView />
   </main>
   <MobileNavBar v-if="!isAuthPage" />

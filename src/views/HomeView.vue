@@ -6,7 +6,9 @@ import AppButton from '@/components/buttons/AppButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
 import { onMounted } from 'vue'
 import { useProviderStore } from '@/stores/provider'
+import { useAuthStore } from '@/stores/auth'
 const providerStore = useProviderStore()
+const authStore = useAuthStore()
 
 const services = [
   {
@@ -42,7 +44,7 @@ onMounted(async () => {
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
-        <h1 class="text-2xl font-bold">Olá André 👋</h1>
+        <h1 class="text-2xl font-bold">Olá {{ authStore.user.full_name }}</h1>
         <h1 class="text-2xl font-bold">
           O que seu <span class="text-doggo-green">pet</span> precisa?
         </h1>
