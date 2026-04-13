@@ -5,24 +5,15 @@ import AltHeader from './components/layouts/AltHeader.vue'
 import MobileNavBar from './components/layouts/MobileNavBar.vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
-const authStore = useAuthStore()
 
 const route = useRoute()
+const authStore = useAuthStore()
 
-const isAppHeader = computed(() => {
-  if (route.path === '/') return true
-  return false
-})
+const isAppHeader = computed(() => route.path === '/')
+const isLoginView = computed(() => route.path === '/login')
+const isRegisterView = computed(() => route.path === '/register')
 
-const isLoginView = computed(() => {
-  if (route.path === '/login') return true
-  return false
-})
-
-const isRegisterView = computed(() => {
-  if (route.path === '/register') return true
-  return false
-})
+const isAuthPage = computed(() => isLoginView.value || isRegisterView.value)
 
 onMounted(async () => {
   await authStore.fetchUser()
@@ -35,7 +26,7 @@ onMounted(async () => {
     <AltHeader v-if="!isAppHeader && !isLoginView" />
   </header>
   <main>
-    <RouterView/>
+    <RouterView />
   </main>
-  <MobileNavBar v-if="!isLoginView && !isRegisterView" />
+  <MobileNavBar v-if="!isAuthPage" />
 </template>

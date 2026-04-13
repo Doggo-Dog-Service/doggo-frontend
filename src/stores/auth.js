@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToast } from 'vue-toast-notification'
+import { useRouter } from 'vue-router'
 import * as authService from '@/services/authService'
 
 export const useAuthStore = defineStore('authStore', () => {
   const $toast = useToast()
+  const router = useRouter()
 
   const user = ref(null)
   const loading = ref(false)
@@ -35,11 +37,7 @@ export const useAuthStore = defineStore('authStore', () => {
       loading.value = true
       user.value = await authService.getMe()
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      router.push('/login')
       user.value = null
     } finally {
       loading.value = false

@@ -33,7 +33,7 @@ const services = [
 ]
 
 onMounted(async () => {
-  providerStore.fetchProviders()
+  await providerStore.fetchProviders()
 })
 </script>
 <template>

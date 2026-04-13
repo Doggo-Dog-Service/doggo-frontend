@@ -4,8 +4,8 @@ export const accessTokenRequest = (data) => {
     return api.post('/token/', data)
 }
 
-export const refreshTokenRequest = (refreshToken) => {
-    return api.post('/token/refresh/')
+export const refreshTokenRequest = (refresh) => {
+    return api.post('/token/refresh/', { refresh })
 }
 
 export const meRequest = () => {
