@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 
 const isAppHeader = computed(() => route.path === '/')
 const isLoginView = computed(() => route.path === '/login')
-const isRegisterView = computed(() => route.path === '/register')
+const isRegisterView = computed(() => route.path === '/register' || route.path === '/register/location')
 
 const isAuthPage = computed(() => isLoginView.value || isRegisterView.value)
 
@@ -21,12 +21,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <header>
-    <AppHeader v-if="isAppHeader && !isLoginView" />
-    <AltHeader v-if="!isAppHeader && !isLoginView" />
-  </header>
-  <main class="text-doggo-black">
-    <RouterView />
-  </main>
-  <MobileNavBar v-if="!isAuthPage" />
+  <div class="flex flex-col h-screen">
+    <header>
+      <AppHeader v-if="isAppHeader && !isLoginView" />
+      <AltHeader v-if="!isAppHeader && !isLoginView" />
+    </header>
+    <main class="flex-1 text-doggo-black">
+      <RouterView />
+    </main>
+    <MobileNavBar v-if="!isAuthPage " />
+  </div>
 </template>
