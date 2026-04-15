@@ -76,8 +76,6 @@ onMounted(async () => {
           data.service_type = Number(router.currentRoute.value.params.serviceTypeId)
 
           selectedMarker.setLatLng([lat, lng])
-
-          console.log([lat, lng])
         })
       },
       (error) => console.log(error),
