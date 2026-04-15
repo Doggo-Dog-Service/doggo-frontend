@@ -29,6 +29,25 @@ const router = createRouter({
       name: 'register-location-view',
       component: () => import('@/views/RegisterLocationView.vue'),
     },
+    {
+      path: '/provider/:id',
+      name: 'provider-view',
+      component: () => import('@/views/ProviderView.vue'),
+      meta: {
+        title: 'Provider',
+        icon: 'mdi mdi-provider-outline',
+        isView: true
+      }
+    },
+  ],
+})
+
+router.beforeEach((to, from) => {
+  const isAuthenticated = !!getAccessToken();
+
+  if(to.meta.requiresAuth && !isAuthenticated) {
+    return '/login'
+  }
 
   ],
 })
