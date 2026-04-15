@@ -54,11 +54,7 @@ export const useProviderStore = defineStore('providerStore', () => {
         })
       }
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      console.log(error)
     } finally {
       loading.value = false
     }

@@ -15,6 +15,21 @@ const router = createRouter({
       }
     },
     {
+      path: '/login',
+      name: 'login-view',
+      component: () => import('@/views/LoginView.vue'),
+    },
+    {
+      path: '/register',
+      name: 'register-view',
+      component: () => import('@/views/RegisterView.vue'),
+    },
+    {
+      path: '/register/location/:serviceTypeId',
+      name: 'register-location-view',
+      component: () => import('@/views/RegisterLocationView.vue'),
+    },
+    {
       path: '/provider/:id',
       name: 'provider-view',
       component: () => import('@/views/ProviderView.vue'),
@@ -34,7 +49,7 @@ router.beforeEach((to, from) => {
     return '/login'
   }
 
-  return true
+  ],
 })
 
 export default router

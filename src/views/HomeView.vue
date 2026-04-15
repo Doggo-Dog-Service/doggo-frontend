@@ -6,7 +6,9 @@ import AppButton from '@/components/buttons/AppButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
 import { onMounted } from 'vue'
 import { useProviderStore } from '@/stores/provider'
+import { useAuthStore } from '@/stores/auth'
 const providerStore = useProviderStore()
+const authStore = useAuthStore()
 
 const services = [
   {
@@ -33,16 +35,16 @@ const services = [
 ]
 
 onMounted(async () => {
-  providerStore.fetchProviders()
+  await providerStore.fetchProviders()
 })
 </script>
 <template>
   <div
-    class="flex flex-col gap-5 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
+    class="flex flex-col gap-5 p-6 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
-        <h1 class="text-2xl font-bold">Olá André 👋</h1>
+        <h1 v-if="authStore.user.full_name" class="text-2xl font-bold">Olá {{ authStore.user.full_name }}!</h1>
         <h1 class="text-2xl font-bold">
           O que seu <span class="text-doggo-green">pet</span> precisa?
         </h1>
@@ -80,22 +82,13 @@ onMounted(async () => {
       </div>
       <div
         class="flex flex-col gap-2 h-110 md:overflow-y-auto"
-        v-if="providerStore.providers.length > 0"
+        v-if="providerStore.providers && providerStore.providers.length > 0"
       >
-        <UserCard
-          v-for="(provider, index) of providerStore.providers"
-          :key="index"
-          :id="provider.id"
-          :full_name="provider.full_name"
-          :service_type="provider.service_type"
-          :location="provider.location"
-          :price_per_day="provider.price_per_day"
-          :price_per_hour="provider.price_per_hour"
-          :profile_photo="provider.profile_photo"
-          :classification="provider.classification"
-        />
+        <div v-for="(provider, index) in providerStore.providers" :key="index">
+          {{ provider }}
+        </div>
       </div>
-      <div class="text-center h-110 flex flex-col items-center justify-center">
+      <div v-else class="text-center h-110 flex flex-col items-center justify-center">
         <p class="text-xl text-doggo-green font-semibold md:text-base">
           Não conseguimos encontrar nenhum provedor perto da sua região
         </p>

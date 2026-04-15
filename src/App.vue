@@ -1,48 +1,34 @@
 <script setup>
-import { onMounted } from 'vue';
-import AppHeader from './components/layouts/AppHeader.vue';
-import AltHeader from './components/layouts/AltHeader.vue';
-import MobileNavBar from './components/layouts/MobileNavBar.vue';
-import { useRoute } from 'vue-router';
-import { useAuthStore } from './stores/auth';
-const authStore = useAuthStore();
+import { computed, onMounted } from 'vue'
+import AppHeader from './components/layouts/AppHeader.vue'
+import AltHeader from './components/layouts/AltHeader.vue'
+import MobileNavBar from './components/layouts/MobileNavBar.vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 
-const route = useRoute();
- 
-onMounted(async() => {
-  await authStore.fetchUser();
-});
+const route = useRoute()
+const authStore = useAuthStore()
+
+const isAppHeader = computed(() => route.path === '/')
+const isLoginView = computed(() => route.path === '/login')
+const isRegisterView = computed(() => route.path === '/register' || route.name === 'register-location-view')
+
+const isAuthPage = computed(() => isLoginView.value || isRegisterView.value)
+
+onMounted(async () => {
+  await authStore.fetchUser()
+})
 </script>
 
 <template>
-  <header v-if="route.path === '/'">
-    <AppHeader/>
-  </header>
-  <header v-else>
-    <AltHeader/>
-  </header>
-  <div class="pb-20">
-    <RouterView v-slot="{ Component }" class="">
-      <Transition name="fade" mode="out-in">
-        <component :is="Component"/>
-      </Transition>
-    </RouterView>
+  <div class="flex flex-col h-screen">
+    <header>
+      <AppHeader v-if="isAppHeader && !isLoginView" />
+      <AltHeader v-if="!isAppHeader && !isLoginView" />
+    </header>
+    <main class="flex-1 text-doggo-black">
+      <RouterView />
+    </main>
+    <MobileNavBar v-if="!isAuthPage " />
   </div>
-  <MobileNavBar/>
 </template>
-
-<style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 300ms ease, transform 300ms ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.fade-leave-to{
-  opacity: 0;
-  transform: translateY(10px);
-}
-</style>
