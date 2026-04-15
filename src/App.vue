@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 
 const isAppHeader = computed(() => route.path === '/')
 const isLoginView = computed(() => route.path === '/login')
-const isRegisterView = computed(() => route.path === '/register' || route.path === '/register/location')
+const isRegisterView = computed(() => route.path === '/register' || route.name === 'register-location-view')
 
 const isAuthPage = computed(() => isLoginView.value || isRegisterView.value)
 

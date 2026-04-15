@@ -2,14 +2,16 @@
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useClientStore } from '@/stores/clients'
+import { useServiceStore } from '@/stores/service'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
 
 const authStore = useAuthStore()
 const clientStore = useClientStore()
+const serviceStore = useServiceStore()
 const router = useRouter()
 const $toast = useToast()
 
@@ -22,10 +24,15 @@ const userData = reactive({
   password: '',
 })
 const confirmPassword = ref('')
+const typeServiceId = ref(0)
 
 const changeProfileType = (type) => {
   profileType.value = type
 }
+
+onMounted( async() => {
+  await serviceStore.getServices()
+})
 
 const handleRegister = async () => {
   if (userData.password !== confirmPassword.value) {
@@ -44,7 +51,7 @@ const handleRegister = async () => {
   })
   if (profileType.value === 'provider') {
     if (authStore.isAuthenticated) {
-      router.push('/register/location')
+      router.push(`/register/location/${typeServiceId.value}`)
     }
   } else {
     await clientStore.createClient()
@@ -73,6 +80,15 @@ const handleRegister = async () => {
           sub-text="Prestador de serviço"
           :selected="profileType === 'provider'"
           @select="changeProfileType('provider')"
+        />
+      </div>
+      <div v-if="profileType === 'provider'" class="flex flex-col gap-2">
+        <h2 class="font-semibold">Tipo de serviço <span class="text-red-400">*</span></h2>
+        <ChoseButton v-for="(typeService, index) in serviceStore.typeServices" :key="index"
+          :text="typeService.name"
+          :sub-text="typeService.description"
+          :selected="typeService.id === typeServiceId"
+          @select="typeServiceId = typeService.id"
         />
       </div>
     </section>
@@ -107,6 +123,7 @@ const handleRegister = async () => {
       <AppInput
         icon="mdi mdi-lock-outline"
         label="Senha"
+        type="password"
         placeholder="*****"
         v-model="userData.password"
         required
@@ -114,6 +131,7 @@ const handleRegister = async () => {
       <AppInput
         icon="mdi mdi-check"
         label="Confirmar senha"
+        type="password"
         placeholder="*****"
         v-model="confirmPassword"
         required

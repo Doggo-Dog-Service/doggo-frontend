@@ -21,6 +21,11 @@ export const useAuthStore = defineStore('authStore', () => {
 
       await authService.login(credentials)
       user.value = await authService.getMe()
+      $toast.success(`Bem vindo ${user.value.full_name}`, {
+        type: 'success',
+        duration: 3000,
+        position: 'top-right'
+      })
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',

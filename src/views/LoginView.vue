@@ -21,7 +21,7 @@ const handleLogin = async () => {
 }
 
 onMounted(() => {
-  const blobs = gsap.utils.toArray('.blob');
+  const blobs = gsap.utils.toArray('.blob')
 
   blobs.forEach((blob, i) => {
     gsap.to(blob, {
@@ -32,7 +32,7 @@ onMounted(() => {
       repeat: -1,
       yoyo: true,
       ease: 'sine.inOut',
-      delay: i * 0.5
+      delay: i * 0.5,
     })
   })
 })
@@ -44,16 +44,30 @@ onMounted(() => {
       <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
       <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
       <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
-      <img src="/white-logo.svg" alt="">
+      <img src="/white-logo.svg" alt="" />
     </div>
-    <div class="fixed w-full min-h-2/3 bottom-0 right-0 left-0 p-10 rounded-t-2xl flex flex-col gap-6 bg-background-light">
+    <div
+      class="fixed w-full min-h-2/3 bottom-0 right-0 left-0 p-10 rounded-t-2xl flex flex-col gap-6 bg-background-light"
+    >
       <section class="flex flex-col">
         <h1 class="text-doggo-black text-2xl">Bem-vindo de volta</h1>
         <p class="text-zinc-400">Entre na sua conta para continuar</p>
       </section>
       <form @submit.prevent="handleLogin" class="flex flex-col gap-6">
-        <AppInput icon="mdi mdi-email-outline" type="email" label="Email" placeholder="seu@email.com" v-model="data.email" />
-        <AppInput icon="mdi mdi-lock-outline" label="Password" placeholder="sua senha" v-model="data.password" />
+        <AppInput
+          icon="mdi mdi-email-outline"
+          type="email"
+          label="Email"
+          placeholder="seu@email.com"
+          v-model="data.email"
+        />
+        <AppInput
+          icon="mdi mdi-lock-outline"
+          label="Password"
+          type="password"
+          placeholder="sua senha"
+          v-model="data.password"
+        />
         <AppButton
           type="submit"
           :text="authStore.loading ? '...' : 'Entrar'"

@@ -1,17 +1,17 @@
 <script setup>
 import IconButton from '@/components/buttons/IconButton.vue'
 import L from 'leaflet'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useRouter } from 'vue-router'
 
 const providerStore = useProviderStore()
 const router = useRouter()
 
-const data = ref({
-  fixed_latitude: 0,
-  fixed_longitude: 0,
-  service_type: 0,
+const data = reactive({
+  fixed_latitude: null,
+  fixed_longitude: null,
+  service_type: null,
 })
 
 const mapTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -42,11 +42,13 @@ const selectedIcon = L.icon({
 let map
 
 onMounted(async () => {
+  console.log(Number(router.currentRoute.value.params.serviceTypeId))
+
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const lat = position.coords.latitude.toFixed(6)
-        const lng = position.coords.longitude.toFixed(6)
+        const lat = Number(position.coords.latitude.toFixed(6))
+        const lng = Number(position.coords.longitude.toFixed(6))
 
         map = L.map('map', {
           zoomControl: false,
@@ -55,21 +57,23 @@ onMounted(async () => {
 
         L.control.layers(baseMaps).addTo(map)
 
-        L.marker([lat, lng], { icon: userIcon}).addTo(map).bindPopup('Você está aqui').openPopup()
+        L.marker([lat, lng], { icon: userIcon}).addTo(map).bindPopup('Você está aqui')
         
         const selectedMarker = L.marker([lat, lng], { icon: selectedIcon})
           .bindPopup('Localização selecionada')
           .addTo(map)
 
-        map.on('click', (event) => {
-          const lat = event.latlng.lat.toFixed(6)
-          const lng = event.latlng.lng.toFixed(6)
+        data.fixed_latitude = lat
+        data.fixed_longitude = lng
+        data.service_type = Number(router.currentRoute.value.params.serviceTypeId)
 
-          data.value = {
-            fixed_latitude: lat,
-            fixed_longitude: lng,
-            service_type: 1
-          }
+        map.on('click', (event) => {
+          const lat = Number(event.latlng.lat.toFixed(6))
+          const lng = Number(event.latlng.lng.toFixed(6))
+
+          data.fixed_latitude = lat
+          data.fixed_longitude = lng
+          data.service_type = Number(router.currentRoute.value.params.serviceTypeId)
 
           selectedMarker.setLatLng([lat, lng])
 
@@ -87,7 +91,7 @@ onMounted(async () => {
 })
 
 const handleRegister = async () => {
-  await providerStore.createProvider(data.value)
+  await providerStore.createProvider(data)
   router.push('/')
 }
 </script>
