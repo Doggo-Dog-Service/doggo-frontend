@@ -29,10 +29,7 @@ export const createProvider = async (payload) => {
     const { data } = await providerApi.createProvider(payload)
     return data
   } catch (error) {
-    throw {
-      message: error.response?.data?.detail || 'Erro ao criar o provedor',
-      status: error.response?.status,
-    }
+    throw error
   }
 }
 
