@@ -40,7 +40,6 @@ const router = createRouter({
       meta: {
         title: 'Provider',
         icon: 'mdi mdi-provider-outline',
-        isView: true,
         requiresAuth: true
       }
     },

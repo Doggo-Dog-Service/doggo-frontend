@@ -55,14 +55,12 @@ export function usePresence() {
   onMounted(async () => {
     if(!authStore.user) {
         await authStore.fetchUser()
-        console.log('online')
     }
 
     await setOnline()
 
     window.addEventListener('beforeunload', () => {
         setOffline()
-        console.log('offline')
     })
   })
 }

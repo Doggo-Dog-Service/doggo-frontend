@@ -79,9 +79,9 @@ onMounted(async () => {
         <InfoCard
           icon="mdi mdi-briefcase-variant"
           :info="providerStore.totalProviders"
-          description="Profissionais"
+          :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
         />
-        <InfoCard icon="mdi mdi-account" :info="clientStore.totalClients" description="Clientes" />
+        <InfoCard icon="mdi mdi-account" :info="clientStore.totalClients" :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'" />
       </div>
     </section>
     <section class="flex flex-col gap-2">

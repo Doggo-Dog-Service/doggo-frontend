@@ -83,7 +83,10 @@ const props = defineProps({
         R$ {{ props.price_per_hour.toFixed(2).replace('.', ',') }}/h
       </p>
       <p v-else-if="props.price_per_day" class="text-doggo-green text-sm font-semibold">
-        {{ props.price_per_day.toFixed(2).replace('.', ',') }}/d
+        R$ {{ props.price_per_day.toFixed(2).replace('.', ',') }}/d
+      </p>
+      <p v-else class="text-doggo-green text-sm font-semibold">
+        indefinido
       </p>
     </div>
   </RouterLink>

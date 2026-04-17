@@ -42,7 +42,6 @@ export const useAuthStore = defineStore('authStore', () => {
     try {
       loading.value = true
       user.value = await authService.getMe()
-      console.log(user.value)
     } catch (error) {
       user.value = null
       router.push('/login')
