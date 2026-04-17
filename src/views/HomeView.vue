@@ -2,13 +2,16 @@
 import InfoCard from '@/components/cards/InfoCard.vue'
 import ServicesCard from '@/components/cards/ServicesCard.vue'
 import SearchBar from '@/components/inputs/SearchBar.vue'
-import AppButton from '@/components/buttons/AppButton.vue'
+import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
+import { useServiceStore } from '@/stores/service'
+
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
+const serviceStore = useServiceStore()
 
 const services = [
   {
@@ -34,8 +37,19 @@ const services = [
   },
 ]
 
+const currentTypeService = ref(0)
+
+async function selectTypeService(typeId) {
+  await providerStore.fetchProviders({
+    service_type: typeId,
+  })
+  currentTypeService.value = typeId
+}
+
 onMounted(async () => {
   await providerStore.fetchProviders()
+  await serviceStore.getServices()
+  selectTypeService(serviceStore.typeServices[0].id)
 })
 </script>
 <template>
@@ -78,15 +92,21 @@ onMounted(async () => {
     <section class="flex flex-col gap-4">
       <h2 class="text-lg font-bold">Perto de você</h2>
       <div class="flex gap-2">
-        <AppButton text="Walkers" :selected="providerStore.currentService === 'walker'" />
-        <AppButton text="Sitters" :selected="providerStore.currentService === 'sitter'" />
-        <AppButton text="Boarding" :selected="providerStore.currentService === 'boarding'" />
+        <ChoseButton
+          v-for="(typeService, index) in serviceStore.typeServices"
+          :key="index"
+          :text="typeService.name"
+          :selected="typeService.id === currentTypeService"
+          @select="selectTypeService(typeService.id)"
+        />
       </div>
       <div
         class="flex flex-col gap-2 h-110 overflow-y-auto"
         v-if="providerStore.providers && providerStore.providers.length > 0"
       >
-        <UserCard v-for="(provider, index) in providerStore.providers" :key="index" 
+        <UserCard
+          v-for="(provider, index) in providerStore.providers"
+          :key="index"
           :id="provider.id"
           :full_name="provider.user.full_name"
           :service_name="provider.service_type_detail.name"

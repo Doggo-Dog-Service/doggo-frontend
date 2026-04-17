@@ -19,7 +19,7 @@ const props = defineProps({
 <template>
   <button
     :class="[
-      'w-full text-center p-2 border-2 rounded-2xl cursor-pointer transition-all duration-300',
+      'w-full text-center p-2 border rounded-2xl cursor-pointer transition-all duration-300',
       props.selected ? 'bg-doggo-green border-doggo-green' : 'bg-white border-doggo-gray',
     ]"
     @click="emits('select')"
