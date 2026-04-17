@@ -8,10 +8,12 @@ import { onMounted, ref } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceStore } from '@/stores/service'
+import { useClientStore } from '@/stores/clients'
 
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
+const clientStore = useClientStore()
 
 const services = [
   {
@@ -47,8 +49,12 @@ async function selectTypeService(typeId) {
 }
 
 onMounted(async () => {
-  await providerStore.fetchProviders()
-  await serviceStore.getServices()
+  await Promise.all([
+    providerStore.fetchProviders(),
+    providerStore.countProviders(),
+    clientStore.countClients(),
+    serviceStore.getServices(),
+  ])
   selectTypeService(serviceStore.typeServices[0].id)
 })
 </script>
@@ -68,11 +74,14 @@ onMounted(async () => {
           Encontre profissionais de confiança perto de você.
         </p>
       </div>
-      <div class="grid grid-cols-3 gap-4">
-        <SearchBar class="col-span-3" placeholder="Buscar profissionais ou serviços…" />
-        <InfoCard info="247" description="Profissionais" />
-        <InfoCard info="4.5" description="Avaliação" />
-        <InfoCard info="1200" description="Pets" />
+      <div class="grid grid-cols-2 gap-4">
+        <SearchBar class="col-span-2" placeholder="Buscar profissionais ou serviços…" />
+        <InfoCard
+          icon="mdi mdi-briefcase-variant"
+          :info="providerStore.totalProviders"
+          description="Profissionais"
+        />
+        <InfoCard icon="mdi mdi-account" :info="clientStore.totalClients" description="Clientes" />
       </div>
     </section>
     <section class="flex flex-col gap-2">

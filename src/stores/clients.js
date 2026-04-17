@@ -7,7 +7,13 @@ export const useClientStore = defineStore('clientStore', () => {
   const $toast = useToast()
 
   const clients = ref([])
+  const totalClients = ref(0) 
   const loading = ref(false)
+
+  const countClients = async () => {
+    const response = await clientService.fetchClients()
+    totalClients.value = response.count
+  }
 
   const fetchClients = async (params) => {
     try {
@@ -101,6 +107,8 @@ export const useClientStore = defineStore('clientStore', () => {
   return {
     loading,
     clients,
+    totalClients,
+    countClients,
     fetchClients,
     fetchClient,
     createClient,

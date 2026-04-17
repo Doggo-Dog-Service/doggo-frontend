@@ -8,8 +8,14 @@ export const useProviderStore = defineStore('providerStore', () => {
   const $toast = useToast()
 
   const providers = ref([])
+  const totalProviders = ref(0)
   const currentService = ref(0)
   const loading = ref(false)
+
+  const countProviders = async () =>{
+    const response = await providerService.fetchProviders()
+    totalProviders.value = response.count
+  }
 
   const fetchProviders = async (params) => {
     try {
@@ -117,7 +123,9 @@ export const useProviderStore = defineStore('providerStore', () => {
   return {
     loading,
     providers,
+    totalProviders,
     currentService,
+    countProviders,
     fetchProviders,
     fetchProvider,
     createProvider,
