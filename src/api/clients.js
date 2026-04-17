@@ -13,7 +13,7 @@ export const createClient = (data) => {
 }
 
 export const updateClient = (id, data) => {
-    return api.put(`/clients/${id}/`, data);
+    return api.patch(`/clients/${id}/`, data);
 }
 
 export const deleteClient = (id) => {

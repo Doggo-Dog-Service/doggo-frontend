@@ -15,7 +15,7 @@ const services = [
     title: 'Dog Boarding',
     description: 'Casa temporária para o pet enquant estiver fora',
     icon: 'mdi mdi-bell',
-    type: 'yellow',
+    type: 'green',
     link: '/',
   },
   {
@@ -40,11 +40,13 @@ onMounted(async () => {
 </script>
 <template>
   <div
-    class="flex flex-col gap-5 p-6 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
+    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
-        <h1 v-if="authStore.user.full_name" class="text-2xl font-bold">Olá {{ authStore.user.full_name }}!</h1>
+        <h1 v-if="authStore.user" class="text-2xl font-bold">
+          Olá {{ authStore.user?.full_name }}!
+        </h1>
         <h1 class="text-2xl font-bold">
           O que seu <span class="text-doggo-green">pet</span> precisa?
         </h1>
@@ -81,12 +83,19 @@ onMounted(async () => {
         <AppButton text="Boarding" :selected="providerStore.currentService === 'boarding'" />
       </div>
       <div
-        class="flex flex-col gap-2 h-110 md:overflow-y-auto"
+        class="flex flex-col gap-2 h-110 overflow-y-auto"
         v-if="providerStore.providers && providerStore.providers.length > 0"
       >
-        <div v-for="(provider, index) in providerStore.providers" :key="index">
-          {{ provider }}
-        </div>
+        <UserCard v-for="(provider, index) in providerStore.providers" :key="index" 
+          :id="provider.id"
+          :full_name="provider.user.full_name"
+          :service_name="provider.service_type_detail.name"
+          :fixed_latitude="provider.fixed_latitude"
+          :fixed_longitude="provider.fixed_longitude"
+          :price_per_hour="provider.price_per_hour"
+          :price_per_day="provider.price_per_day"
+          :is_active="provider.is_active"
+        />
       </div>
       <div v-else class="text-center h-110 flex flex-col items-center justify-center">
         <p class="text-xl text-doggo-green font-semibold md:text-base">

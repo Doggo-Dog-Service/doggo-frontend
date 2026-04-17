@@ -3,7 +3,7 @@ import router from "@/router";
 import { getAccessToken } from "@/utils/token";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/'
+    baseURL: import.meta.env.VITE_API_URL || 'http://192.168.0.103:8000/api/'
 });
 
 api.interceptors.request.use((config) => {
