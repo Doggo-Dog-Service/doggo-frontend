@@ -26,7 +26,7 @@ class="flex flex-col items-center justify-center h-22 w-22 rounded-2xl bg-linear
 <p class="text-black -translate-y-22 ml-35 text-2xl font-bold  ">{{ user.full_name }}</p>
 <div class="flex flex-nowrap w-1/3">
 <p class="whitespace-nowrap ml-56 -translate-22 text-gray-400"><span class="mdi mdi-map-marker"></span>{{user.location_home}}</p>
-<button class="ml-8 -translate-24 border-1 rounded-4xl px-3 py-1 font-bold text-doggo-green bg-green-100">Editar</button>
+<button class="ml-8 -translate-24 border rounded-4xl px-3 py-1 font-bold text-doggo-green bg-green-100">Editar</button>
 </div>
 <div>
   

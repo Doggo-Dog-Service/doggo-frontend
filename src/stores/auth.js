@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useToast } from 'vue-toast-notification'
 import { useRouter } from 'vue-router'
 import * as authService from '@/services/authService'
+import { removeAccessToken } from '@/utils/token'
 
 export const useAuthStore = defineStore('authStore', () => {
   const $toast = useToast()
@@ -42,8 +43,9 @@ export const useAuthStore = defineStore('authStore', () => {
       loading.value = true
       user.value = await authService.getMe()
     } catch (error) {
-      router.push('/login')
       user.value = null
+      router.push('/login')
+      removeAccessToken()
     } finally {
       loading.value = false
     }

@@ -34,6 +34,7 @@ const props = defineProps({
         :type="props.type"
         :placeholder="props.placeholder"
         :required="props.required"
+        :step="props.type === 'number' ? '0.01' : ''"
         v-model="model"
       />
     </div>

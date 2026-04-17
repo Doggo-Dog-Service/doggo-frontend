@@ -13,7 +13,7 @@ export const createProvider = (data) => {
 }
 
 export const updateProvider = (id, data) => {
-    return api.put(`/providers/${id}/`, data);
+    return api.patch(`/providers/${id}/`, data);
 }
 
 export const deleteProvider = (id)  => {

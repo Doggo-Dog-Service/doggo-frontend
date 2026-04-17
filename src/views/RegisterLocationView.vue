@@ -1,5 +1,6 @@
 <script setup>
-import IconButton from '@/components/buttons/IconButton.vue'
+import AppButton from '@/components/buttons/AppButton.vue'
+import AppInput from '@/components/inputs/AppInput.vue'
 import L from 'leaflet'
 import { onMounted, reactive } from 'vue'
 import { useProviderStore } from '@/stores/provider'
@@ -11,6 +12,8 @@ const router = useRouter()
 const data = reactive({
   fixed_latitude: null,
   fixed_longitude: null,
+  price_per_hour: null,
+  price_per_day: null,
   service_type: null,
 })
 
@@ -95,16 +98,12 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="w-full h-full pb-4 px-4 relative overflow-hidden">
-    <div id="map" class="w-full h-full rounded-xl z-0"></div>
-    <IconButton
-      class="absolute bottom-12 right-8"
-      icon="mdi mdi-check"
-      tooltip="Confirmar localização"
-      @event="handleRegister"
-    />
+  <form class="flex flex-col gap-3 w-full h-full pb-4 px-4 relative overflow-hidden" @submit.prevent="handleRegister">
+    <div id="map" class="w-full h-1/2 rounded-xl z-0"></div>
     <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl rounded-tl-xl p-2">
       <p class="text-white font-semibold">Configure a sua localização de partida dos serviços</p>
     </div>
-  </div>
+    <AppInput icon="mdi mdi-currency-brl" placeholder="Ex: 49.90" label="Preço por hora" type="number" v-model="data.price_per_hour" required/>
+    <AppButton mode="outline" :text="providerStore.loading ? '...' : 'Criar meu perfil'" type="submit"/>
+  </form>
 </template>

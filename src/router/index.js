@@ -12,6 +12,7 @@ const router = createRouter({
         title: 'Home',
         icon: 'mdi mdi-home-outline',
         isView: true,
+        requiresAuth: true
       }
     },
     {
@@ -28,6 +29,9 @@ const router = createRouter({
       path: '/register/location/:serviceTypeId',
       name: 'register-location-view',
       component: () => import('@/views/RegisterLocationView.vue'),
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/provider/:id',
@@ -36,7 +40,7 @@ const router = createRouter({
       meta: {
         title: 'Provider',
         icon: 'mdi mdi-provider-outline',
-        isView: true
+        requiresAuth: true
       }
     },
   ],
@@ -49,7 +53,6 @@ router.beforeEach((to, from) => {
     return '/login'
   }
 
-  ],
 })
 
 export default router
