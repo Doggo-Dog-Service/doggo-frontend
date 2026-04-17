@@ -1,13 +1,12 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
+import { usePresence } from './composables/usePresence'
 import AppHeader from './components/layouts/AppHeader.vue'
 import AltHeader from './components/layouts/AltHeader.vue'
 import MobileNavBar from './components/layouts/MobileNavBar.vue'
 import { useRoute } from 'vue-router'
-import { useAuthStore } from './stores/auth'
 
 const route = useRoute()
-const authStore = useAuthStore()
 
 const isAppHeader = computed(() => route.path === '/')
 const isLoginView = computed(() => route.path === '/login')
@@ -15,9 +14,7 @@ const isRegisterView = computed(() => route.path === '/register' || route.name =
 
 const isAuthPage = computed(() => isLoginView.value || isRegisterView.value)
 
-onMounted(async () => {
-  await authStore.fetchUser()
-})
+usePresence()
 </script>
 
 <template>
