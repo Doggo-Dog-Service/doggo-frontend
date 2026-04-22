@@ -60,7 +60,7 @@ onMounted(async () => {
 </script>
 <template>
   <div
-    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black md:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
+    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">

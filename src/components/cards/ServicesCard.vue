@@ -28,7 +28,7 @@ const props = defineProps({
   <RouterLink
     :to="props.link"
     :class="[
-      'flex flex-col gap-2 p-3 border rounded-xl transition-all duration-200 ease-in-out active:scale-98 active:opacity-70',
+      'flex flex-col gap-2 p-3 border rounded-xl transition-all duration-200 ease-in-out active:scale-98 active:opacity-70 hover:scale-99',
       props.type === 'default' && 'border-doggo-gray bg-white',
       props.type === 'green' && 'border-doggo-light-green bg-green-50 text-doggo-green'
     ]"

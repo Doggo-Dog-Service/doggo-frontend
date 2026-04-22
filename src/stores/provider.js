@@ -21,15 +21,7 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       const response = await providerService.fetchProviders(params)
-      const fetchedProviders = response.results?.map(p => ({
-        ...p,
-        fixed_latitude: toFloat(p.fixed_latitude),
-        fixed_longitude: toFloat(p.fixed_longitude),
-        last_latitude: toFloat(p.last_latitude),
-        last_longitude: toFloat(p.last_longitude),
-        price_per_hour: toFloat(p.price_per_hour),
-        price_per_day: toFloat(p.price_per_day),
-      }))
+      const fetchedProviders = response.results
       providers.value = fetchedProviders
     } catch (error) {
       $toast.error(error.message, {
@@ -46,15 +38,7 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       const response = await providerService.fetchProvider(id)
-      const provider = {
-        ...response,
-        fixed_latitude: toFloat(response.fixed_latitude),
-        fixed_longitude: toFloat(response.fixed_longitude),
-        last_latitude: toFloat(response.last_latitude),
-        last_longitude: toFloat(response.last_longitude),
-        price_per_hour: toFloat(response.price_per_hour),
-        price_per_day: toFloat(response.price_per_day),
-      }
+      const provider = response
       return provider
     } catch (error) {
       $toast.error(error.message, {

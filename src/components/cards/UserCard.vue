@@ -17,20 +17,20 @@ const props = defineProps({
     required: true,
   },
   fixed_latitude: {
-    type: Number,
+    type: String,
     required: true,
   },
   fixed_longitude: {
-    type: Number,
+    type: String,
     required: true,
   },
   price_per_hour: {
-    type: Number,
-    default: 0,
+    type: String,
+    default: '',
   },
   price_per_day: {
-    type: Number,
-    default: 0,
+    type: String,
+    default: '',
   },
   is_active: {
     type: Boolean,
@@ -41,7 +41,7 @@ const props = defineProps({
 
 <template>
   <RouterLink
-    class="w-full flex justify-between bg-white p-4 border border-doggo-gray rounded-xl transition-all duration-200 active:scale-98"
+    class="w-full flex justify-between bg-white p-4 border border-doggo-gray rounded-xl transition-all duration-200 active:scale-98 active:opacity-70 hover:scale-99"
     to="/"
   >
     <div class="flex items-center gap-4">
@@ -80,10 +80,10 @@ const props = defineProps({
         <p>{{ props.is_active ? 'Online' : 'Offline' }}</p>
       </div>
       <p v-if="props.price_per_hour" class="text-doggo-green text-sm font-semibold">
-        R$ {{ props.price_per_hour.toFixed(2).replace('.', ',') }}/h
+        R$ {{ props.price_per_hour }}/h
       </p>
       <p v-else-if="props.price_per_day" class="text-doggo-green text-sm font-semibold">
-        R$ {{ props.price_per_day.toFixed(2).replace('.', ',') }}/d
+        R$ {{ props.price_per_day }}/d
       </p>
       <p v-else class="text-doggo-green text-sm font-semibold">
         indefinido
