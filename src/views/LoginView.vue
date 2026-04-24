@@ -39,15 +39,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col bg-linear-to-b from-doggo-green to-doggo-light-green min-h-screen">
-    <div class="fixed flex flex-col items-center justify-center inset-0 overflow-hidden h-1/3 z-0">
-      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
-      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
-      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5']"></div>
-      <img src="/white-logo.svg" alt="" />
+  <div class="flex flex-col justify-center items-center bg-linear-to-b from-doggo-green to-doggo-light-green min-h-screen md:gap-10">
+    <div class="fixed flex flex-col items-center justify-center inset-0 overflow-hidden h-1/3 z-0 md:h-full md:justify-start">
+      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5 md:w-screen md:h-screen']"></div>
+      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5 md:w-screen md:h-screen']"></div>
+      <div :class="['blob', 'absolute w-100 h-100 rounded-full opacity-60 bg-white/5 md:w-screen md:h-screen']"></div>
+      <img class="md:translate-y-30" src="/white-logo.svg" alt="Logo Doggo." />
     </div>
     <div
-      class="fixed w-full min-h-2/3 bottom-0 right-0 left-0 p-10 rounded-t-2xl flex flex-col gap-6 bg-background-light"
+      class="fixed w-full min-h-2/3 bottom-0 right-0 left-0 p-10 rounded-t-2xl flex flex-col gap-6 bg-background-light md:relative md:rounded-2xl md:w-1/2 md:text-center md:shadow-2xl md:translate-y-20"
     >
       <section class="flex flex-col">
         <h1 class="text-doggo-black text-2xl">Bem-vindo de volta</h1>

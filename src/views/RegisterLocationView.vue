@@ -33,13 +33,13 @@ const baseMaps = {
 
 const userIcon = L.icon({
   iconUrl: '/markers/user-marker.svg',
-  iconSize: [20, 20]
+  iconSize: [20, 20],
 })
 
 const selectedIcon = L.icon({
   iconUrl: '/markers/selected-marker.svg',
   iconSize: [30, 36],
-  iconAnchor: [15, 36]
+  iconAnchor: [15, 36],
 })
 
 let map
@@ -60,9 +60,9 @@ onMounted(async () => {
 
         L.control.layers(baseMaps).addTo(map)
 
-        L.marker([lat, lng], { icon: userIcon}).addTo(map).bindPopup('Você está aqui')
-        
-        const selectedMarker = L.marker([lat, lng], { icon: selectedIcon})
+        L.marker([lat, lng], { icon: userIcon }).addTo(map).bindPopup('Você está aqui')
+
+        const selectedMarker = L.marker([lat, lng], { icon: selectedIcon })
           .bindPopup('Localização selecionada')
           .addTo(map)
 
@@ -98,12 +98,28 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <form class="flex flex-col gap-3 w-full h-full pb-4 px-4 relative overflow-hidden" @submit.prevent="handleRegister">
-    <div id="map" class="w-full h-1/2 rounded-xl z-0"></div>
+  <form
+    class="flex flex-col gap-3 w-full h-full pb-4 px-4 relative overflow-hidden md:flex-row md:gap-10"
+    @submit.prevent="handleRegister"
+  >
+    <div id="map" class="w-full h-1/2 rounded-xl z-0 md:h-full md:w-2/3"></div>
     <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl rounded-tl-xl p-2">
       <p class="text-white font-semibold">Configure a sua localização de partida dos serviços</p>
     </div>
-    <AppInput icon="mdi mdi-currency-brl" placeholder="Ex: 49.90" label="Preço por hora" type="number" v-model="data.price_per_hour" required/>
-    <AppButton mode="outline" :text="providerStore.loading ? '...' : 'Criar meu perfil'" type="submit"/>
+    <div class="flex flex-col gap-3 md:w-1/3">
+      <AppInput
+        icon="mdi mdi-currency-brl"
+        placeholder="Ex: 49.90"
+        label="Preço por hora"
+        type="number"
+        v-model="data.price_per_hour"
+        required
+      />
+      <AppButton
+        mode="outline"
+        :text="providerStore.loading ? '...' : 'Criar meu perfil'"
+        type="submit"
+      />
+    </div>
   </form>
 </template>
