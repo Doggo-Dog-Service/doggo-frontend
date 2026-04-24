@@ -8,24 +8,6 @@ import {
 } from '@/utils/token'
 
 export const login = async (credentials) => {
-  const refreshToken = getRefreshToken()
-
-  if (refreshToken) {
-    try {
-      const { data } = await refreshTokenRequest(refreshToken)
-      const accessToken = data.access
-
-      if (accessToken) {
-        setAccessToken(accessToken)
-      }
-    } catch (error) {
-      throw {
-        message: error.response?.data?.detail || 'Erro ao fazer login',
-        status: error.response?.status,
-      }
-    }
-  }
-
   try {
     const { data } = await accessTokenRequest(credentials)
 
