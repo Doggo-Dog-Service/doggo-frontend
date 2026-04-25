@@ -10,7 +10,6 @@ export const useSearchStore = defineStore('searchStore', () => {
     try {
       loading.value = true
       const response = await searchService.globalSearchService(query)
-      console.log(response)
       searched.value = response
     } catch (error) {
       console.log(error)
@@ -20,6 +19,7 @@ export const useSearchStore = defineStore('searchStore', () => {
   }
 
   return {
+    loading,
     searched,
     globalSearch,
   }
