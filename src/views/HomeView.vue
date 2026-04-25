@@ -4,16 +4,18 @@ import ServicesCard from '@/components/cards/ServicesCard.vue'
 import SearchBar from '@/components/inputs/SearchBar.vue'
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceStore } from '@/stores/service'
 import { useClientStore } from '@/stores/clients'
+import { useSearchStore } from '@/stores/search'
 
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 const clientStore = useClientStore()
+const searchStore = useSearchStore()
 
 const services = [
   {
@@ -41,6 +43,7 @@ const services = [
 
 const currentTypeService = ref(0)
 const searchedList = ref(false)
+const searchBarData = ref("")
 
 async function selectTypeService(typeId) {
   await providerStore.fetchProviders({
@@ -57,6 +60,18 @@ onMounted(async () => {
     serviceStore.getServices(),
   ])
   selectTypeService(serviceStore.typeServices[0].id)
+})
+
+let timeout = null
+
+watch(searchBarData, (value) => {
+  clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    if (value) {
+      searchStore.globalSearch(value)
+    }
+  }, 300)
 })
 </script>
 <template>
@@ -79,6 +94,7 @@ onMounted(async () => {
         <SearchBar
           class="col-span-2"
           placeholder="Buscar profissionais ou serviços…"
+          v-model="searchBarData"
           @on-focus="searchedList = true"
           @on-focus-out="searchedList = false"
         >
@@ -96,7 +112,9 @@ onMounted(async () => {
                 class="absolute w-full h-100 top-16 right-0 bg-white rounded-xl border border-doggo-gray transition-all duration-200"
                 @mousedown.prevent
               >
-                
+                <!-- <div v-for="(providers, index) in searchStore.searched.providers" :key="index">
+                  {{ providers?.user?.full_name }}
+                </div> -->
               </div>
             </transition>
           </template>
