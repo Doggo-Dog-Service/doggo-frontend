@@ -40,6 +40,7 @@ const services = [
 ]
 
 const currentTypeService = ref(0)
+const searchedList = ref(false)
 
 async function selectTypeService(typeId) {
   await providerStore.fetchProviders({
@@ -75,13 +76,41 @@ onMounted(async () => {
         </p>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <SearchBar class="col-span-2" placeholder="Buscar profissionais ou serviços…" />
+        <SearchBar
+          class="col-span-2"
+          placeholder="Buscar profissionais ou serviços…"
+          @on-focus="searchedList = true"
+          @on-focus-out="searchedList = false"
+        >
+          <template #list>
+            <transition
+              enter-active-class="transition duration-200 ease-out"
+              enter-from-class="opacity-0 translate-y-2"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-150 ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-2"
+            >
+              <div
+                v-if="searchedList"
+                class="absolute w-full h-100 top-16 right-0 bg-white rounded-xl border border-doggo-gray transition-all duration-200"
+                @mousedown.prevent
+              >
+                
+              </div>
+            </transition>
+          </template>
+        </SearchBar>
         <InfoCard
           icon="mdi mdi-briefcase-variant"
           :info="providerStore.totalProviders"
           :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
         />
-        <InfoCard icon="mdi mdi-account" :info="clientStore.totalClients" :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'" />
+        <InfoCard
+          icon="mdi mdi-account"
+          :info="clientStore.totalClients"
+          :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'"
+        />
       </div>
     </section>
     <section class="flex flex-col gap-2">
