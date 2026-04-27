@@ -2,27 +2,23 @@
 import InfoCard from '@/components/cards/InfoCard.vue'
 import ServicesCard from '@/components/cards/ServicesCard.vue'
 import SearchBar from '@/components/inputs/SearchBar.vue'
+import SearchCard from '@/components/cards/SearchCard.vue'
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceStore } from '@/stores/service'
 import { useClientStore } from '@/stores/clients'
+import { useSearchStore } from '@/stores/search'
 
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 const clientStore = useClientStore()
+const searchStore = useSearchStore()
 
 const services = [
-  {
-    title: 'Dog Boarding',
-    description: 'Casa temporária para o pet enquant estiver fora',
-    icon: 'mdi mdi-bell',
-    type: 'green',
-    link: '/',
-  },
   {
     title: 'Dog Sitter',
     description: 'Cuidador do pet na sua própria casa',
@@ -40,6 +36,8 @@ const services = [
 ]
 
 const currentTypeService = ref(0)
+const searchedList = ref(false)
+const searchBarData = ref('')
 
 async function selectTypeService(typeId) {
   await providerStore.fetchProviders({
@@ -57,10 +55,22 @@ onMounted(async () => {
   ])
   selectTypeService(serviceStore.typeServices[0].id)
 })
+
+let timeout = null
+
+watch(searchBarData, (value) => {
+  clearTimeout(timeout)
+
+  timeout = setTimeout(() => {
+    if (value) {
+      searchStore.globalSearch(value.trim())
+    }
+  }, 300)
+})
 </script>
 <template>
   <div
-    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:flex-wrap md:gap-10 md:justify-end md:max-h-screen"
+    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:flex-wrap md:gap-10 md:justify-start md:max-h-screen"
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
@@ -75,13 +85,79 @@ onMounted(async () => {
         </p>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <SearchBar class="col-span-2" placeholder="Buscar profissionais ou serviços…" />
+        <SearchBar
+          class="col-span-2"
+          placeholder="Buscar profissionais ou clientes"
+          v-model="searchBarData"
+          @on-focus="searchedList = true"
+          @on-focus-out="searchedList = false"
+        >
+          <template #list>
+            <transition
+              enter-active-class="transition duration-200 ease-out"
+              enter-from-class="opacity-0 translate-y-2"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-150 ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-2"
+            >
+              <div
+                v-if="searchedList"
+                class="absolute w-full h-100 top-16 right-0 bg-white rounded-xl border border-doggo-gray transition-all duration-200 p-3 overflow-y-auto"
+                @mousedown.prevent
+              >
+                <div
+                  v-if="searchStore.loading"
+                  class="w-full h-full flex flex-col items-center justify-center"
+                >
+                  <div
+                    class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"
+                  ></div>
+                </div>
+                <div
+                  v-else-if="
+                    searchStore.searched.providers?.length > 0 ||
+                    searchStore.searched.clients?.length > 0
+                  "
+                  class="w-full h-full flex flex-col gap-2"
+                >
+                  <SearchCard
+                    v-for="(provider, index) in searchStore.searched.providers"
+                    :key="index"
+                    :full_name="provider.user.full_name"
+                    :service="provider.service_type_detail?.name"
+                    classification="5,0"
+                    link="/"
+                  />
+                  <SearchCard
+                    v-for="(client, index) in searchStore.searched.clients"
+                    :key="index"
+                    :full_name="client.user.full_name"
+                    service="Cliente"
+                    link="/"
+                  />
+                </div>
+                <div
+                  v-else
+                  class="w-full h-full flex flex-col items-center justify-center text-doggo-green"
+                >
+                  <p v-if="searchBarData.length > 0">Nenhum resultado encontrado</p>
+                  <p v-else>Procure por algum provedor ou usuário</p>
+                </div>
+              </div>
+            </transition>
+          </template>
+        </SearchBar>
         <InfoCard
           icon="mdi mdi-briefcase-variant"
           :info="providerStore.totalProviders"
           :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
         />
-        <InfoCard icon="mdi mdi-account" :info="clientStore.totalClients" :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'" />
+        <InfoCard
+          icon="mdi mdi-account"
+          :info="clientStore.totalClients"
+          :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'"
+        />
       </div>
     </section>
     <section class="flex flex-col gap-2">
@@ -94,7 +170,6 @@ onMounted(async () => {
           :description="service.description"
           :icon="service.icon"
           :type="service.type"
-          :class="[index === services.length - 1 && 'col-span-2']"
         />
       </div>
     </section>
