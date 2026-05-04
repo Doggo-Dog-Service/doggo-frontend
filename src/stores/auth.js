@@ -54,11 +54,12 @@ export const useAuthStore = defineStore('authStore', () => {
   const logout = () => {
     authService.logout()
     user.value = null
-    $toast.error('Logout realizado!', {
-      type: 'error',
+    $toast.success('Logout realizado!', {
+      type: 'success',
       duration: 3000,
       position: 'top-right',
     })
+    router.push('/login')
   }
 
   const createUser = async (data) => {
