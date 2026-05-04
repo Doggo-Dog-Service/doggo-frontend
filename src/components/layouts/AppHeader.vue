@@ -95,7 +95,7 @@ getLocation()
     </div>
 
     <div class="flex gap-2">
-      <button @click="authStore.logout()">
+      <button @click="authStore.logout()" class="cursor-pointer">
         <div class="text-2xl border border-doggo-gray text-red-400 rounded-xl px-1.5 pb-0.5">
           <span class="mdi mdi-exit-to-app"></span>
         </div>
