@@ -30,7 +30,7 @@ const props = defineProps({
     <div class="flex items-center gap-2 md:gap-4">
       <img
         v-if="props.profile_photo"
-        class="h-10 w-10 rounded-lg md:h-12 md:w-12"
+        class="h-10 w-10 rounded-lg object-cover md:h-12 md:w-12"
         :src="props.profile_photo"
         :alt="`${props.full_name.toLowerCase()}-photo`"
       />
