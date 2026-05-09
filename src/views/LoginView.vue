@@ -77,7 +77,7 @@ onMounted(() => {
       </form>
       <div class="flex justify-center gap-2">
         <p>Não possui uma conta ainda?</p>
-        <RouterLink class="font-bold text-doggo-green" to="/register">Registrar-se</RouterLink>
+        <RouterLink class="font-bold text-doggo-green" to="/auth/register">Registrar-se</RouterLink>
       </div>
     </div>
   </div>

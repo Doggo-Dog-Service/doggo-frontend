@@ -51,7 +51,7 @@ const handleRegister = async () => {
   })
   if (profileType.value === 'provider') {
     if (authStore.isAuthenticated) {
-      router.push(`/register/location/${typeServiceId.value}`)
+      router.push(`/auth/register/location/${typeServiceId.value}`)
     }
   } else {
     await clientStore.createClient()
@@ -148,7 +148,7 @@ const handleRegister = async () => {
       />
       <div class="flex justify-center gap-2">
         <p>Já possui uma conta?</p>
-        <RouterLink class="font-bold text-doggo-green" to="/login">Entrar</RouterLink>
+        <RouterLink class="font-bold text-doggo-green" to="/auth/login">Entrar</RouterLink>
       </div>
     </form>
   </div>

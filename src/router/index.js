@@ -6,53 +6,64 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home-view',
-      component: () => import('@/views/HomeView.vue'),
-      meta: {
-        title: 'Home',
-        icon: 'mdi mdi-home-outline',
-        isView: true,
-        requiresAuth: true
-      }
+      component: () => import('@/layouts/DefaultLayout.vue'),
+      children: [
+        {
+          path: '',
+          name: 'home-view',
+          component: () => import('@/views/HomeView.vue'),
+          meta: {
+            title: 'Home',
+            icon: 'mdi mdi-home-outline',
+            isView: true,
+            requiresAuth: true,
+          },
+        },
+        {
+          path: '/provider/:id',
+          name: 'provider-view',
+          component: () => import('@/views/ProviderView.vue'),
+          meta: {
+            title: 'Provider',
+            icon: 'mdi mdi-provider-outline',
+            requiresAuth: true,
+          },
+        },
+      ],
     },
     {
-      path: '/login',
-      name: 'login-view',
-      component: () => import('@/views/LoginView.vue'),
-    },
-    {
-      path: '/register',
-      name: 'register-view',
-      component: () => import('@/views/RegisterView.vue'),
-    },
-    {
-      path: '/register/location/:serviceTypeId',
-      name: 'register-location-view',
-      component: () => import('@/views/RegisterLocationView.vue'),
-      meta: {
-        requiresAuth: true
-      }
-    },
-    {
-      path: '/provider/:id',
-      name: 'provider-view',
-      component: () => import('@/views/ProviderView.vue'),
-      meta: {
-        title: 'Provider',
-        icon: 'mdi mdi-provider-outline',
-        requiresAuth: true
-      }
+      path: '/auth',
+      component: () => import('@/layouts/AuthLayout.vue'),
+      children: [
+        {
+          path: 'login',
+          name: 'login-view',
+          component: () => import('@/views/LoginView.vue'),
+        },
+        {
+          path: 'register',
+          name: 'register-view',
+          component: () => import('@/views/RegisterView.vue'),
+        },
+        {
+          path: 'register/location/:serviceTypeId',
+          name: 'register-location-view',
+          component: () => import('@/views/RegisterLocationView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        },
+      ],
     },
   ],
 })
 
 router.beforeEach((to, from) => {
-  const isAuthenticated = !!getAccessToken();
+  const isAuthenticated = !!getAccessToken()
 
-  if(to.meta.requiresAuth && !isAuthenticated) {
-    return '/login'
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return '/auth/login'
   }
-
 })
 
 export default router
