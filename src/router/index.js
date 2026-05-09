@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
+import { HomeIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,19 +14,26 @@ const router = createRouter({
           name: 'home-view',
           component: () => import('@/views/HomeView.vue'),
           meta: {
-            title: 'Home',
-            icon: 'mdi mdi-home-outline',
+            title: 'Início',
+            icon: HomeIcon,
             isView: true,
             requiresAuth: true,
           },
         },
         {
-          path: '/provider/:id',
+          path: 'search',
+          name: 'search-view',
+          meta: {
+            title: 'Buscar',
+            icon: MagnifyingGlassIcon,
+            isView: true
+          }
+        },
+        {
+          path: 'provider/:id',
           name: 'provider-view',
           component: () => import('@/views/ProviderView.vue'),
           meta: {
-            title: 'Provider',
-            icon: 'mdi mdi-provider-outline',
             requiresAuth: true,
           },
         },

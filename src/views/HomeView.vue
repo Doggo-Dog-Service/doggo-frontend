@@ -70,7 +70,7 @@ watch(searchBarData, (value) => {
 </script>
 <template>
   <div
-    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:flex-wrap md:gap-10 md:justify-start md:max-h-screen"
+    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:grid md:grid-cols-2 lg:gap-10 md:justify-start md:max-h-screen"
   >
     <section class="flex flex-col gap-4">
       <div class="flex flex-col">
