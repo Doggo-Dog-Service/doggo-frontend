@@ -141,7 +141,7 @@ const handleRegister = async () => {
         required
       />
       <AppButton
-        :text="authStore.loading ? '...' : 'Criar minha conta'"
+        :text="authStore.loading ? 'Registrando sua conta...' : 'Criar minha conta'"
         mode="outline"
         type="submit"
         :disabled="authStore.loading"

@@ -70,7 +70,7 @@ onMounted(() => {
         />
         <AppButton
           type="submit"
-          :text="authStore.loading ? '...' : 'Entrar'"
+          :text="authStore.loading ? 'Carregando...' : 'Entrar'"
           mode="outline"
           :disabled="authStore.loading"
         />

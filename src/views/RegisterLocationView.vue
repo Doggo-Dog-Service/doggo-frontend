@@ -117,7 +117,7 @@ const handleRegister = async () => {
       />
       <AppButton
         mode="outline"
-        :text="providerStore.loading ? '...' : 'Criar meu perfil'"
+        :text="providerStore.loading ? 'Registrando seu perfil...' : 'Criar meu perfil'"
         type="submit"
       />
     </div>
