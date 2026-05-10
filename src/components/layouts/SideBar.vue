@@ -8,6 +8,8 @@ const router = useRouter()
 
 const routes = ref([])
 
+const isRouteActive = (path) => router.currentRoute.value.path === path
+
 onMounted(() => {
   routes.value = router.getRoutes().filter((route) => route.meta.isView)
 })
@@ -18,12 +20,14 @@ onMounted(() => {
     <RouterLink class="w-full flex flex-col items-center py-6" to="/">
       <img class="w-25" src="/logo.png" alt="logo" />
     </RouterLink>
-    <nav class="w-full px-6">
+    <nav class="flex flex-col gap-1 w-full px-6">
       <NavButton
         v-for="(route, index) in routes"
         :key="index"
+        :to="route.path"
         :icon="route.meta.icon"
         :text="route.meta.title"
+        :active="isRouteActive(route.path)"
       />
     </nav>
   </aside>
