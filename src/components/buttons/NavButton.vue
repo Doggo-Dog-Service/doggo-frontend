@@ -28,7 +28,7 @@ const props = defineProps({
     :to="props.to"
   >
     <div v-if="active" class="absolute w-1 h-6 rounded-r-sm bg-doggo-green left-0 hidden md:block"></div>
-    <component v-if="props.icon" :is="props.icon" class="w-6 h-6 stroke-2" />
-    <p class="text-base font-semibold md:text-lg">{{ props.text }}</p>
+    <component v-if="props.icon" :is="props.icon" class="w-5 h-5 stroke-2" />
+    <p class="text-base font-semibold">{{ props.text }}</p>
   </RouterLink>
 </template>

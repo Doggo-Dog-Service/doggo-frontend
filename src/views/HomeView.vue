@@ -186,8 +186,8 @@ watch(searchBarData, (value) => {
           @select="selectTypeService(typeService.id)"
         />
       </div>
-      <div
-        class="flex flex-col gap-2 h-110 overflow-y-auto"
+      <div  
+        class="flex flex-col gap-2 max-h-110 overflow-y-auto"
         v-if="providerStore.providers && providerStore.providers.length > 0"
       >
         <UserCard
