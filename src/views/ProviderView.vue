@@ -6,15 +6,14 @@ import { useRoute } from 'vue-router';
 
 const providerStore = useProviderStore();
 const route = useRoute()
-const provider = ref();
+const provider = ref({});
 
 onMounted(async () => {
-  const newProvider = await providerStore.fetchProvider(Number(route.params.id))
-  console.log(newProvider)
-  provider.value = newProvider
+  const response = await providerStore.fetchProvider(Number(route.params.id))
+  provider.value = response
+  console.log(provider.value)
 })
 </script>
 <template>
-  <p>{{ provider?.id }}</p>
   <ProviderProfileTop :provider="provider"/>
 </template>
