@@ -33,7 +33,7 @@ const baseMaps = {
 
 const userIcon = L.icon({
   iconUrl: '/markers/user-marker.svg',
-  iconSize: [20, 20],
+  iconSize: [10, 10],
 })
 
 const selectedIcon = L.icon({
@@ -98,28 +98,30 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <form
-    class="flex flex-col gap-3 w-full h-full pb-4 px-4 relative overflow-hidden md:flex-row md:gap-10"
-    @submit.prevent="handleRegister"
-  >
-    <div id="map" class="w-full h-1/2 rounded-xl z-0 md:h-full md:w-2/3"></div>
-    <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl rounded-tl-xl p-2">
-      <p class="text-white font-semibold">Configure a sua localização de partida dos serviços</p>
-    </div>
-    <div class="flex flex-col gap-3 md:w-1/3">
-      <AppInput
-        icon="mdi mdi-currency-brl"
-        placeholder="Ex: 49.90"
-        label="Preço por hora"
-        type="number"
-        v-model="data.price_per_hour"
-        required
-      />
-      <AppButton
-        mode="outline"
-        :text="providerStore.loading ? 'Registrando seu perfil...' : 'Criar meu perfil'"
-        type="submit"
-      />
-    </div>
-  </form>
+  <div class="h-screen w-screen p-4 md:p-6">
+    <form
+      class="flex flex-col gap-3 w-full h-full relative overflow-hidden md:flex-row md:gap-10"
+      @submit.prevent="handleRegister"
+    >
+      <div id="map" class="w-full h-1/2 rounded-xl z-0 md:h-full md:w-2/3"></div>
+      <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl rounded-tl-xl p-2">
+        <p class="text-white font-semibold">Configure a sua localização de partida dos serviços</p>
+      </div>
+      <div class="flex flex-col gap-3 md:w-1/3">
+        <AppInput
+          icon="mdi mdi-currency-brl"
+          placeholder="Ex: 49.90"
+          label="Preço por hora"
+          type="number"
+          v-model="data.price_per_hour"
+          required
+        />
+        <AppButton
+          mode="outline"
+          :text="providerStore.loading ? 'Registrando seu perfil...' : 'Criar meu perfil'"
+          type="submit"
+        />
+      </div>
+    </form>
+  </div>
 </template>

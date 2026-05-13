@@ -1,10 +1,10 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import NavButton from '../buttons/NavButton.vue'
-import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon, BellIcon } from '@heroicons/vue/24/outline'
 import LogOutButton from '../buttons/LogOutButton.vue'
+import { onMounted, ref } from 'vue'
+import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon, BellIcon } from '@heroicons/vue/24/outline'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 

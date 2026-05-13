@@ -21,15 +21,6 @@ const router = createRouter({
           },
         },
         {
-          path: 'search',
-          name: 'search-view',
-          meta: {
-            title: 'Buscar',
-            icon: MagnifyingGlassIcon,
-            isView: true
-          }
-        },
-        {
           path: 'provider/:id',
           name: 'provider-view',
           component: () => import('@/views/ProviderView.vue'),
