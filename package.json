@@ -13,6 +13,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@mdi/font": "^7.4.47",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.14.0",

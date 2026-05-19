@@ -44,7 +44,7 @@ export const useAuthStore = defineStore('authStore', () => {
       user.value = await authService.getMe()
     } catch (error) {
       user.value = null
-      router.push('/login')
+      router.push('/auth/login')
       removeAccessToken()
     } finally {
       loading.value = false
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore('authStore', () => {
       duration: 3000,
       position: 'top-right',
     })
-    router.push('/login')
+    router.push('/auth/login')
   }
 
   const createUser = async (data) => {
