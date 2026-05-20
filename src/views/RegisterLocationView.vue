@@ -1,10 +1,11 @@
 <script setup>
 import AppButton from '@/components/buttons/AppButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
-import L from 'leaflet'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useRouter } from 'vue-router'
+import { useGeolocation } from '@/composables/useGeolocation'
+import { useMap } from '@/composables/useMap'
 
 const providerStore = useProviderStore()
 const router = useRouter()
@@ -17,97 +18,64 @@ const data = reactive({
   service_type: null,
 })
 
-const mapTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors',
-})
-
-const satelliteTile = L.tileLayer(
-  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  { attribution: 'Tiles &copy; Esri' },
-)
-
-const baseMaps = {
-  Mapa: mapTile,
-  Satélite: satelliteTile,
-}
-
-const userIcon = L.icon({
-  iconUrl: '/markers/user-marker.svg',
-  iconSize: [10, 10],
-})
-
-const selectedIcon = L.icon({
-  iconUrl: '/markers/selected-marker.svg',
-  iconSize: [30, 36],
-  iconAnchor: [15, 36],
-})
-
-let map
-
-onMounted(async () => {
-  console.log(Number(router.currentRoute.value.params.serviceTypeId))
-
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = Number(position.coords.latitude.toFixed(6))
-        const lng = Number(position.coords.longitude.toFixed(6))
-
-        map = L.map('map', {
-          zoomControl: false,
-          layers: [mapTile],
-        }).setView([lat, lng], 13)
-
-        L.control.layers(baseMaps).addTo(map)
-
-        L.marker([lat, lng], { icon: userIcon }).addTo(map).bindPopup('Você está aqui')
-
-        const selectedMarker = L.marker([lat, lng], { icon: selectedIcon })
-          .bindPopup('Localização selecionada')
-          .addTo(map)
-
-        data.fixed_latitude = lat
-        data.fixed_longitude = lng
-        data.service_type = Number(router.currentRoute.value.params.serviceTypeId)
-
-        map.on('click', (event) => {
-          const lat = Number(event.latlng.lat.toFixed(6))
-          const lng = Number(event.latlng.lng.toFixed(6))
-
-          data.fixed_latitude = lat
-          data.fixed_longitude = lng
-          data.service_type = Number(router.currentRoute.value.params.serviceTypeId)
-
-          selectedMarker.setLatLng([lat, lng])
-        })
-      },
-      (error) => console.log(error),
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      },
-    )
-  }
-})
-
 const handleRegister = async () => {
   await providerStore.createProvider(data)
   router.push('/')
 }
+
+const { latitude, longitude, getCurrentPosition } = useGeolocation()
+const { map, createMap, addMarker } = useMap()
+
+const userMarker = ref(null)
+const fixedMarker = ref(null)
+
+onMounted(async () => {
+  await getCurrentPosition()
+
+  createMap('map', [longitude.value, latitude.value], 15)
+
+  userMarker.value = addMarker(longitude.value, latitude.value, {
+    color: '#3b82f6',
+  })
+
+  fixedMarker.value = addMarker(longitude.value, latitude.value, {
+    color: '#ef4444',
+    draggable: true,
+  })
+
+  data.fixed_latitude = latitude.value
+  data.fixed_longitude = longitude.value
+
+  map.value.on('click', (e) => {
+    const lng = e.lngLat.lng
+    const lat = e.lngLat.lat
+
+    fixedMarker.value.setLngLat([lng, lat])
+
+    data.fixed_latitude = lat
+    data.fixed_longitude = lng
+  })
+
+  fixedMarker.value.on('dragend', () => {
+    const lngLat = fixedMarker.value.getLngLat()
+
+    data.fixed_latitude = lngLat.lat
+    data.fixed_longitude = lngLat.lng
+  })
+})
 </script>
 
 <template>
-  <div class="h-screen w-screen p-4 md:p-6">
+  <div class="h-screen w-screen">
     <form
-      class="flex flex-col gap-3 w-full h-full relative overflow-hidden md:flex-row md:gap-10"
+      class="flex flex-col gap-3 w-full h-full relative overflow-hidden md:flex-row md:gap-0"
       @submit.prevent="handleRegister"
     >
-      <div id="map" class="w-full h-1/2 rounded-xl z-0 md:h-full md:w-2/3"></div>
-      <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl rounded-tl-xl p-2">
+      <div id="map" class="w-full h-2/3 z-0 md:h-full md:w-2/3"></div>
+      <div class="absolute top-0 bg-black/40 w-60 rounded-br-xl p-2">
         <p class="text-white font-semibold">Configure a sua localização de partida dos serviços</p>
       </div>
-      <div class="flex flex-col gap-3 md:w-1/3">
+      <div class="flex flex-col gap-3 p-6 md:w-1/3">
         <AppInput
           icon="mdi mdi-currency-brl"
           placeholder="Ex: 49.90"

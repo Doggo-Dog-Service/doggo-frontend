@@ -46,7 +46,7 @@ export const useMap = () => {
   function addMarker(lng, lat, options) {
     if(!map.value) return
 
-    const marker = maplibregl.Marker(options)
+    const marker = new maplibregl.Marker(options)
       .setLngLat([lng, lat])
       .addTo(map.value)
 
