@@ -1,6 +1,6 @@
 <script setup>
 import gsap from "gsap";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 
 onMounted(() => {
   const blobs = gsap.utils.toArray('.blob');
@@ -29,6 +29,7 @@ const props = defineProps ({
 onMounted(() => {
   console.log(props.provider)
 })
+
 </script>
 <template>
   <div class="bg-doggo-green h-80 relative overflow-hidden">
@@ -66,16 +67,5 @@ onMounted(() => {
     >
       Editar
     </button>
-  </div>
-  <div class="bg-background-light border border-doggo-gray rounded-2xl h-40 mx-2">
-    <div class="">
-      
-    </div>
-    <div>
-
-    </div>
-    <div>
-
-    </div>
   </div>
 </template>
