@@ -1,6 +1,5 @@
 import '@mdi/font/css/materialdesignicons.css'
 import '@/assets/css/main.css'
-import 'leaflet/dist/leaflet.css'
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
