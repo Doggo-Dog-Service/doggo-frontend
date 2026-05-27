@@ -1,9 +1,11 @@
 <script setup>
 import ProviderProfileTop from '@/components/layouts/ProviderProfileTop.vue';
+import InfoBar from '@/components/layouts/InfoBar.vue';
+import AboutComponent from '@/components/layouts/AboutComponent.vue';
 import { onMounted, ref } from 'vue';
 import { useProviderStore } from '@/stores/provider';
 import { useRoute } from 'vue-router';
-import InfoBar from '@/components/layouts/InfoBar.vue';
+
 
 const providerStore = useProviderStore();
 const route = useRoute()
@@ -16,6 +18,9 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <ProviderProfileTop :provider="provider"/>
-  <InfoBar :provider="provider"/>
+  <div>
+    <ProviderProfileTop :provider="provider"/>
+    <InfoBar :provider="provider.created_at"/>
+    <AboutComponent :provider="provider.description"/>
+  </div>
 </template>

@@ -11,7 +11,7 @@ const props = defineProps({
 const {
   experienceTime,
   experienceLabel
-} = useProvider(props.provider)
+} = useProvider()
 </script>
 
 <template>
