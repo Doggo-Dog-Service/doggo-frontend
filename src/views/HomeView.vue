@@ -62,7 +62,7 @@ watch(searchBarData, (value) => {
   clearTimeout(timeout)
 
   timeout = setTimeout(() => {
-    if (value) {
+    if (value.length >= 3) {
       searchStore.globalSearch(value.trim())
     }
   }, 300)

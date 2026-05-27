@@ -2,11 +2,13 @@
 import AppButton from '@/components/buttons/AppButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
 import { onMounted, reactive, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import { useProviderStore } from '@/stores/provider'
 import { useRouter } from 'vue-router'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useMap } from '@/composables/useMap'
 
+const authStore = useAuthStore()
 const providerStore = useProviderStore()
 const router = useRouter()
 
@@ -15,12 +17,14 @@ const data = reactive({
   fixed_longitude: null,
   price_per_hour: null,
   price_per_day: null,
-  service_type: null,
+  service_type: router.currentRoute.value.params.serviceTypeId,
 })
 
 const handleRegister = async () => {
-  await providerStore.createProvider(data)
-  router.push('/')
+  const success = await providerStore.createProvider(data)
+  if (success) {
+    router.push('/')
+  }
 }
 
 const { latitude, longitude, getCurrentPosition } = useGeolocation()
@@ -29,13 +33,34 @@ const { map, createMap, addMarker } = useMap()
 const userMarker = ref(null)
 const fixedMarker = ref(null)
 
+const userElement = document.createElement('img')
+Object.assign(userElement.style, {
+  width: '30px',
+  height: '30px',
+  borderRadius: '50%',
+  objectFit: 'cover',
+  border: 'solid 2px #2E7D6B',
+  backgroundColor: '#A7F3D0',
+})
+
 onMounted(async () => {
   await getCurrentPosition()
+  await authStore.fetchUser()
 
   createMap('map', [longitude.value, latitude.value], 15)
 
+  if (authStore.user?.profile_picture?.file) {
+    userElement.src = authStore.user.profile_picture.file
+  } else {
+    Object.assign(userElement.style, {
+      with: '20px',
+      height: '20px',
+    })
+  }
+
   userMarker.value = addMarker(longitude.value, latitude.value, {
     color: '#3b82f6',
+    element: userElement,
   })
 
   fixedMarker.value = addMarker(longitude.value, latitude.value, {
@@ -52,15 +77,15 @@ onMounted(async () => {
 
     fixedMarker.value.setLngLat([lng, lat])
 
-    data.fixed_latitude = lat
-    data.fixed_longitude = lng
+    data.fixed_latitude = lat?.toFixed(6)
+    data.fixed_longitude = lng?.toFixed(6)
   })
 
   fixedMarker.value.on('dragend', () => {
     const lngLat = fixedMarker.value.getLngLat()
 
-    data.fixed_latitude = lngLat.lat
-    data.fixed_longitude = lngLat.lng
+    data.fixed_latitude = lngLat.lat?.toFixed(6)
+    data.fixed_longitude = lngLat.lng?.toFixed(6)
   })
 })
 </script>

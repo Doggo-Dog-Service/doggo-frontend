@@ -25,8 +25,8 @@ export const useGeolocation = () => {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          latitude.value = position.coords.latitude
-          longitude.value = position.coords.longitude
+          latitude.value = position.coords.latitude.toFixed(6)
+          longitude.value = position.coords.longitude.toFixed(6)
           accuracy.value = position.coords.accuracy
 
           loading.value = false
@@ -51,8 +51,8 @@ export const useGeolocation = () => {
 
     watchId = navigator.geolocation.watchPosition(
       (position) => {
-        latitude.value = position.coords.latitude
-        ;((longitude.value = position.coords), longitude)
+        latitude.value = position.coords.latitude.toFixed(6)
+        longitude.value = position.coords.longitude.toFixed(6)
         accuracy.value = position.coords.accuracy
       },
       (err) => {
