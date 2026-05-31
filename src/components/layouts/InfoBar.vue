@@ -1,13 +1,6 @@
 <script setup>
 import { useProvider } from '@/composables/useProvider'
 
-const props = defineProps({
-  provider: {
-    type: Object,
-    required: true
-  }
-})
-
 const {
   experienceTime,
   experienceLabel

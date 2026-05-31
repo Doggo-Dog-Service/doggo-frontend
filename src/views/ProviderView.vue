@@ -20,7 +20,7 @@ onMounted(async () => {
 <template>
   <div>
     <ProviderProfileTop :provider="provider"/>
-    <InfoBar :provider="provider.created_at"/>
+    <InfoBar/>
     <AboutComponent :provider="provider.description"/>
   </div>
 </template>
