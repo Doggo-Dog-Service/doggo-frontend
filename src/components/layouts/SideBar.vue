@@ -16,6 +16,12 @@ const isRouteActive = (path) => router.currentRoute.value.path === path
 onMounted(() => {
   routes.value = router.getRoutes().filter((route) => route.meta.isView)
   console.log(authStore.user)
+  console.log(
+    routes.value.map(route => ({
+      name: route.name,
+      path: route.path
+    }))
+  )
 })
 </script>
 
@@ -63,7 +69,7 @@ onMounted(() => {
             v-else
             class="w-12 h-12 bg-doggo-light-green grid items-center justify-center rounded-full text-white"
           >
-            {{ authStore.user?.full_name[0] }}
+            {{ authStore.user?.full_name?.[0] }}
           </div>
           <div class="col-span-2">
             <h2 class="text-base truncate font-semibold">

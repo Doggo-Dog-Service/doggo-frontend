@@ -4,8 +4,8 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  link: {
-    type: String,
+  id: {
+    type: Number,
     required: true,
   },
   profile_photo: {
@@ -24,7 +24,7 @@ const props = defineProps({
 </script>
 <template>
   <RouterLink
-    :to="props.link"
+    :to="`/provider/${props.id}`"
     class="relative w-full flex items-start justify-between bg-white border border-doggo-gray rounded-xl p-3 transition-all duration-200 hover:scale-99"
   >
     <div class="flex items-center gap-2 md:gap-4">
