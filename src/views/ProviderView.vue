@@ -18,7 +18,7 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div>
+  <div class="flex flex-col gap-5 p-6">
     <ProviderProfileTop :provider="provider"/>
     <InfoBar/>
     <AboutComponent :provider="provider.description"/>
