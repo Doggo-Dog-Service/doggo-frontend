@@ -76,9 +76,11 @@ export const useProviderStore = defineStore('providerStore', () => {
           duration: 3000,
           position: 'top-right',
         })
+        return true
       }
     } catch (error) {
       console.log(error)
+      return false
     } finally {
       loading.value = false
     }
