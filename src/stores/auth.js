@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToast } from 'vue-toast-notification'
+import { useRouter } from 'vue-router'
 import * as authService from '@/services/authService'
+import { removeAccessToken } from '@/utils/token'
 
 export const useAuthStore = defineStore('authStore', () => {
   const $toast = useToast()
+  const router = useRouter()
 
   const user = ref(null)
   const loading = ref(false)
@@ -19,6 +22,11 @@ export const useAuthStore = defineStore('authStore', () => {
 
       await authService.login(credentials)
       user.value = await authService.getMe()
+      $toast.success(`Bem vindo ${user.value.full_name}`, {
+        type: 'success',
+        duration: 3000,
+        position: 'top-right'
+      })
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
@@ -35,12 +43,9 @@ export const useAuthStore = defineStore('authStore', () => {
       loading.value = true
       user.value = await authService.getMe()
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
       user.value = null
+      router.push('/auth/login')
+      removeAccessToken()
     } finally {
       loading.value = false
     }
@@ -49,11 +54,28 @@ export const useAuthStore = defineStore('authStore', () => {
   const logout = () => {
     authService.logout()
     user.value = null
-    $toast.error('Logout realizado!', {
-      type: 'error',
+    $toast.success('Logout realizado!', {
+      type: 'success',
       duration: 3000,
       position: 'top-right',
     })
+    router.push('/auth/login')
+  }
+
+  const createUser = async (data) => {
+    try {
+      loading.value = true
+      const userData = await authService.createBaseUser(data)
+      return userData
+    } catch (error) {
+      $toast.error(error.message, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right'
+      })
+    } finally {
+      loading.value = false
+    }
   }
 
   const deleteUser = async (id) => {
@@ -82,6 +104,7 @@ export const useAuthStore = defineStore('authStore', () => {
     isProvider,
     login,
     fetchUser,
+    createUser,
     logout,
     deleteUser
   }

@@ -19,7 +19,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'yellow', 'green'].includes(value),
+    validator: (value) => ['default', 'green'].includes(value),
   },
 })
 </script>
@@ -28,9 +28,8 @@ const props = defineProps({
   <RouterLink
     :to="props.link"
     :class="[
-      'flex flex-col gap-2 p-3 border-2 rounded-xl transition-all duration-200 ease-in-out active:scale-98 active:opacity-70',
+      'flex flex-col gap-2 p-3 border rounded-xl transition-all duration-200 ease-in-out active:scale-98 active:opacity-70 hover:scale-99',
       props.type === 'default' && 'border-doggo-gray bg-white',
-      props.type === 'yellow' && 'border-doggo-yellow bg-yellow-50 text-doggo-yellow-text',
       props.type === 'green' && 'border-doggo-light-green bg-green-50 text-doggo-green'
     ]"
   >
@@ -40,7 +39,6 @@ const props = defineProps({
         :class="[
           'flex flex-col items-center justify-center w-10 h-10 rounded-xl',
           props.type === 'default' && 'bg-doggo-gray',
-          props.type === 'yellow' && 'bg-doggo-yellow',
           props.type === 'green' && 'bg-doggo-light-green'
         ]"
       >

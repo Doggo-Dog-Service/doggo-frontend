@@ -8,14 +8,21 @@ export const useProviderStore = defineStore('providerStore', () => {
 
   const providers = ref([])
   const currentProvider = ref(null)
+  const totalProviders = ref(0)
   const currentService = ref(0)
   const loading = ref(false)
+
+  const countProviders = async () =>{
+    const response = await providerService.fetchProviders()
+    totalProviders.value = response.count
+  }
 
   const fetchProviders = async (params) => {
     try {
       loading.value = true
       const response = await providerService.fetchProviders(params)
-      providers.value = response.results
+      const fetchedProviders = response.results
+      providers.value = fetchedProviders
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
@@ -30,11 +37,8 @@ export const useProviderStore = defineStore('providerStore', () => {
   const fetchProvider = async (id) => {
     try {
       loading.value = true
-
       const response = await providerService.fetchProvider(id)
-
       currentProvider.value = response
-
       return response
     } catch (error) {
       $toast.error(error.message, {
@@ -42,6 +46,21 @@ export const useProviderStore = defineStore('providerStore', () => {
         duration: 3000,
         position: 'top-right',
       })
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateProvider = async (id, data) => {
+    try {
+      loading.value = true
+      const updatedProvider = await providerService.updateProvider(id, data)
+      const index = providers.value.findIndex((provider) => provider.id === updatedProvider.id)
+      if(index !== -1) {
+        providers.value[index] = updatedProvider
+      }
+    } catch (error) {
+      console.log(error)
     } finally {
       loading.value = false
     }
@@ -59,11 +78,7 @@ export const useProviderStore = defineStore('providerStore', () => {
         })
       }
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      console.log(error)
     } finally {
       loading.value = false
     }
@@ -92,11 +107,14 @@ export const useProviderStore = defineStore('providerStore', () => {
   return {
     loading,
     providers,
+    totalProviders,
     currentService,
     currentProvider,
+    countProviders,
     fetchProviders,
     fetchProvider,
     createProvider,
+    updateProvider,
     deleteProvider,
   }
 })

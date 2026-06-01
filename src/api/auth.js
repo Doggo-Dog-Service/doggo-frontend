@@ -4,12 +4,16 @@ export const accessTokenRequest = (data) => {
     return api.post('/token/', data)
 }
 
-export const refreshTokenRequest = (refreshToken) => {
-    return api.post('/token/refresh/')
+export const refreshTokenRequest = (refresh) => {
+    return api.post('/token/refresh/', { refresh })
 }
 
 export const meRequest = () => {
     return api.get('/profile/')
+}
+
+export const createUser = (data) => {
+    return api.post('/register/', data)
 }
 
 export const deleteUser = (id) => {
