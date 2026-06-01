@@ -64,7 +64,7 @@ onMounted(async () => {
   })
 
   fixedMarker.value = addMarker(longitude.value, latitude.value, {
-    color: '#ef4444',
+    color: '#2E7D6B',
     draggable: true,
   })
 
