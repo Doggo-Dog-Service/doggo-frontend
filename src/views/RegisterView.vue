@@ -2,27 +2,32 @@
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
+import ImageInput from '@/components/inputs/ImageInput.vue'
 import { onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useClientStore } from '@/stores/clients'
 import { useServiceStore } from '@/stores/service'
+import { useMedia } from '@/composables/useMedia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
 
 const authStore = useAuthStore()
 const clientStore = useClientStore()
 const serviceStore = useServiceStore()
+const { postImage } = useMedia()
 const router = useRouter()
 const $toast = useToast()
 
 const profileType = ref('client')
 const userData = reactive({
+  profile_picture: '',
   full_name: '',
   email: '',
   cpf: '',
   phone: '',
   password: '',
 })
+const profilePicture = ref(null)
 const confirmPassword = ref('')
 const typeServiceId = ref(0)
 
@@ -44,6 +49,18 @@ const handleRegister = async () => {
     return
   }
 
+  if(profilePicture.value) {
+    const newImage = await postImage({
+      file: profilePicture.value,
+      description: userData.email
+    })
+    if(newImage.attachment_key) {
+      userData.profile_picture = newImage.attachment_key
+    } else {
+      return
+    }
+  }
+  
   await authStore.createUser(userData)
   await authStore.login({
     email: userData.email,
@@ -63,9 +80,12 @@ const handleRegister = async () => {
 <template>
   <div class="flex flex-col gap-6 w-full p-6 md:flex-row md:gap-15">
     <section class="w-full flex flex-col md:w-1/2 md:items-center md:gap-10">
-      <div class="w-full flex flex-col md:items-center">
-        <h1 class="text-doggo-black text-2xl font">Criar conta</h1>
-        <p class="text-zinc-400">Preencha os dados para começar</p>
+      <div class="w-full flex flex-col gap-5">
+        <div class="text-center">
+          <h1 class="text-doggo-black text-2xl font">Criar conta</h1>
+          <p class="text-zinc-400">Preencha os dados para começar</p>
+        </div>
+        <ImageInput label="Imagem de perfil" v-model="profilePicture" />
       </div>
       <div class="w-full flex flex-col gap-2">
         <h2 class="font-semibold">Tipo de conta</h2>
