@@ -36,7 +36,7 @@ const changeProfileType = (type) => {
 }
 
 onMounted(async () => {
-  await serviceStore.getServices()
+  await serviceStore.getTypeServices()
 })
 
 const handleRegister = async () => {

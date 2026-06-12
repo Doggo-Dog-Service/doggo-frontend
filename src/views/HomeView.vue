@@ -51,7 +51,7 @@ onMounted(async () => {
     providerStore.fetchProviders(),
     providerStore.countProviders(),
     clientStore.countClients(),
-    serviceStore.getServices(),
+    serviceStore.getTypeServices(),
   ])
   selectTypeService(serviceStore.typeServices[0].id)
 })
