@@ -28,6 +28,14 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
+        {
+          path: 'scheduling/:providerId',
+          name: 'scheduling-view',
+          component: () => import('@/views/SchedulingView.vue'),
+          meta: {
+            requiresAuth: true
+          }
+        }
       ],
     },
     {
