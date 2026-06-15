@@ -12,6 +12,6 @@ export const postService = (data) => {
   return api.post('/services/', data)
 }
 
-export const updateService = (data) => {
-  return api.patch('/service/', data)
+export const updateService = (id, data) => {
+  return api.patch(`/service/${id}/`, data)
 }

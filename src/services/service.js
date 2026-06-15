@@ -18,18 +18,18 @@ export const getServices = async (params) => {
   }
 }
 
-export const postService = async (data) => {
+export const postService = async (payload) => {
   try {
-    const { data } = await serviceApi.postService(data)
+    const { data } = await serviceApi.postService(payload)
     return data
   } catch (error) {
     throw error
   }
 }
 
-export const updateService = async (data) => {
+export const updateService = async (payload) => {
   try {
-    const { data } = await serviceApi.updateService(data)
+    const { data } = await serviceApi.updateService(payload)
     return data
   } catch (error) {
     throw error
