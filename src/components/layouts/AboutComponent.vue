@@ -7,7 +7,7 @@ const props = defineProps({
 });
 </script>
 <template>
-  <div class="mx-2 my-8">
+  <div class="mx-2">
     <h1 class="text-xl">
       Sobre
     </h1>

@@ -1,11 +1,13 @@
 <script setup>
-import ProviderProfileTop from '@/components/layouts/ProviderProfileTop.vue'
-import InfoBar from '@/components/layouts/InfoBar.vue'
-import AboutComponent from '@/components/layouts/AboutComponent.vue'
 import { onMounted, ref } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useRoute } from 'vue-router'
+
+import ProviderProfileTop from '@/components/layouts/ProviderProfileTop.vue'
+import InfoBar from '@/components/layouts/InfoBar.vue'
+import AboutComponent from '@/components/layouts/AboutComponent.vue'
 import ScheduleButton from '@/components/buttons/ScheduleButton.vue'
+import ReviewList from '@/components/layouts/ReviewList.vue'
 
 const providerStore = useProviderStore()
 const route = useRoute()
@@ -22,27 +24,16 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="flex flex-col gap-5 p-6">
+  <div class="flex flex-col gap-10 p-4 sm:p-6 pb-28 max-w-4xl mx-auto">
     <ProviderProfileTop :provider="provider" />
     <InfoBar />
     <AboutComponent :description="provider.description" />
-    <div v-if="provider?.user" class="">
+    <ReviewList :reviews="provider.reviews" />
+    <div v-if="provider?.user">
       <ScheduleButton
-      :text="provider?.user?.full_name"
-      :price="provider?.price_per_hour"
-      class="fixed bottom-4 left-4 right-4 z-50"/>
-    </div>
-    <div
-      v-if="provider.reviews?.length"
-      class="flex flex-col gap-4"
-    >
-      <h2 class="text-xl font-bold">
-        Avaliações
-      </h2>
-      <ReviewCard
-        v-for="review in provider.reviews"
-        :key="review.id"
-        :review="review"
+        :text="provider?.user?.full_name"
+        :price="provider?.price_per_hour"
+        class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:w-96 sm:self-center z-50"
       />
     </div>
   </div>
