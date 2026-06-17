@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
   text: {
     type: String,
@@ -12,8 +14,8 @@ const props = defineProps({
 </script>
 <template>
   <div class="">
-    <button class="">
-      Agendar com {{ props.text }} · R${{ props.price }}/h
+    <button class="w-full bg-doggo-green text-white py-4 rounded-2xl font-semibold shadow-md">
+      Agendar com {{ props.text.split(' ')[0] }} · R${{ props.price }}/h
     </button>
   </div>
 </template>
