@@ -27,7 +27,7 @@ onMounted(() => {
       />
       <div
         v-else
-        class="flex items-center justify-center h-22 w-22 rounded-2xl bg-linear-to-r from-doggo-green to-doggo-light-green border-white border-2 shrink-0"
+        class="flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-linear-to-r from-doggo-green to-doggo-light-green border-white border-2 shrink-0"
       >
         <p class="text-white text-2xl">
           {{ provider.user?.full_name?.charAt(0) }}
