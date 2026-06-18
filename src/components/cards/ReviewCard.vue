@@ -7,7 +7,7 @@ const props = defineProps({
 })
 </script>
 <template>
-  <div class="border border-doggo-gray px-6 py-6 rounded-2xl">
+  <div class="bg-white border border-doggo-gray px-6 py-6 rounded-2xl">
     <div class="flex gap-4 items-start">
       <img
         v-if="props.review.client.user.profile_picture"
@@ -17,7 +17,7 @@ const props = defineProps({
       />
       <div
         v-else
-        class="flex items-center justify-center w-12 h-12 rounded-xl bg-linear-to-r from-doggo-green to-doggo-light-green text-white font-semibold text-lg shrink-0"
+        class="flex items-center justify-center w-12 h-12 rounded-xl bg-doggo-light-green text-white font-semibold text-lg shrink-0"
       >
         {{ props.review.client.user.full_name.charAt(0) }}
       </div>
@@ -38,7 +38,7 @@ const props = defineProps({
         </div>
       </div>
     </div>
-    <p class="mt-4 break-words whitespace-pre-wrap">
+    <p class="mt-4 wrap-break-word whitespace-pre-wrap">
       {{ props.review.comment }}
     </p>
   </div>

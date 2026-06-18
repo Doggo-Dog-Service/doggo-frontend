@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 <template>
   <div class="">
-    <button class="w-full bg-doggo-green text-white py-4 rounded-2xl font-semibold shadow-md transition-all duration-200 active:scale-98 active:opacity-70 hover:scale-99">
+    <button class="w-full bg-doggo-green text-white py-4 rounded-2xl font-semibold shadow-md transition-all duration-200 cursor-pointer active:scale-98 active:opacity-70 hover:scale-99">
       Agendar com {{ props.text.split(' ')[0] }} · R${{ props.price }}/h
     </button>
   </div>

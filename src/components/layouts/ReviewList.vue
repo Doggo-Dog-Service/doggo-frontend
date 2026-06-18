@@ -9,7 +9,7 @@ defineProps({
 })
 </script>
 <template>
-  <div class="flex flex-col gap-4 mx-2">
+  <div class="flex flex-col gap-4 mx-2 h-120 overflow-y-auto">
     <h2 class="text-xl">
       Avaliações
     </h2>

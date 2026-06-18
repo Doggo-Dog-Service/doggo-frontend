@@ -15,13 +15,6 @@ const isRouteActive = (path) => router.currentRoute.value.path === path
 
 onMounted(() => {
   routes.value = router.getRoutes().filter((route) => route.meta.isView)
-  console.log(authStore.user)
-  console.log(
-    routes.value.map(route => ({
-      name: route.name,
-      path: route.path
-    }))
-  )
 })
 </script>
 

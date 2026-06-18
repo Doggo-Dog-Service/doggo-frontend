@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted } from 'vue'
+import { useLocation } from '@/composables/useLocation'
 import { useAuthStore } from '@/stores/auth'
-
+import { onMounted } from 'vue'
 const authStore = useAuthStore()
 
 const props = defineProps({
@@ -11,42 +11,49 @@ const props = defineProps({
   },
 })
 
-onMounted(() => {
-  console.log('Usuário logado:', authStore.user)
-  console.log('Provider:', props.provider)
+const { cityName, setLocation } = useLocation()
+
+onMounted(async () => {
+  await setLocation(Number(props.provider.fixed_latitude), Number(props.provider.fixed_longitude))
 })
 </script>
 <template>
   <div class="flex flex-col sm:flex-row justify-between gap-4">
     <div class="flex gap-5">
       <img
-        v-if="provider.user?.profile_picture"
+        v-if="props.provider.user?.profile_picture"
         class="w-22 h-22 object-cover rounded-2xl shrink-0"
-        :src="provider.user?.profile_picture?.file"
+        :src="props.provider.user?.profile_picture?.file"
         alt="profile-photo"
       />
       <div
         v-else
-        class="flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-linear-to-r from-doggo-green to-doggo-light-green border-white border-2 shrink-0"
+        class="flex items-center justify-center h-20 w-20 sm:h-24 sm:w-24 rounded-2xl bg-doggo-light-green border-white border-2 shrink-0"
       >
         <p class="text-white text-2xl">
-          {{ provider.user?.full_name?.charAt(0) }}
+          {{ props.provider.user?.full_name?.charAt(0) }}
         </p>
       </div>
       <div class="min-w-0">
-        <h1 class="text-lg sm:text-xl font-semibold break-words">
-          {{ provider.user?.full_name }}
+        <h1 class="text-lg sm:text-xl font-semibold wrap-break-word">
+          {{ props.provider.user?.full_name }}
         </h1>
-        <div class="flex items-center gap-1 text-gray-400">
+        <div class="flex items-start gap-1 text-gray-400">
           <span class="mdi mdi-map-marker"></span>
           <p class="truncate">
-            {{ provider.fixed_latitude }}
+            {{ cityName }}
+          </p>
+        </div>
+        <div class="flex items-start gap-1 text-gray-400">
+          <span class="mdi mdi-briefcase-variant"></span>
+          <p class="truncate">
+            {{ props.provider.service_type.name }}
           </p>
         </div>
       </div>
     </div>
     <button
-      v-if="authStore.user?.id === provider.user?.id"
+      v-if="authStore.user?.id === props.provider.user?.id"
       class="self-start sm:self-center border rounded-full px-4 py-2 font-bold text-doggo-green bg-green-100 whitespace-nowrap"
     >
       Editar

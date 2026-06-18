@@ -11,30 +11,25 @@ import ReviewList from '@/components/layouts/ReviewList.vue'
 
 const providerStore = useProviderStore()
 const route = useRoute()
-const provider = ref({})
+const provider = ref(null)
 
 onMounted(async () => {
-  const response = await providerStore.fetchProvider(
-    Number(route.params.id)
-  )
+  const response = await providerStore.fetchProvider(Number(route.params.id))
 
   provider.value = response
-
-  console.log(provider.value.reviews)
 })
 </script>
+
 <template>
-  <div class="flex flex-col gap-10 p-4 sm:p-6 pb-28 w-full max-w-5xl mx-auto">
+  <div v-if="provider" class="relative grid gap-10 w-full p-6 pb-28 md:grid-cols-2">
     <ProviderProfileTop :provider="provider" />
-    <InfoBar />
+    <InfoBar :reviews="provider.reviews" />
     <AboutComponent :description="provider.description" />
     <ReviewList :reviews="provider.reviews" />
-    <div v-if="provider?.user">
-      <ScheduleButton
-        :text="provider?.user?.full_name"
-        :price="provider?.price_per_hour"
-        class="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-96 z-50"
-      />
-    </div>
+    <ScheduleButton
+      :text="provider?.user?.full_name"
+      :price="provider?.price_per_hour"
+      class="fixed bottom-4 left-4 right-4 z-50 md:left-75 md:2-1/3"
+    />
   </div>
 </template>
