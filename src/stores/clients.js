@@ -57,6 +57,7 @@ export const useClientStore = defineStore('clientStore', () => {
           duration: 3000,
           position: 'top-right',
         })
+        return true
       }
     } catch (error) {
       $toast.error(error.message, {
@@ -64,6 +65,7 @@ export const useClientStore = defineStore('clientStore', () => {
         duration: 3000,
         position: 'top-right',
       })
+      return false
     } finally {
       loading.value = false
     }
