@@ -116,8 +116,7 @@ watch(searchBarData, (value) => {
                 </div>
                 <div
                   v-else-if="
-                    searchStore.searched.providers?.length > 0 ||
-                    searchStore.searched.clients?.length > 0
+                    searchStore.searched.providers?.length > 0
                   "
                   class="w-full h-full flex flex-col gap-2"
                 >
@@ -129,17 +128,8 @@ watch(searchBarData, (value) => {
                     :profile_photo="provider.user?.profile_picture?.url"
                     :service="provider.service_type_detail?.name"
                     classification="5,0"
-                    link="/"
+                    :link="`/provider/${provider.id}`"
                     />
-                    <SearchCard
-                    v-for="(client, index) in searchStore.searched.clients"
-                    :key="index"
-                    :id="client.user?.id"
-                    :full_name="client.user?.full_name"
-                    :profile_photo="client.user?.profile_picture?.url"
-                    service="Cliente"
-                    link="/"
-                  />
                 </div>
                 <div
                   v-else

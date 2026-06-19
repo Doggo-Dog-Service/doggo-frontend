@@ -20,11 +20,15 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  link: {
+    type: String,
+    required: false
+  }
 })
 </script>
 <template>
   <RouterLink
-    :to="`/provider/${props.id}`"
+    :to="props.link"
     class="relative w-full flex items-start justify-between bg-white border border-doggo-gray rounded-xl p-3 transition-all duration-200 hover:scale-99"
   >
     <div class="flex items-center gap-2 md:gap-4">
