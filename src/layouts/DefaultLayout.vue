@@ -1,5 +1,6 @@
 <script setup>
 import AppHeader from '@/components/layouts/AppHeader.vue'
+import AltHeader from '@/components/layouts/AltHeader.vue'
 import MobileNavBar from '@/components/layouts/MobileNavBar.vue'
 import SideBar from '@/components/layouts/SideBar.vue'
 import { useRoute } from 'vue-router'
@@ -10,7 +11,8 @@ const route = useRoute()
   <div class="flex flex-col md:flex-row">
     <SideBar class="hidden md:block" />
     <div class="md:ml-72">
-      <AppHeader class="md:hidden" />
+      <AppHeader v-if="route.name === 'home-view'" class="md:hidden"/>
+      <AltHeader v-else/>
       <main>
         <RouterView v-slot="{ Component }">
           <Transition
