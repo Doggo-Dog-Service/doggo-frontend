@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+body {
+    background: #F7F8FA;
+}
+
+@theme {
+    --color-doggo-black: #111827;
+    --color-doggo-green: #2E7D6B;
+    --color-doggo-gray: #E8EAED;
+    --color-doggo-light-green: #A7F3D0;
+    --color-doggo-yellow: #FDE68A;
+    --color-doggo-yellow-text: #E6B64E;
+    --color-background-light: #F7F8FA;
+}
