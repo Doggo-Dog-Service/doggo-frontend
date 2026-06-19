@@ -39,13 +39,13 @@ onMounted(async () => {
           {{ props.provider.user?.full_name }}
         </h1>
         <div class="flex items-start gap-1 text-gray-400">
-          <span class="mdi mdi-map-marker"></span>
+          <span class="mdi mdi-map-marker text-doggo-green"></span>
           <p class="truncate">
             {{ cityName }}
           </p>
         </div>
         <div class="flex items-start gap-1 text-gray-400">
-          <span class="mdi mdi-briefcase-variant"></span>
+          <span class="mdi mdi-briefcase-variant text-doggo-green"></span>
           <p class="truncate">
             {{ props.provider.service_type.name }}
           </p>

@@ -10,7 +10,7 @@ const route = useRoute()
 <template>
   <div class="flex flex-col md:flex-row">
     <SideBar class="hidden md:block" />
-    <div class="md:ml-72">
+    <div class="w-full md:ml-72">
       <AppHeader v-if="route.name === 'home-view'" class="md:hidden"/>
       <AltHeader v-else/>
       <main>

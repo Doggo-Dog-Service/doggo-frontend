@@ -2,14 +2,13 @@
 import NavButton from '../buttons/NavButton.vue'
 import LogOutButton from '../buttons/LogOutButton.vue'
 import { onMounted, ref } from 'vue'
-import { ArrowLeftEndOnRectangleIcon, Cog6ToothIcon, BellIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftEndOnRectangleIcon, BellIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 
 const routes = ref([])
-const userConfigRouter = '/user/configs'
 
 const isRouteActive = (path) => router.currentRoute.value.path === path
 
@@ -39,12 +38,6 @@ onMounted(() => {
 
       <ul class="grid gap-5">
         <li class="grid gap-1 border-y border-doggo-gray py-5">
-          <NavButton
-            :to="userConfigRouter"
-            :icon="Cog6ToothIcon"
-            text="Configurações"
-            :active="isRouteActive(userConfigRouter)"
-          />
           <LogOutButton
             :icon="ArrowLeftEndOnRectangleIcon"
             text="Sair"
@@ -72,7 +65,7 @@ onMounted(() => {
               {{ authStore.user?.provider_profile ? authStore.user?.provider_profile?.service_type_detail?.name : 'Cliente' }}
             </p>
           </div>
-          <RouterLink to="/notifications" class="grid col-span-1 justify-center items-center p-2 w-fit h-fit rounded-xl transition-all duration-200 hover:bg-gray-400/20 ">
+          <RouterLink to="/" class="grid col-span-1 justify-center items-center p-2 w-fit h-fit rounded-xl transition-all duration-200 hover:bg-gray-400/20 ">
             <BellIcon class="w-5 h-5 text-gray-400" />
           </RouterLink>
         </li>

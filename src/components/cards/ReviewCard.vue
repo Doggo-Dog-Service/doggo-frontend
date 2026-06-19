@@ -10,8 +10,8 @@ const props = defineProps({
   <div class="bg-white border border-doggo-gray px-6 py-6 rounded-2xl">
     <div class="flex gap-4 items-start">
       <img
-        v-if="props.review.client.user.profile_picture"
-        :src="props.review.client.user.profile_picture.file"
+        v-if="props.review.client.user.profile_picture.url"
+        :src="props.review.client.user.profile_picture.url"
         alt="profile-picture"
         class="w-12 h-12 rounded-full object-cover"
       />

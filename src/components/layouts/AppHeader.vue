@@ -48,7 +48,7 @@ onMounted(async () => {
           <span class="mdi mdi-exit-to-app"></span>
         </div>
       </button>
-      <RouterLink to="/notifications">
+      <RouterLink to="/">
         <div class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 pb-0.5">
           <span class="mdi mdi-bell-outline"></span>
         </div>
