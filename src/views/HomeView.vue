@@ -124,6 +124,7 @@ watch(searchBarData, (value) => {
                   <SearchCard
                     v-for="(provider, index) in searchStore.searched.providers"
                     :key="index"
+                    :id="provider.id"
                     :full_name="provider.user?.full_name"
                     :profile_photo="provider.user?.profile_picture?.url"
                     :service="provider.service_type_detail?.name"
@@ -133,6 +134,7 @@ watch(searchBarData, (value) => {
                     <SearchCard
                     v-for="(client, index) in searchStore.searched.clients"
                     :key="index"
+                    :id="client.user?.id"
                     :full_name="client.user?.full_name"
                     :profile_photo="client.user?.profile_picture?.url"
                     service="Cliente"
@@ -186,7 +188,7 @@ watch(searchBarData, (value) => {
           @select="selectTypeService(typeService.id)"
         />
       </div>
-      <div  
+      <div
         class="flex flex-col gap-2 max-h-110 overflow-y-auto"
         v-if="providerStore.providers && providerStore.providers.length > 0"
       >

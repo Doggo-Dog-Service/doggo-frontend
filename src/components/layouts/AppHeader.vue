@@ -1,72 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { useLocation } from '@/composables/useLocation'
 import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 
-const cityName = ref('')
-const stateAbbr = ref('')
-const loading = ref(false)
-const error = ref('')
+const {
+  cityName,
+  stateAbbr,
+  loading,
+  error,
+  getLocation
+} = useLocation()
 
-const stateAbbreviations = {
-  Acre: 'AC',
-  Alagoas: 'AL',
-  Amapá: 'AP',
-  Amazonas: 'AM',
-  Bahia: 'BA',
-  Ceará: 'CE',
-  'Distrito Federal': 'DF',
-  'Espírito Santo': 'ES',
-  Goiás: 'GO',
-  Maranhão: 'MA',
-  'Mato Grosso': 'MT',
-  'Mato Grosso do Sul': 'MS',
-  'Minas Gerais': 'MG',
-  Pará: 'PA',
-  Paraíba: 'PB',
-  Paraná: 'PR',
-  Pernambuco: 'PE',
-  Piauí: 'PI',
-  'Rio de Janeiro': 'RJ',
-  'Rio Grande do Norte': 'RN',
-  'Rio Grande do Sul': 'RS',
-  Rondônia: 'RO',
-  Roraima: 'RR',
-  'Santa Catarina': 'SC',
-  'São Paulo': 'SP',
-  Sergipe: 'SE',
-  Tocantins: 'TO',
-}
-
-async function getLocation() {
-  if (!navigator.geolocation) {
-    error.value = 'Geolocalização não suportada pelo navegador.'
-    return
-  }
-
-  loading.value = true
-  error.value = ''
-
-  navigator.geolocation.getCurrentPosition(
-    async ({ coords }) => {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`,
-      )
-      const data = await res.json()
-      const { city, town, village, state } = data.address
-
-      cityName.value = city || town || village
-      stateAbbr.value = stateAbbreviations[state] || state
-      loading.value = false
-    },
-    () => {
-      error.value = `Não foi possível obter a localização`
-      loading.value = false
-    },
-  )
-}
-
-getLocation()
+onMounted(async () => {
+  await getLocation()
+})
 </script>
 
 <template>

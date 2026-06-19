@@ -2,6 +2,8 @@
 import AppHeader from '@/components/layouts/AppHeader.vue'
 import MobileNavBar from '@/components/layouts/MobileNavBar.vue'
 import SideBar from '@/components/layouts/SideBar.vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 </script>
 
 <template>
@@ -25,6 +27,8 @@ import SideBar from '@/components/layouts/SideBar.vue'
         </RouterView>
       </main>
     </div>
-    <MobileNavBar class="block md:hidden" />
+    <MobileNavBar
+     v-if="route.name !== 'provider-view'"
+     class="block md:hidden" />
   </div>
 </template>

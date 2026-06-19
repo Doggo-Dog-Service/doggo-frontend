@@ -42,7 +42,7 @@ const props = defineProps({
 <template>
   <RouterLink
     class="w-full flex justify-between bg-white p-4 border border-doggo-gray rounded-xl transition-all duration-200 active:scale-98 active:opacity-70 hover:scale-99"
-    to="/"
+    :to="`/provider/${props.id}`"
   >
     <div class="flex items-center gap-4">
       <img

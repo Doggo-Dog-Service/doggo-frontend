@@ -1,13 +1,13 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useToast } from 'vue-toast-notification'
 import * as providerService from '@/services/providerService'
-import { toFloat } from '@/utils/toFloat'
 
 export const useProviderStore = defineStore('providerStore', () => {
   const $toast = useToast()
 
   const providers = ref([])
+  const currentProvider = ref(null)
   const totalProviders = ref(0)
   const currentService = ref(0)
   const loading = ref(false)
@@ -38,8 +38,8 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       const response = await providerService.fetchProvider(id)
-      const provider = response
-      return provider
+      currentProvider.value = response
+      return response
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
@@ -111,6 +111,7 @@ export const useProviderStore = defineStore('providerStore', () => {
     providers,
     totalProviders,
     currentService,
+    currentProvider,
     countProviders,
     fetchProviders,
     fetchProvider,
