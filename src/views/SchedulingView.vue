@@ -78,7 +78,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-6 mb-19 text-doggo-black">
+  <div class="flex flex-col gap-6 p-6 mb-19 text-doggo-black pb-22">
     <UserCard
       v-if="provider"
       :id="provider.id"
