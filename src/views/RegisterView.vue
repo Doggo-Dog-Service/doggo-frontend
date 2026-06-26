@@ -20,7 +20,6 @@ const $toast = useToast()
 
 const profileType = ref('client')
 const userData = reactive({
-  profile_picture: '',
   full_name: '',
   email: '',
   cpf: '',
