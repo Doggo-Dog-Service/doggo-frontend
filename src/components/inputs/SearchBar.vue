@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const model = defineModel()
-const emits = defineEmits(['onChange', 'onFocus', 'onFocusOut'])
+const emits = defineEmits(['onChange', 'focus', 'out'])
 const props = defineProps({
   placeholder: {
     type: String,
@@ -14,7 +14,7 @@ const wrapper = ref(null)
 
 function handleClickOutside(e) {
   if(!wrapper.value?.contains(e.target)) {
-    emits('onFocusOut')
+    emits('out')
   }
 }
 
@@ -35,7 +35,7 @@ onBeforeUnmount(() => {
       :placeholder="props.placeholder"
       v-model="model"
       @change="emits('onChange')"
-      @focus="emits('onFocus')"
+      @focus="emits('focus')"
     />
     <span :class="['mdi mdi-magnify', 'absolute right-4 top-3 bottom-3 text-doggo-black/30 text-xl']"></span>
     <slot name="list"></slot>

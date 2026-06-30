@@ -73,7 +73,7 @@ function handleClick() {
 <template>
   <button
     type="button"
-    class="w-full flex items-start gap-3 bg-white p-3 md:p-4 border-b border-doggo-gray last:border-b-0 text-left transition-all duration-200 hover:bg-doggo-green/5 active:scale-[0.99]"
+    class="w-full flex items-start gap-3 bg-white p-3 md:p-4 border-b border-doggo-gray last:border-b-0 text-left transition-all duration-200 cursor-pointer hover:bg-doggo-green/5 active:scale-[0.99]"
     @click="handleClick"
   >
     <span

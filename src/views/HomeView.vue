@@ -89,8 +89,8 @@ watch(searchBarData, (value) => {
           class="col-span-2"
           placeholder="Buscar profissionais ou clientes"
           v-model="searchBarData"
-          @on-focus="searchedList = true"
-          @on-focus-out="searchedList = false"
+          @focus="searchedList = true"
+          @blur="searchedList = false"
         >
           <template #list>
             <transition

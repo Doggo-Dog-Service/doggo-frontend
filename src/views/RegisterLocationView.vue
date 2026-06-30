@@ -46,6 +46,7 @@ function handleLocationSelect({ lng, lat }) {
   data.fixed_longitude = lng?.toFixed(6)
   searchBarData.value = ''
   searchedData.value = []
+  searchedList.value = false
 }
 
 const userElement = document.createElement('img')
@@ -68,7 +69,7 @@ onMounted(async () => {
     userElement.src = authStore.user.profile_picture.file
   } else {
     Object.assign(userElement.style, {
-      with: '20px',
+      width: '20px',
       height: '20px',
     })
   }
@@ -104,20 +105,24 @@ onMounted(async () => {
   })
 })
 
+let searchTimeout
+
 watch(searchBarData, (searchData) => {
+  clearTimeout(searchTimeout)
+
   if (searchData.length < 3) {
     searchedData.value = []
     return
   }
 
-  setTimeout(() => {
+  searchTimeout = setTimeout(() => {
     searchLocation(searchData)
   }, 500)
 })
 </script>
 
 <template>
-  <form @submit.prevent="handleRegister" class="h-dvh w-screen relative overflow-hidden">
+  <form @submit.prevent="handleRegister" class="h-dvh w-screen relative md:overflow-hidden">
     <div id="map" class="w-full h-full"></div>
 
     <div class="md:hidden">
@@ -125,10 +130,20 @@ watch(searchBarData, (searchData) => {
         <SearchBar
           v-model="searchBarData"
           placeholder="Busque sua localização"
-          @on-focus="searchedList = true"
-          @on-focus-out="searchedList = false"
+          @focus="searchedList = true"
+          @blur="searchedList = false"
         >
           <template #list>
+            <div
+              v-if="loading && searchedList"
+              class="absolute top-full left-0 right-0 mt-2 z-50 bg-white border border-doggo-gray rounded-xl shadow-lg"
+            >
+              <div class="flex items-center justify-center gap-2 p-4 text-sm text-doggo-black/50">
+                <span class="mdi mdi-loading mdi-spin"></span>
+                <span>Buscando...</span>
+              </div>
+            </div>
+
             <transition
               enter-active-class="transition duration-200 ease-out"
               enter-from-class="opacity-0 translate-y-2"
@@ -142,13 +157,6 @@ watch(searchBarData, (searchData) => {
                 class="absolute top-full left-0 right-0 mt-2 z-50 bg-white border border-doggo-gray rounded-xl shadow-lg overflow-hidden"
               >
                 <div class="max-h-60 overflow-y-auto">
-                  <div
-                    v-if="loading"
-                    class="flex items-center justify-center gap-2 p-4 text-sm text-doggo-black/50"
-                  >
-                    <span class="mdi mdi-loading mdi-spin"></span>
-                    <span>Buscando...</span>
-                  </div>
                   <LocationCard
                     v-for="(feature, index) in searchedData"
                     :key="feature.properties?.osm_id || feature.properties?.osm_type + index"
@@ -199,13 +207,13 @@ watch(searchBarData, (searchData) => {
         <SearchBar
           v-model="searchBarData"
           placeholder="Busque sua localização"
-          @on-focus="searchedList = true"
-          @on-focus-out="searchedList = false"
+          @focus="searchedList = true"
+          @blur="searchedList = false"
         />
       </div>
 
       <div
-        v-if="searchedData.length > 0"
+        v-if="(searchedData.length > 0 || loading) && searchedList"
         class="flex-1 min-h-0 overflow-y-auto px-6 pointer-events-auto"
       >
         <div class="bg-white border border-doggo-gray rounded-xl shadow-lg overflow-hidden">
