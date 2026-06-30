@@ -30,7 +30,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="relative w-full" ref="wrapper">
     <input
-      class="w-full border-2 bg-white border-doggo-gray px-4 py-3 rounded-2xl focus:outline-0 placeholder:text-doggo-black/30 focus:border-doggo-green focus:bg-doggo-green/5 transition-all duration-200"
+      class="w-full border-2 bg-white border-doggo-gray px-4 py-3 rounded-2xl focus:outline-0 placeholder:text-doggo-black/30 focus:border-doggo-green transition-all duration-200"
       type="text"
       :placeholder="props.placeholder"
       v-model="model"
