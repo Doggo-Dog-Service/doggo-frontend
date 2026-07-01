@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,13 +21,23 @@ const router = createRouter({
           },
         },
         {
-          path: 'provider/:id',
-          name: 'provider-view',
-          component: () => import('@/views/ProviderView.vue'),
+          path: 'provider/',
+          name: 'provider-list-view',
+          component: () => import('@/views/ProviderListView.vue'),
           meta: {
             requiresAuth: true,
+            isView: true,
+            title: 'Profissionais',
+            icon: BriefcaseIcon
           },
         },
+        {
+          path: 'provider/:id/',
+          component: () => import('@/views/ProviderView.vue'),
+          meta: {
+            requiresAuth: true
+          }
+        }
       ],
     },
     {
