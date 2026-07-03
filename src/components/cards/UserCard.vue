@@ -32,6 +32,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  classification: {
+    type: [Number, String],
+    required: false,
+  },
   is_active: {
     type: Boolean,
     required: true,
@@ -65,7 +69,7 @@ const props = defineProps({
         </div>
         <div class="flex text-sm gap-1">
           <span class="mdi mdi-star text-amber-400"></span>
-          <p class="font-semibold">5,0</p>
+          <p class="font-semibold">{{ props.classification }}</p>
         </div>
       </div>
     </div>

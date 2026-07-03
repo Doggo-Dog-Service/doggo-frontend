@@ -127,7 +127,7 @@ watch(searchBarData, (value) => {
                     :full_name="provider.user?.full_name"
                     :profile_photo="provider.user?.profile_picture?.url"
                     :service="provider.service_type_detail?.name"
-                    classification="5,0"
+                    :classification="provider.classification ? provider.classification : '--'"
                     :link="`/provider/${provider.id}`"
                     />
                 </div>
@@ -194,9 +194,10 @@ watch(searchBarData, (value) => {
           :price_per_day="provider.price_per_day"
           :is_active="provider.is_active"
           :profile_photo="provider.user.profile_picture?.url"
+          :classification="provider.classification ? provider.classification : '--'"
         />
       </div>
-      <div v-else class="text-center h-110 flex flex-col items-center justify-center">
+      <div v-else class="text-center flex flex-col items-center justify-center py-10">
         <p class="text-xl text-doggo-green font-semibold md:text-base">
           Não conseguimos encontrar nenhum provedor perto da sua região
         </p>
