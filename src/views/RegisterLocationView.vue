@@ -127,6 +127,10 @@ watch(searchBarData, (searchData) => {
 
     <div class="md:hidden">
       <div class="absolute top-0 left-0 right-0 z-10 p-4 pb-1 pointer-events-auto">
+        <p class="text-sm text-doggo-black tracking-wider mb-1.5 text-center">
+          <span class="mdi mdi-map-marker-outline text-doggo-primary/60"></span>
+          Registre seu endereço e o preço de seu serviço
+        </p>
         <SearchBar
           v-model="searchBarData"
           placeholder="Busque sua localização"
@@ -204,6 +208,10 @@ watch(searchBarData, (searchData) => {
 
     <div class="hidden md:flex absolute inset-y-0 left-0 w-105 z-10 flex-col pointer-events-none">
       <div class="p-6 pb-3 pointer-events-auto">
+        <p class="text-sm text-doggo-black tracking-wide mb-2 flex items-center gap-1.5">
+          <span class="mdi mdi-map-marker-outline text-doggo-primary/60"></span>
+          Registre seu endereço e o preço de seu serviço
+        </p>
         <SearchBar
           v-model="searchBarData"
           placeholder="Busque sua localização"
