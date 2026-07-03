@@ -9,17 +9,17 @@ onMounted(async() => {
 })
 </script>
 <template>
-  <div>
-    <div>
-      <h1>
-        Profissionais
+  <div class="flex flex-col gap-y-10 mx-auto px-2 py-8">
+    <div class="">
+      <h1 class="text-4xl text-center">
+        Pr<span class="text-doggo-green">o</span>fissionais
       </h1>
-      <button>
+      <button class="bg-white border border-doggo-gray px-3 py-3 rounded-2xl ">
         Filtrar
         <span class="mdi mdi-filter"></span>
       </button>
     </div>
-    <div>
+    <div class="flex flex-col gap-y-5">
       <UserCard
         v-for="provider in providerStore.providers"
         :key="provider.id"

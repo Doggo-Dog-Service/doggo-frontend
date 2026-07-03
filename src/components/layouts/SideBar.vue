@@ -13,7 +13,7 @@ const routes = ref([])
 const isRouteActive = (path) => router.currentRoute.value.path === path
 
 onMounted(() => {
-  routes.value = router.getRoutes().filter((route) => route.meta.isView)
+  routes.value = router.getRoutes().filter((route) => route.meta.isView).sort((a, b) => a.meta.id - b.meta.id)
 })
 </script>
 

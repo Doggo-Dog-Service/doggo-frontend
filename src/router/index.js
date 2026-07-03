@@ -14,6 +14,7 @@ const router = createRouter({
           name: 'home-view',
           component: () => import('@/views/HomeView.vue'),
           meta: {
+            id: 1,
             title: 'Início',
             icon: HomeIcon,
             isView: true,
@@ -25,6 +26,7 @@ const router = createRouter({
           name: 'provider-list-view',
           component: () => import('@/views/ProviderListView.vue'),
           meta: {
+            id: 2,
             requiresAuth: true,
             isView: true,
             title: 'Profissionais',
