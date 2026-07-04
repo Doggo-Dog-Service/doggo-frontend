@@ -62,7 +62,7 @@ onMounted(() => {
               {{ authStore.user?.full_name }}
             </h2>
             <p class="text-sm font-medium text-gray-400">
-              {{ authStore.user?.provider_profile ? authStore.user?.provider_profile?.service_type_detail?.name : 'Cliente' }}
+              {{ authStore.user?.provider_profile ? 'Profissional' : 'Cliente' }}
             </p>
           </div>
           <RouterLink to="/" class="grid col-span-1 justify-center items-center p-2 w-fit h-fit rounded-xl transition-all duration-200 hover:bg-gray-400/20 ">
