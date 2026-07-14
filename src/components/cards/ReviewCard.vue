@@ -10,8 +10,8 @@ const props = defineProps({
   <div class="bg-white border border-doggo-gray px-6 py-6 rounded-2xl">
     <div class="flex gap-4 items-start">
       <img
-        v-if="props.review.client.user.profile_picture.url"
-        :src="props.review.client.user.profile_picture.url"
+        v-if="props.review.client_picture"
+        :src="props.review.client_picture"
         alt="profile-picture"
         class="w-12 h-12 rounded-full object-cover"
       />
@@ -19,11 +19,11 @@ const props = defineProps({
         v-else
         class="flex items-center justify-center w-12 h-12 rounded-xl bg-doggo-light-green text-white font-semibold text-lg shrink-0"
       >
-        {{ props.review.client.user.full_name.charAt(0) }}
+        {{ props.review.client_name.charAt(0) }}
       </div>
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold">
-          {{ props.review.client.user.full_name }}
+          {{ props.review.client_name }}
         </h3>
         <div class="flex mt-1">
           <span
