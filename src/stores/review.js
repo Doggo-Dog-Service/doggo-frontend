@@ -12,7 +12,7 @@ export const useReviewStore = defineStore('reviewStore', () => {
     if(reviews.value.length <= 0) return '--'
     let total = 0
     reviews.value.forEach((review) => total+=review.rating)
-    return total
+    return (total / reviews.value.length).toFixed(1)
   })
 
   async function getReviews(params) {

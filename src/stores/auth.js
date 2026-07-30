@@ -27,12 +27,14 @@ export const useAuthStore = defineStore('authStore', () => {
         duration: 3000,
         position: 'top-right'
       })
+      return true
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
         position: 'top-right',
       })
+      return false
     } finally {
       loading.value = false
     }
@@ -73,6 +75,7 @@ export const useAuthStore = defineStore('authStore', () => {
         duration: 3000,
         position: 'top-right'
       })
+      return null
     } finally {
       loading.value = false
     }
