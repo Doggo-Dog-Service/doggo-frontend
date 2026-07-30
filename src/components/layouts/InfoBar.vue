@@ -1,35 +1,18 @@
 <script setup>
 import InfoCard from '../cards/InfoCard.vue'
 import { useProvider } from '@/composables/useProvider'
-import { computed } from 'vue'
+import { useReviewStore } from '@/stores/review.js'
 
 const { experienceTime, experienceLabel } = useProvider()
-
-const props = defineProps({
-  reviews: {
-    type: Array,
-    required: true,
-  },
-})
-
-const media = computed(() => {
-  if (props.reviews?.length === 0) {
-    return '--'
-  }
-  let total = 0
-  for (let review of props.reviews) {
-    total += review.rating
-  }
-  return Number(total / props.reviews?.length).toFixed(1)
-})
+const reviewStore = useReviewStore()
 </script>
 
 <template>
   <div
     class="flex items-center w-full gap-2"
   >
-    <InfoCard :info="media" description="Nota"/>
-    <InfoCard :info="props.reviews?.length !== 0 ? props.reviews.length : '--'" description="Avaliações"/>
-    <InfoCard :info="`${experienceTime} ${experienceLabel}`" description="Experiência"/>
+    <InfoCard :info="reviewStore.media" description="Nota" icon="mdi mdi-star-outline"/>
+    <InfoCard :info="reviewStore.reviews.length !== 0 ? reviewStore.reviews.length : '--'" description="Avaliações" icon="mdi mdi-comment-multiple-outline"/>
+    <InfoCard :info="`${experienceTime} ${experienceLabel}`" description="Experiência" icon="mdi mdi-clock-outline"/>
   </div>
 </template>
