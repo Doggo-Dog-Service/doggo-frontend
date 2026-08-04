@@ -11,9 +11,19 @@ const router = useRouter()
 const routes = ref([])
 
 const isRouteActive = (path) => router.currentRoute.value.path === path
+function logout() {
+  authStore.logout()
+  router.push('/auth/login/')
+}
 
 onMounted(() => {
-  routes.value = router.getRoutes().filter((route) => route.meta.isView)
+  routes.value = router.getRoutes().filter((route) => {
+    if(!route.meta.isView) return false
+
+    if(route.meta.requiresClient && !authStore.isClient) return false
+
+    return true
+  })
 })
 </script>
 
@@ -41,7 +51,7 @@ onMounted(() => {
           <LogOutButton
             :icon="ArrowLeftEndOnRectangleIcon"
             text="Sair"
-            @logout="authStore.logout"
+            @logout="logout"
           />
         </li>
         <li class="grid grid-cols-4 items-center  gap-4 w-full">
