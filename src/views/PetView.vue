@@ -42,13 +42,13 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col gap-4 p-6">
-    <PetModal v-if="modalOpen" :mode="modalMode" :pet_id="modalPetId" @close="closeModal"/>
+    <PetModal v-if="modalOpen" :mode="modalMode" :pet_id="modalPetId" @close="closeModal" @change-mode="changeModalMode"/>
     <h1 class="w-full font-semibold text-2xl">
       Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
     </h1>
     <ul class="w-full grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <li v-for="pet in petStore.pets" :key="pet.id">
-        <PetCard :name="pet.name" :breed="pet.breed" @click="petDetail(pet.id)"/>
+        <PetCard :name="pet.name" :breed="pet.breed" @click="petDetail(pet.id)" :pet_picture="pet.pet_picture"/>
       </li>
     </ul>
   </div>
