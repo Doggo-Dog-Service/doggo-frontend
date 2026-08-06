@@ -35,6 +35,20 @@ export const usePetStore = defineStore('petStore', () => {
     }
   }
 
+  const createPet = async (payload) => {
+    try {
+      loading.value = true
+      const data = await petService.createPet(payload)
+      $toast.success(`${data.name} adicionado!`, {
+        type: 'success',
+        position: 'top-right',
+        duration: 3000
+      })
+    } catch(error) {
+      $toast.error()
+    }
+  }
+
   const updatePet = async (id, payload) => {
     try {
       loading.value = true
@@ -76,6 +90,7 @@ export const usePetStore = defineStore('petStore', () => {
     currentPet,
     getPets,
     getPet,
+    createPet,
     updatePet,
     deletePet
   }

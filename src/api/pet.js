@@ -8,6 +8,10 @@ export const getPet = (id) => {
   return api.get(`/pets/${id}/`)
 }
 
+export const createPet = (data) => {
+  return api.post('/pets/', data)
+}
+
 export const updatePet = (id, data) => {
   return api.patch(`/pets/${id}/`, data)
 }

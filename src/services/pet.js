@@ -24,6 +24,18 @@ export const getPet = async (id) => {
   }
 }
 
+export const createPet = async(payload) => {
+  try {
+    const { data } = await petApi.createPet(payload)
+    return data
+  } catch(error) {
+    throw {
+      message: error.response?.data?.detail || 'Erro ao criar o pet',
+      status: error.response?.status,
+    }
+  }
+}
+
 export const updatePet = async (id, payload) => {
   try {
     const { data } = await petApi.updatePet(id, payload)
