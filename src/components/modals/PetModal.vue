@@ -43,7 +43,7 @@ const petEditData = reactive({
 const petRegisterData = reactive({
   name: '',
   breed: '',
-  size: '',
+  size: 'p',
   weight: 0,
   notes: '',
 })
@@ -69,7 +69,6 @@ async function handleUpdate() {
     })
     if (newImage?.attachment_key) {
       petEditData.pet_picture = newImage.attachment_key
-      console.log(petEditData)
     } else {
       return
     }
@@ -94,8 +93,7 @@ async function handleRegister() {
   }
 
   await petStore.createPet(petRegisterData)
-  emits('changeMode', 'view')
-  petStore.getPet(props.pet_id)
+  emits('close')
 }
 
 function cancelUpdate() {
@@ -136,7 +134,10 @@ onMounted(async () => {
             alt="pet-picture"
             class="h-50 w-50 object-cover rounded-xl"
           />
-          <div v-else class="h-50 w-50 grid justify-center items-center bg-doggo-green/20 rounded-xl">
+          <div
+            v-else
+            class="h-50 w-50 grid justify-center items-center bg-doggo-green/20 rounded-xl"
+          >
             <span class="mdi mdi-dog text-doggo-green text-5xl"></span>
           </div>
           <h1 class="text-center font-semibold text-2xl">{{ petStore.currentPet.name }}</h1>
@@ -167,9 +168,14 @@ onMounted(async () => {
         class="grid gap-4 lg:grid-cols-2 lg:items-end"
       >
         <div class="w-full flex items-center justify-center gap-4">
-          <img v-if="petEditPreview" class="w-32 h-32 rounded-4xl object-cover" :src="petEditPreview" alt="pet-preview">
+          <img
+            v-if="petEditPreview"
+            class="w-32 h-32 rounded-4xl object-cover"
+            :src="petEditPreview"
+            alt="pet-preview"
+          />
           <span v-if="petEditPreview" class="mdi mdi-arrow-right"></span>
-          <ImageInput v-model="petEditPicutre" :edit="!!petEditPreview"/>
+          <ImageInput v-model="petEditPicutre" :edit="!!petEditPreview" />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <AppInput
@@ -180,7 +186,7 @@ onMounted(async () => {
             v-model="petEditData.name"
           />
           <AppInput label="Raça" placeholder="Raça do seu Pet" v-model="petEditData.breed" />
-          <AppInput label="Peso" placeholder="0" type="number" v-model="petEditData.weight" />
+          <AppInput label="Peso (kg)" placeholder="0" type="number" v-model="petEditData.weight" />
         </div>
         <div class="flex flex-col gap-2">
           <p class="font-semibold text-sm">Porte</p>
@@ -211,7 +217,51 @@ onMounted(async () => {
         </div>
       </form>
 
-      <form v-else-if="props.mode == 'add'" @submit.prevent="handleRegister"></form>
+      <form
+        v-else-if="props.mode == 'add'"
+        @submit.prevent="handleRegister"
+        class="grid gap-4 lg:grid-cols-2 lg:items-end"
+      >
+        <ImageInput v-model="petRegisterPicture"/>
+        <div class="grid grid-cols-2 gap-4">
+          <AppInput
+            class="col-span-2"
+            label="Nome"
+            placeholder="Nome do seu Pet"
+            required
+            v-model="petRegisterData.name"
+          />
+          <AppInput label="Raça" placeholder="Raça do seu Pet" v-model="petRegisterData.breed" />
+          <AppInput label="Peso (kg)" placeholder="0" type="number" v-model="petRegisterData.weight" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="font-semibold text-sm">Porte</p>
+          <div class="flex gap-4 items-center lg:flex-col">
+            <ChoseButton
+              v-for="(choice, index) in sizeChoices"
+              :key="index"
+              :text="choice.title"
+              :selected="petRegisterData.size == choice.value"
+              @select="petRegisterData.size = choice.value"
+            />
+          </div>
+        </div>
+        <TextInput
+          placeholder="Adicione alguma nota importante sobre seu pet"
+          label="Notas"
+          v-model="petRegisterData.notes"
+        />
+        <div
+          class="absolute bottom-6 right-6 left-6 lg:left-20 lg:right-20"
+        >
+          <AppButton
+            class="md:w-50"
+            :text="petStore.loading ? 'Criando...' : 'Criar'"
+            mode="outline"
+            type="submit"
+          />
+        </div>
+      </form>
     </div>
   </div>
 </template>

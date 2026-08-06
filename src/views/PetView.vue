@@ -1,4 +1,5 @@
 <script setup>
+import AppButton from '@/components/buttons/AppButton.vue'
 import PetCard from '@/components/cards/PetCard.vue'
 import PetModal from '@/components/modals/PetModal.vue'
 import { useRouter } from 'vue-router'
@@ -34,6 +35,11 @@ async function petDetail(petId) {
   openModal()
 }
 
+function openAddPet() {
+  changeModalMode('add')
+  openModal()
+}
+
 onMounted(async () => {
   await authStore.fetchUser()
   if (authStore.isClient) {
@@ -48,7 +54,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 p-6">
+  <div class="relative h-screen flex flex-col gap-4 p-6">
     <PetModal
       v-if="modalOpen"
       :mode="modalMode"
@@ -69,5 +75,8 @@ onMounted(async () => {
         />
       </li>
     </ul>
+    <div class="fixed w-full bottom-22 right-0 px-4 md:w-50 md:bottom-6">
+      <AppButton text="+ Adicionar pet" mode="outline" @event="openAddPet"/>
+    </div>
   </div>
 </template>
