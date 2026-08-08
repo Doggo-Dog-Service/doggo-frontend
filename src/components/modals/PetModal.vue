@@ -12,7 +12,7 @@ import { onMounted, reactive, ref } from 'vue'
 import AppButton from '../buttons/AppButton.vue'
 
 const petStore = usePetStore()
-const { postImage } = useMedia()
+const { postImage, loading } = useMedia()
 
 const emits = defineEmits(['close', 'changeMode'])
 
@@ -20,7 +20,7 @@ const props = defineProps({
   mode: {
     type: String,
     default: 'view',
-    validator: (value) => ['view', 'add', 'edit'].includes(value),
+    validator: (value) => ['view', 'add', 'edit', 'delete'].includes(value),
   },
   pet_id: {
     type: Number,
@@ -96,6 +96,11 @@ async function handleRegister() {
   emits('close')
 }
 
+async function handleDelete() {
+  await petStore.deletePet(props.pet_id)
+  emits('close')
+}
+
 function cancelUpdate() {
   resetEditData()
   emits('changeMode', 'view')
@@ -126,7 +131,16 @@ onMounted(async () => {
           <span class="mdi mdi-close"></span>
         </button>
       </div>
-      <div v-if="props.mode == 'view'" class="flex flex-col gap-5">
+
+      <div
+        v-if="petStore.loading || loading"
+        class="flex flex-col items-center justify-center gap-4 pt-75"
+      >
+        <span class="mdi mdi-loading animate-spin text-5xl text-doggo-green"></span>
+        <p>Aguarde um momento</p>
+      </div>
+
+      <div v-else-if="props.mode == 'view'" class="flex flex-col gap-5">
         <div class="flex flex-col gap-4 items-center">
           <img
             v-if="petStore.currentPet.pet_picture?.url"
@@ -143,9 +157,22 @@ onMounted(async () => {
           <h1 class="text-center font-semibold text-2xl">{{ petStore.currentPet.name }}</h1>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <InfoCard description="Porte" :info="petSizeConverter(petStore.currentPet.size)" />
-          <InfoCard description="Peso" :info="`${Number(petStore.currentPet.weight)} kg`" />
-          <InfoCard description="Raça" :info="petStore.currentPet.breed" class="col-span-2" />
+          <InfoCard
+            v-if="petStore.currentPet.size"
+            description="Porte"
+            :info="petSizeConverter(petStore.currentPet.size)"
+          />
+          <InfoCard
+            v-if="petStore.currentPet.weight"
+            description="Peso"
+            :info="`${Number(petStore.currentPet.weight)} kg`"
+          />
+          <InfoCard
+            v-if="petStore.currentPet.breed"
+            description="Raça"
+            :info="petStore.currentPet.breed"
+            class="col-span-2"
+          />
           <div
             class="p-6 rounded-xl border border-doggo-gray col-span-2 bg-white"
             v-if="petStore.currentPet.notes"
@@ -154,12 +181,19 @@ onMounted(async () => {
             <p>{{ petStore.currentPet.notes }}</p>
           </div>
         </div>
-        <IconButton
-          icon="mdi mdi-square-edit-outline"
-          tooltip="Editar"
-          class="fixed bottom-16 right-12 md:bottom-12 md:right-46"
-          @event="emits('changeMode', 'edit')"
-        />
+        <div class="flex gap-4 fixed bottom-16 right-12 md:bottom-12 md:right-46">
+          <IconButton
+            icon="mdi mdi-square-edit-outline"
+            tooltip="Editar pet"
+            @event="emits('changeMode', 'edit')"
+          />
+          <IconButton
+            icon="mdi mdi-delete"
+            mode="red"
+            tooltip="Deletar pet"
+            @event="emits('changeMode', 'delete')"
+          />
+        </div>
       </div>
 
       <form
@@ -209,7 +243,7 @@ onMounted(async () => {
           class="absolute bottom-6 right-6 left-6 grid grid-cols-2 items-center gap-4 lg:left-20 lg:right-20"
         >
           <AppButton
-            :text="petStore.loading ? 'Salvando...' : 'Salvar'"
+            :text="petStore.loading || loading ? 'Salvando...' : 'Salvar'"
             mode="outline"
             type="submit"
           />
@@ -222,7 +256,7 @@ onMounted(async () => {
         @submit.prevent="handleRegister"
         class="grid gap-4 lg:grid-cols-2 lg:items-end"
       >
-        <ImageInput v-model="petRegisterPicture"/>
+        <ImageInput v-model="petRegisterPicture" />
         <div class="grid grid-cols-2 gap-4">
           <AppInput
             class="col-span-2"
@@ -232,7 +266,12 @@ onMounted(async () => {
             v-model="petRegisterData.name"
           />
           <AppInput label="Raça" placeholder="Raça do seu Pet" v-model="petRegisterData.breed" />
-          <AppInput label="Peso (kg)" placeholder="0" type="number" v-model="petRegisterData.weight" />
+          <AppInput
+            label="Peso (kg)"
+            placeholder="0"
+            type="number"
+            v-model="petRegisterData.weight"
+          />
         </div>
         <div class="flex flex-col gap-2">
           <p class="font-semibold text-sm">Porte</p>
@@ -251,17 +290,30 @@ onMounted(async () => {
           label="Notas"
           v-model="petRegisterData.notes"
         />
-        <div
-          class="absolute bottom-6 right-6 left-6 lg:left-20 lg:right-20"
-        >
+        <div class="absolute bottom-6 right-6 left-6 lg:left-20 lg:right-20">
           <AppButton
             class="md:w-50"
-            :text="petStore.loading ? 'Criando...' : 'Criar'"
+            :text="petStore.loading || loading ? 'Criando...' : 'Criar'"
             mode="outline"
             type="submit"
           />
         </div>
       </form>
+
+      <div
+        v-else-if="props.mode == 'delete'"
+        class="flex flex-col items-center justify-center gap-8 pt-50"
+      >
+        <div class="text-center">
+          <span class="mdi mdi-alert-circle-outline text-6xl text-red-400"></span>
+          <h2 class="mt-4 font-semibold text-xl">Deseja mesmo deletar esse pet?</h2>
+          <p class="mt-2 text-sm text-gray-500">Essa ação não poderá ser desfeita.</p>
+        </div>
+        <div class="w-full max-w-xl grid grid-cols-2 gap-4">
+          <AppButton text="Deletar" mode="red" @event="handleDelete" />
+          <AppButton text="Cancelar" @event="emits('changeMode', 'view')" />
+        </div>
+      </div>
     </div>
   </div>
 </template>

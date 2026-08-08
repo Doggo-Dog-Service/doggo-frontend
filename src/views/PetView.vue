@@ -25,7 +25,7 @@ const closeModal = () => {
 }
 
 function changeModalMode(mode) {
-  if (!['view', 'add', 'edit'].includes(mode)) return
+  if (!['view', 'add', 'edit', 'delete'].includes(mode)) return
   modalMode.value = mode
 }
 
@@ -54,7 +54,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="relative h-screen flex flex-col gap-4 p-6">
+  <div class="relative flex flex-col gap-4 p-6">
     <PetModal
       v-if="modalOpen"
       :mode="modalMode"
