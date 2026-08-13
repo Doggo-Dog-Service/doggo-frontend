@@ -3,6 +3,7 @@ import { ref } from 'vue'
 export function useLocation() {
   const cityName = ref('')
   const stateAbbr = ref('')
+  const searchedData = ref([])
   const loading = ref(false)
   const error = ref('')
 
@@ -81,12 +82,27 @@ export function useLocation() {
     loading.value = false
   }
 
+  async function searchLocation(query) {
+    loading.value = true
+    error.value = ''
+
+    const response = await fetch(
+      `https://photon.komoot.io/api/?q=${query}&limit=5`
+    )
+
+    const { features } = await response.json()
+    searchedData.value = features
+    loading.value = false
+  }
+
   return {
     cityName,
+    searchedData,
     stateAbbr,
     loading,
     error,
     getLocation,
-    setLocation
+    setLocation,
+    searchLocation
   }
 }

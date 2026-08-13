@@ -48,27 +48,29 @@ const handleRegister = async () => {
     return
   }
 
-  if(profilePicture.value) {
+  if (profilePicture.value) {
     const newImage = await postImage({
       file: profilePicture.value,
       description: userData.email
     })
-    if(newImage.attachment_key) {
+    if (newImage?.attachment_key) {
       userData.profile_picture = newImage.attachment_key
     } else {
       return
     }
   }
-  
-  await authStore.createUser(userData)
-  await authStore.login({
+
+  const user = await authStore.createUser(userData)
+  if (!user) return
+
+  const loggedIn = await authStore.login({
     email: userData.email,
     password: userData.password,
   })
+  if (!loggedIn) return
+
   if (profileType.value === 'provider') {
-    if (authStore.isAuthenticated) {
-      router.push(`/auth/register/location/${typeServiceId.value}`)
-    }
+    router.push(`/auth/register/location/${typeServiceId.value}`)
   } else {
     await clientStore.createClient()
     router.push('/')

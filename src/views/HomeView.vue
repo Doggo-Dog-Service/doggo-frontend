@@ -89,8 +89,8 @@ watch(searchBarData, (value) => {
           class="col-span-2"
           placeholder="Buscar profissionais ou clientes"
           v-model="searchBarData"
-          @on-focus="searchedList = true"
-          @on-focus-out="searchedList = false"
+          @focus="searchedList = true"
+          @out="searchedList = false"
         >
           <template #list>
             <transition
@@ -124,10 +124,10 @@ watch(searchBarData, (value) => {
                     v-for="(provider, index) in searchStore.searched.providers"
                     :key="index"
                     :id="provider.id"
-                    :full_name="provider.user?.full_name"
-                    :profile_photo="provider.user?.profile_picture?.url"
-                    :service="provider.service_type_detail?.name"
-                    classification="5,0"
+                    :full_name="provider.full_name"
+                    :profile_photo="provider.profile_picture"
+                    :service="provider.service_type_name"
+                    :classification="provider.classification ? provider.classification : '--'"
                     :link="`/provider/${provider.id}`"
                     />
                 </div>
@@ -186,17 +186,18 @@ watch(searchBarData, (value) => {
           v-for="(provider, index) in providerStore.providers"
           :key="index"
           :id="provider.id"
-          :full_name="provider.user.full_name"
-          :service_name="provider.service_type_detail.name"
+          :full_name="provider.full_name"
+          :service_name="provider.service_type_name"
           :fixed_latitude="provider.fixed_latitude"
           :fixed_longitude="provider.fixed_longitude"
           :price_per_hour="provider.price_per_hour"
           :price_per_day="provider.price_per_day"
           :is_active="provider.is_active"
-          :profile_photo="provider.user.profile_picture?.url"
+          :profile_photo="provider.profile_picture"
+          :classification="provider.classification ? provider.classification : '--'"
         />
       </div>
-      <div v-else class="text-center h-110 flex flex-col items-center justify-center">
+      <div v-else class="text-center flex flex-col items-center justify-center py-10">
         <p class="text-xl text-doggo-green font-semibold md:text-base">
           Não conseguimos encontrar nenhum provedor perto da sua região
         </p>
