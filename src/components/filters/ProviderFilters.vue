@@ -74,7 +74,7 @@ const close = () => {
     <div v-if="open" class="fixed inset-x-0 bottom-0 z-60 md:static md:inset-auto md:z-auto">
       <div class="fixed inset-0 bg-black/40 md:hidden" @click="close"></div>
       <div
-        class="relative bg-white rounded-t-2xl md:rounded-2xl border border-doggo-gray p-5 max-h-[85vh] overflow-y-auto md:max-h-none md:shadow-lg"
+        class="relative bg-white rounded-t-2xl md:rounded-2xl border border-doggo-gray p-5 max-h-[85vh] overflow-y-auto md:max-h-none"
       >
         <div class="flex items-center justify-between mb-5 md:hidden">
           <h2 class="text-lg font-bold text-doggo-black">Filtros</h2>

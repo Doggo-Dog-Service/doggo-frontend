@@ -98,9 +98,10 @@ const distanceLabel = computed(() => {
           <span class="mdi mdi-briefcase-variant"></span>
           <p class="truncate">{{ props.service_name }}</p>
         </div>
-        <div v-if="ratingLabel" class="flex text-sm gap-1">
+        <div class="flex text-sm gap-1">
           <span class="mdi mdi-star text-amber-400"></span>
-          <p class="font-semibold">{{ ratingLabel }}</p>
+          <p v-if="ratingLabel" class="font-semibold">{{ ratingLabel }}</p>
+          <p v-else class="font-semibold">--</p>
         </div>
       </div>
     </div>
