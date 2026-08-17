@@ -115,9 +115,7 @@ watch(searchBarData, (value) => {
                   ></div>
                 </div>
                 <div
-                  v-else-if="
-                    searchStore.searched.providers?.length > 0
-                  "
+                  v-else-if="searchStore.searched.providers?.length > 0"
                   class="w-full h-full flex flex-col gap-2"
                 >
                   <SearchCard
@@ -129,7 +127,7 @@ watch(searchBarData, (value) => {
                     :service="provider.service_type_name"
                     :classification="provider.classification ? provider.classification : '--'"
                     :link="`/provider/${provider.id}`"
-                    />
+                  />
                 </div>
                 <div
                   v-else
@@ -188,13 +186,11 @@ watch(searchBarData, (value) => {
           :id="provider.id"
           :full_name="provider.full_name"
           :service_name="provider.service_type_name"
-          :fixed_latitude="provider.fixed_latitude"
-          :fixed_longitude="provider.fixed_longitude"
           :price_per_hour="provider.price_per_hour"
           :price_per_day="provider.price_per_day"
           :is_active="provider.is_active"
           :profile_photo="provider.profile_picture"
-          :classification="provider.classification ? provider.classification : '--'"
+          :classification="provider.classification"
         />
       </div>
       <div v-else class="text-center flex flex-col items-center justify-center py-10">

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon, HeartIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, HeartIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -15,6 +15,7 @@ const router = createRouter({
           name: 'home-view',
           component: () => import('@/views/HomeView.vue'),
           meta: {
+            id: 1,
             title: 'Início',
             icon: HomeIcon,
             isView: true,
@@ -22,12 +23,23 @@ const router = createRouter({
           },
         },
         {
-          path: 'provider/:id',
-          name: 'provider-view',
+          path: 'provider/',
+          name: 'provider-list-view',
+          component: () => import('@/views/ProviderListView.vue'),
+          meta: {
+            id: 2,
+            requiresAuth: true,
+            isView: true,
+            title: 'Profissionais',
+            icon: BriefcaseIcon
+          },
+        },
+        {
+          path: 'provider/:id/',
           component: () => import('@/views/ProviderView.vue'),
           meta: {
-            requiresAuth: true,
-          },
+            requiresAuth: true
+          }
         },
         {
           path: 'pets',
@@ -44,7 +56,7 @@ const router = createRouter({
             const authStore = useAuthStore()
             if(!authStore.isClient) {
               return '/'
-            } 
+            }
           }
         },
       ],
