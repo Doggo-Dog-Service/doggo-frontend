@@ -67,7 +67,7 @@ onMounted(async () => {
     </h1>
     <ul
       v-if="petStore.pets.length > 0"
-      class="w-full grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+      class="w-full grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 pb-40 md:pb-20"
     >
       <li v-for="pet in petStore.pets" :key="pet.id">
         <PetCard
