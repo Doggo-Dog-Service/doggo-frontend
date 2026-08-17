@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import ProviderCard from '@/components/cards/ProviderCard.vue'
+import UserCard from '@/components/cards/UserCard.vue'
 import ProviderFilters from '@/components/filters/ProviderFilters.vue'
 import { useProviderStore } from '@/stores/provider'
 import { useServiceStore } from '@/stores/service'
@@ -24,10 +24,27 @@ const filters = reactive({
 })
 
 const loadProviders = async () => {
-  await providerStore.fetchProviders({
+  const params = {
     service_type: filters.serviceType,
     page_size: 100,
-  })
+  }
+
+  if (toFloat(filters.minPrice) != null) {
+    params.min_price = filters.minPrice
+  }
+  if (toFloat(filters.maxPrice) != null) {
+    params.max_price = filters.maxPrice
+  }
+
+  if (hasGeolocation.value) {
+    params.lat = latitude.value
+    params.lon = longitude.value
+    if (toFloat(filters.maxDistance) !== 50) {
+      params.max_distance = filters.maxDistance
+    }
+  }
+
+  await providerStore.fetchProviders(params)
 }
 
 watch(() => filters.serviceType, loadProviders)
@@ -42,41 +59,17 @@ const distanceFor = (provider) => {
   )
 }
 
-const filteredProviders = computed(() => {
-  const minPrice = toFloat(filters.minPrice)
-  const maxPrice = toFloat(filters.maxPrice)
-  const maxDistance = toFloat(filters.maxDistance)
-  const distanceFilterActive =
-    hasGeolocation.value && maxDistance != null && maxDistance !== 50
-
-  return providerStore.providers.filter((provider) => {
-    const price = toFloat(provider.price_per_hour)
-
-    if (minPrice != null && (price == null || price < minPrice)) return false
-    if (maxPrice != null && (price == null || price > maxPrice)) return false
-
-    if (distanceFilterActive) {
-      const distance = distanceFor(provider)
-      if (distance != null && distance > maxDistance) return false
-    }
-
-    return true
-  })
-})
-
 const cardProviders = computed(() =>
-  filteredProviders.value.map((provider) => ({
+  providerStore.providers.map((provider) => ({
     id: provider.id,
     full_name: provider.full_name ?? provider.user?.full_name ?? 'Profissional',
-    service_name:
-      provider.service_type_name ?? provider.service_type_detail?.name ?? '',
-    profile_photo:
-      provider.profile_picture ?? provider.user?.profile_picture?.url ?? '',
+    service_name: provider.service_type_name ?? provider.service_type_detail?.name ?? '',
+    profile_photo: provider.profile_picture ?? provider.user?.profile_picture?.url ?? '',
     price_per_hour: provider.price_per_hour,
     price_per_day: provider.price_per_day,
     classification: provider.classification,
     is_active: provider.is_active,
-    distance: distanceFor(provider),
+    distance: provider.distance ?? distanceFor(provider),
   })),
 )
 
@@ -98,6 +91,7 @@ const clearFilters = () => {
   filters.minPrice = null
   filters.maxPrice = null
   filters.maxDistance = 50
+  loadProviders()
 }
 
 onMounted(async () => {
@@ -109,14 +103,13 @@ onMounted(async () => {
   } catch {
     hasGeolocation.value = false
   }
-
 })
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-6 md:py-10 mb-19 md:mb-0">
-    <div class="mt-8 flex items-center justify-between gap-4">
-      <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">Profissionais</h1>
+  <div class="p-6 mb-19 md:mb-0 text-doggo-black flex flex-col gap-5">
+    <div class="flex items-center justify-between gap-4">
+      <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">Pr<span class="text-3xl md:text-4xl font-bold text-doggo-green">o</span>fissionais</h1>
       <button
         class="flex items-center gap-2 h-10 px-4 bg-white border border-doggo-gray rounded-lg text-sm font-semibold text-doggo-black/70 cursor-pointer transition-all duration-200 active:scale-98"
         @click="filtersOpen = !filtersOpen"
@@ -131,7 +124,7 @@ onMounted(async () => {
         </span>
       </button>
     </div>
-    <div class="mt-8 flex flex-col md:flex-row md:gap-10">
+    <div class="flex flex-col md:flex-row md:gap-10">
       <div class="flex-1 min-w-0">
         <div v-if="providerStore.loading" class="flex flex-col gap-3">
           <div
@@ -156,7 +149,7 @@ onMounted(async () => {
           </button>
         </div>
         <div
-          v-else-if="filteredProviders.length === 0"
+          v-else-if="providerStore.providers.length === 0"
           class="flex flex-col items-center justify-center gap-4 py-16 text-center"
         >
           <span class="mdi mdi-paw-off text-5xl text-gray-300"></span>
@@ -176,7 +169,7 @@ onMounted(async () => {
           </button>
         </div>
         <div v-else class="flex flex-col gap-3">
-          <ProviderCard
+          <UserCard
             v-for="provider in cardProviders"
             :key="provider.id"
             :id="provider.id"

@@ -71,7 +71,7 @@ const close = () => {
 
 <template>
   <Transition name="panel">
-    <div v-if="open" class="fixed inset-x-0 bottom-0 z-50 md:static md:inset-auto md:z-auto">
+    <div v-if="open" class="fixed inset-x-0 bottom-0 z-60 md:static md:inset-auto md:z-auto">
       <div class="fixed inset-0 bg-black/40 md:hidden" @click="close"></div>
       <div
         class="relative bg-white rounded-t-2xl md:rounded-2xl border border-doggo-gray p-5 max-h-[85vh] overflow-y-auto md:max-h-none md:shadow-lg"
@@ -98,8 +98,7 @@ const close = () => {
                 class="w-full h-9 pl-8 pr-3 rounded-lg border border-doggo-gray text-sm placeholder:text-gray-300 focus:outline-none focus:border-doggo-green transition-all duration-200"
               />
             </div>
-          </div>
-          <span class="pb-2.5 text-gray-400">–</span>
+          </div>  
           <div class="flex-1">
             <label class="block text-xs text-gray-400 mb-1">Máximo</label>
             <div class="relative">
