@@ -1,4 +1,7 @@
 <script setup>
+import { computed } from 'vue'
+import { formatDistance } from '@/utils/distance'
+
 const props = defineProps({
   id: {
     type: Number,
@@ -14,32 +17,56 @@ const props = defineProps({
   },
   service_name: {
     type: String,
-    required: true,
+    default: '',
   },
-  fixed_latitude: {
-    type: String,
-    required: true,
-  },
-  fixed_longitude: {
-    type: String,
-    required: true,
+  distance: {
+    type: Number,
+    default: null,
   },
   price_per_hour: {
-    type: String,
-    default: '',
+    type: [String, Number],
+    default: null,
   },
   price_per_day: {
-    type: String,
-    default: '',
+    type: [String, Number],
+    default: null,
   },
   classification: {
     type: [Number, String],
-    required: false,
+    default: null,
   },
   is_active: {
     type: Boolean,
-    required: true,
+    default: false,
   },
+})
+
+const formatPrice = (value) => {
+  const number = Number(value)
+  if (Number.isNaN(number)) return ''
+  return number.toFixed(2).replace('.', ',').replace(/,00$/, '')
+}
+
+const priceLabel = computed(() => {
+  if (props.price_per_hour != null && props.price_per_hour !== '') {
+    return `R$ ${formatPrice(props.price_per_hour)}/h`
+  }
+  if (props.price_per_day != null && props.price_per_day !== '') {
+    return `R$ ${formatPrice(props.price_per_day)}/dia`
+  }
+  return 'indefinido'
+})
+
+const ratingLabel = computed(() => {
+  if (props.classification == null) return ''
+  const rating = Number(props.classification)
+  if (Number.isNaN(rating)) return ''
+  return rating.toFixed(1).replace('.', ',')
+})
+
+const distanceLabel = computed(() => {
+  const label = formatDistance(props.distance)
+  return label ? `${label} de você` : ''
 })
 </script>
 
@@ -51,25 +78,30 @@ const props = defineProps({
     <div class="flex items-center gap-4">
       <img
         v-if="props.profile_photo"
-        class="h-15 w-15 rounded-xl object-cover"
+        class="h-15 w-15 rounded-xl object-cover shrink-0"
         :src="props.profile_photo"
         :alt="`${props.full_name.toLowerCase()}-photo`"
       />
       <div
         v-else
-        class="flex flex-col items-center justify-center h-15 w-15 rounded-xl bg-doggo-light-green"
+        class="flex flex-col items-center justify-center h-15 w-15 rounded-xl bg-doggo-light-green shrink-0"
       >
         <p class="text-white text-xl">{{ props.full_name.charAt() }}</p>
       </div>
-      <div>
+      <div class="min-w-0">
         <h3 class="text-base font-semibold truncate w-40">{{ props.full_name }}</h3>
-        <div class="flex text-sm text-zinc-400 gap-2">
+        <div v-if="distanceLabel" class="flex items-center gap-1 mt-0.5">
+          <span class="mdi mdi-map-marker text-sm text-doggo-green"></span>
+          <p class="text-sm text-zinc-400 truncate">{{ distanceLabel }}</p>
+        </div>
+        <div v-if="props.service_name" class="flex text-sm text-zinc-400 gap-2">
           <span class="mdi mdi-briefcase-variant"></span>
-          <p>{{ props.service_name }}</p>
+          <p class="truncate">{{ props.service_name }}</p>
         </div>
         <div class="flex text-sm gap-1">
           <span class="mdi mdi-star text-amber-400"></span>
-          <p class="font-semibold">{{ props.classification }}</p>
+          <p v-if="ratingLabel" class="font-semibold">{{ ratingLabel }}</p>
+          <p v-else class="font-semibold">--</p>
         </div>
       </div>
     </div>
@@ -83,14 +115,8 @@ const props = defineProps({
         <span class="mdi mdi-circle text-[10px]"></span>
         <p>{{ props.is_active ? 'Online' : 'Offline' }}</p>
       </div>
-      <p v-if="props.price_per_hour" class="text-doggo-green text-sm font-semibold">
-        R$ {{ props.price_per_hour }}/h
-      </p>
-      <p v-else-if="props.price_per_day" class="text-doggo-green text-sm font-semibold">
-        R$ {{ props.price_per_day }}/d
-      </p>
-      <p v-else class="text-doggo-green text-sm font-semibold">
-        indefinido
+      <p class="text-doggo-green text-sm font-semibold">
+        {{ priceLabel }}
       </p>
     </div>
   </RouterLink>
