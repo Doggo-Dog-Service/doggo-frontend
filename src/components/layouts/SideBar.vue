@@ -17,14 +17,13 @@ function logout() {
 }
 
 onMounted(() => {
-  routes.value = router.getRoutes().filter((route) => route.meta.isView).sort((a, b) => a.meta.id - b.meta.id)
-  routes.value = router.getRoutes().filter((route) => {
-    if(!route.meta.isView) return false
-
-    if(route.meta.requiresClient && !authStore.isClient) return false
-
-    return true
-  })
+  routes.value = router.getRoutes()
+    .filter((route) => {
+      if (!route.meta.isView) return false
+      if (route.meta.requiresClient && !authStore.isClient) return false
+      return true
+    })
+    .sort((a, b) => a.meta.id - b.meta.id)
 })
 </script>
 

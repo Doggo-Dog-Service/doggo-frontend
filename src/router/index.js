@@ -46,6 +46,7 @@ const router = createRouter({
           name: 'pets-view',
           component: () => import('@/views/PetView.vue'),
           meta: {
+            id: 3,
             requiresAuth: true,
             requiresClient: true,
             title: 'Meus Pets',
