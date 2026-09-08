@@ -6,7 +6,7 @@ import ImageInput from '@/components/inputs/ImageInput.vue'
 import { onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useClientStore } from '@/stores/clients'
-import { useServiceStore } from '@/stores/service'
+import { useServiceStore } from '@/stores/serviceType'
 import { useMedia } from '@/composables/useMedia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
@@ -35,7 +35,7 @@ const changeProfileType = (type) => {
 }
 
 onMounted(async () => {
-  await serviceStore.getServices()
+  await serviceStore.getTypeServices()
 })
 
 const handleRegister = async () => {
@@ -51,7 +51,7 @@ const handleRegister = async () => {
   if (profilePicture.value) {
     const newImage = await postImage({
       file: profilePicture.value,
-      description: userData.email
+      description: userData.email,
     })
     if (newImage?.attachment_key) {
       userData.profile_picture = newImage.attachment_key

@@ -8,7 +8,7 @@ import UserCard from '@/components/cards/UserCard.vue'
 import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
-import { useServiceStore } from '@/stores/service'
+import { useServiceStore } from '@/stores/serviceType'
 import { useClientStore } from '@/stores/clients'
 import { useSearchStore } from '@/stores/search'
 
@@ -51,7 +51,7 @@ onMounted(async () => {
     providerStore.fetchProviders(),
     providerStore.countProviders(),
     clientStore.countClients(),
-    serviceStore.getServices(),
+    serviceStore.getTypeServices(),
   ])
   selectTypeService(serviceStore.typeServices[0].id)
 })
