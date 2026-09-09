@@ -1,4 +1,4 @@
-import * as serviceApi from '../api/serviceApi'
+import * as serviceApi from '../api/services'
 
 export const getServices = async (params) => {
   try {
@@ -51,6 +51,19 @@ export const updateService = async (id, payload) => {
 export const deleteService = async (id) => {
   try {
     const response = await serviceApi.deleteService(id)
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const startService = async (id) => {
+  try {
+    const response = await serviceApi.startService(id)
+
     return response.data
   } catch (error) {
     throw {

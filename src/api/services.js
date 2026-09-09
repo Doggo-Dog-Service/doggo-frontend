@@ -19,3 +19,7 @@ export const updateService = (id, payload) => {
 export const deleteService = (id) => {
     return api.delete(`/services/${id}/`)
 }
+
+export const startService = (id) => {
+    return api.post(`/services/${id}/start/`)
+}

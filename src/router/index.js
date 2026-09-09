@@ -60,6 +60,14 @@ const router = createRouter({
             }
           }
         },
+        {
+          path: 'walk/:id',
+          name: 'walk-view',
+          component: () => import('@/views/WalkView.vue'),
+          meta: {
+            requiresAuth: true,
+          }
+        }
       ],
     },
     {

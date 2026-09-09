@@ -2,12 +2,12 @@ import { onUnmounted, ref } from 'vue'
 
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { useGeolocation } from '@/composables/useGeolocation'
-import { WebSocketService } from '@/services/WebSocketService'
+import { WebSocketService } from '@/services/serviceWebSocket'
 import { getAccessToken } from '@/utils/token'
 
 const LOCATION_INTERVAL = 2000
 
-export const useServiceWebSocket = (serviceId) => {
+export const useServiceWebSocket = (serviceId, handlers = {}) => {
   const serviceWebSocketStore = useServiceWebSocketStore()
 
   const {
@@ -108,6 +108,10 @@ export const useServiceWebSocket = (serviceId) => {
     }
 
     serviceWebSocketStore.updateLocation(
+      message.location
+    )
+
+    handlers.onLocation?.(
       message.location
     )
   }
