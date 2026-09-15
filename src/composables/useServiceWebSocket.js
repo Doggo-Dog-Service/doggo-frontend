@@ -108,7 +108,8 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
     }
 
     serviceWebSocketStore.updateLocation(
-      message.location
+      message.location,
+      message.distance
     )
 
     handlers.onLocation?.(
@@ -214,7 +215,7 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
     }
 
     serviceWebSocketStore.setTracking(true)
-
+    startSendingLocation()
     watchPosition()
 
     connect()

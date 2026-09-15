@@ -10,6 +10,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const tracking = ref(false)
 
   const currentLocation = ref(null)
+  const currentDistance = ref(null)
   const route = ref([])
 
   const error = ref(null)
@@ -21,6 +22,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const providerId = computed(() => service.value?.provider_id ?? null)
   const providerName = computed(() => service.value?.provider_name ?? null)
   const serviceType = computed(() => service.value?.service_type ?? null)
+  const pets = computed(() => service.value?.pets ?? [])
 
   async function getService(serviceId) {
     loading.value = true
@@ -84,8 +86,9 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     service.value.status = value
   }
 
-  function updateLocation(location) {
+  function updateLocation(location, distance) {
     currentLocation.value = location
+    currentDistance.value = distance
     route.value.push(location)
   }
 
@@ -115,7 +118,9 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     providerId,
     providerName,
     serviceType,
+    pets,
     currentLocation,
+    currentDistance,
     route,
     error,
     loading,
