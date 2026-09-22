@@ -23,3 +23,23 @@ export const deleteService = (id) => {
 export const startService = (id) => {
     return api.post(`/services/${id}/start/`)
 }
+
+export const confirmService = (id) => {
+    return api.post(`/services/${id}/confirm/`)
+}
+
+export const rejectService = (id) => {
+    return api.post(`/services/${id}/reject/`)
+}
+
+export const completeService = (id) => {
+    return api.post(`/services/${id}/complete/`)
+}
+
+export const cancelService = (id) => {
+    return api.post(`/services/${id}/cancel/`)
+}
+
+export const getServiceRoute = (id) => {
+    return api.get(`/services/${id}/route/`)
+}

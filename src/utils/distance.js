@@ -27,3 +27,15 @@ export const formatDistance = (distance) => {
 
   return `${Math.round(value)} km`
 }
+
+export const formatMeters = (meters) => {
+  if (meters == null || Number.isNaN(Number(meters))) return '0 m'
+
+  const value = Number(meters)
+
+  if (value < 1000) {
+    return `${Math.round(value)} m`
+  }
+
+  return `${(value / 1000).toFixed(2)} km`
+}

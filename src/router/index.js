@@ -61,9 +61,9 @@ const router = createRouter({
           }
         },
         {
-          path: 'walk/:id',
-          name: 'walk-view',
-          component: () => import('@/views/WalkView.vue'),
+          path: 'service/:id',
+          name: 'service-view',
+          component: () => import('@/views/ServiceView.vue'),
           meta: {
             requiresAuth: true,
           }

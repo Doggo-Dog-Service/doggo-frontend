@@ -1,4 +1,4 @@
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { useGeolocation } from '@/composables/useGeolocation'
@@ -28,18 +28,20 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
       return
     }
 
+    if (serviceWebSocketStore.isTerminal) {
+      return
+    }
+
     const token = getAccessToken()
 
     if (!token) {
-      serviceWebSocketStore.setError(
-        'Usuário não autenticado.'
-      )
+      serviceWebSocketStore.setError('Usuário não autenticado.')
 
       return
     }
 
     websocket.value = new WebSocketService(
-      serviceId,
+      serviceId?.value ?? serviceId,
       token,
       {
         onOpen: handleOpen,
@@ -78,6 +80,14 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
         handleLocation(message)
         break
 
+      case 'walk_confirmed':
+        handleWalkConfirmed(message)
+        break
+
+      case 'walk_rejected':
+        handleWalkRejected(message)
+        break
+
       case 'walk_started':
         handleWalkStarted(message)
         break
@@ -95,10 +105,7 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
         break
 
       default:
-        console.warn(
-          'Tipo de mensagem WebSocket desconhecido:',
-          message.type
-        )
+        console.warn('Tipo de mensagem WebSocket desconhecido:', message.type)
     }
   }
 
@@ -107,61 +114,57 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
       return
     }
 
-    serviceWebSocketStore.updateLocation(
-      message.location,
-      message.distance
-    )
+    serviceWebSocketStore.updateLocation(message.location, message.distance)
 
-    handlers.onLocation?.(
-      message.location
-    )
+    handlers.onLocation?.(message.location)
+  }
+
+  function handleWalkConfirmed(message) {
+    serviceWebSocketStore.setStatus(message.status)
+
+    serviceWebSocketStore.clearError()
+  }
+
+  function handleWalkRejected(message) {
+    serviceWebSocketStore.setStatus(message.status)
+
+    serviceWebSocketStore.clearError()
   }
 
   function handleWalkStarted(message) {
-    serviceWebSocketStore.setStatus(
-      message.status
-    )
+    serviceWebSocketStore.setStatus(message.status)
 
     serviceWebSocketStore.clearError()
   }
 
   function handleWalkCompleted(message) {
-    serviceWebSocketStore.setStatus(
-      message.status
-    )
+    serviceWebSocketStore.setStatus(message.status)
 
     stopSendingLocation()
     stopWatching()
 
     serviceWebSocketStore.setTracking(false)
+    websocket.value?.stopReconnecting()
   }
 
   function handleWalkCancelled(message) {
-    serviceWebSocketStore.setStatus(
-      message.status
-    )
+    serviceWebSocketStore.setStatus(message.status)
 
     stopSendingLocation()
     stopWatching()
 
     serviceWebSocketStore.setTracking(false)
+    websocket.value?.stopReconnecting()
   }
 
   function handleServerError(message) {
-    serviceWebSocketStore.setError(
-      message.message
-    )
+    serviceWebSocketStore.setError(message.message)
   }
 
   function handleError(error) {
-    console.error(
-      'Erro WebSocket:',
-      error
-    )
+    console.error('Erro WebSocket:', error)
 
-    serviceWebSocketStore.setError(
-      'Erro na conexão com o servidor.'
-    )
+    serviceWebSocketStore.setError('Erro na conexão com o servidor.')
   }
 
   function handleClose() {
@@ -173,10 +176,7 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
       return false
     }
 
-    if (
-      latitude.value === null ||
-      longitude.value === null
-    ) {
+    if (latitude.value === null || longitude.value === null) {
       return false
     }
 
@@ -227,6 +227,18 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
 
     serviceWebSocketStore.setTracking(false)
   }
+
+  watch(
+    () => serviceWebSocketStore.isTerminal,
+    (terminal) => {
+      if (terminal) {
+        stopSendingLocation()
+        stopWatching()
+
+        websocket.value?.stopReconnecting()
+      }
+    }
+  )
 
   onUnmounted(() => {
     disconnect()

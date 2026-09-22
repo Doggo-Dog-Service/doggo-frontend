@@ -72,3 +72,68 @@ export const startService = async (id) => {
     }
   }
 }
+
+export const confirmService = async (id) => {
+  try {
+    const response = await serviceApi.confirmService(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const rejectService = async (id) => {
+  try {
+    const response = await serviceApi.rejectService(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const completeService = async (id) => {
+  try {
+    const response = await serviceApi.completeService(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const cancelService = async (id) => {
+  try {
+    const response = await serviceApi.cancelService(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const getServiceRoute = async (id) => {
+  try {
+    const response = await serviceApi.getServiceRoute(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
