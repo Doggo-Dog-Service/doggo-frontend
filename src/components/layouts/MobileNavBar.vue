@@ -17,13 +17,14 @@ const routes = router.getRoutes().filter((route) => {
 const isRouteActive = (path) => router.currentRoute.value.path === path
 </script>
 <template>
-  <div class="fixed bottom-0 left-0 right-0 bg-background-light border-t border-doggo-gray py-2 z-50">
-    <nav class="flex justify-center gap-5">
+  <div class="fixed w-screen bottom-0 left-0 right-0 bg-background-light border-t border-doggo-gray z-50">
+    <nav class="grid grid-cols-4 w-full justify-center items-center px-4 py-3">
       <NavButton
         v-for="(route, index) in routes"
         :key="index"
         :to="route.path"
-        :icon="route.meta.icon"
+        :type="route.meta.icon.type"
+        :icon="route.meta.icon.value"
         :text="route.meta.title"
         :active="isRouteActive(route.path)"
       />

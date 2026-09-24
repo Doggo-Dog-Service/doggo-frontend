@@ -106,6 +106,10 @@ async function load() {
     if (isParticipant.value) {
       connect()
     }
+
+    if (serviceWebSocketStore.isFinished) {
+      await loadRoute()
+    }
   } catch {
     pageError.value = serviceWebSocketStore.error || 'Não foi possível carregar o serviço.'
   } finally {

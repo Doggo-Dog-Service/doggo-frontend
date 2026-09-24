@@ -62,8 +62,8 @@ onMounted(async () => {
       @close="closeModal"
       @change-mode="changeModalMode"
     />
-    <h1 class="w-full font-semibold text-2xl">
-      Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
+    <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
+        Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
     </h1>
     <ul
       v-if="petStore.pets.length > 0"

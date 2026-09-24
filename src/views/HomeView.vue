@@ -8,13 +8,13 @@ import UserCard from '@/components/cards/UserCard.vue'
 import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
-import { useServiceStore } from '@/stores/serviceType'
+import { useServiceTypeStore } from '@/stores/serviceType'
 import { useClientStore } from '@/stores/clients'
 import { useSearchStore } from '@/stores/search'
 
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
-const serviceStore = useServiceStore()
+const serviceTypeStore = useServiceTypeStore()
 const clientStore = useClientStore()
 const searchStore = useSearchStore()
 
@@ -51,9 +51,9 @@ onMounted(async () => {
     providerStore.fetchProviders(),
     providerStore.countProviders(),
     clientStore.countClients(),
-    serviceStore.getTypeServices(),
+    serviceTypeStore.getTypeServices(),
   ])
-  selectTypeService(serviceStore.typeServices[0].id)
+  selectTypeService(serviceTypeStore.typeServices[0].id)
 })
 
 let timeout = null
@@ -169,7 +169,7 @@ watch(searchBarData, (value) => {
       <h2 class="text-lg font-bold">Perto de você</h2>
       <div class="flex gap-2">
         <ChoseButton
-          v-for="(typeService, index) in serviceStore.typeServices"
+          v-for="(typeService, index) in serviceTypeStore.typeServices"
           :key="index"
           :text="typeService.name"
           :selected="typeService.id === currentTypeService"

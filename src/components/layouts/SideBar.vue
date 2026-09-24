@@ -39,7 +39,8 @@ onMounted(() => {
         <li v-for="(route, index) in routes" :key="index">
           <NavButton
             :to="route.path"
-            :icon="route.meta.icon"
+            :type="route.meta.icon.type"
+            :icon="route.meta.icon.value"
             :text="route.meta.title"
             :active="isRouteActive(route.path)"
           />

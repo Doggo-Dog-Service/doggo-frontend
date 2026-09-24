@@ -3,13 +3,13 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import UserCard from '@/components/cards/UserCard.vue'
 import ProviderFilters from '@/components/filters/ProviderFilters.vue'
 import { useProviderStore } from '@/stores/provider'
-import { useServiceStore } from '@/stores/serviceType'
+import { useServiceTypeStore } from '@/stores/serviceType'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { haversine } from '@/utils/distance'
 import { toFloat } from '@/utils/toFloat'
 
 const providerStore = useProviderStore()
-const serviceStore = useServiceStore()
+const serviceTypeStore = useServiceTypeStore()
 
 const { latitude, longitude, getCurrentPosition } = useGeolocation()
 
@@ -95,7 +95,7 @@ const clearFilters = () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadProviders(), serviceStore.getTypeServices()])
+  await Promise.all([loadProviders(), serviceTypeStore.getTypeServices()])
 
   try {
     await getCurrentPosition()
@@ -191,7 +191,7 @@ onMounted(async () => {
           <ProviderFilters
             v-model:open="filtersOpen"
             v-model:filters="filters"
-            :service-types="serviceStore.typeServices"
+            :service-types="serviceTypeStore.typeServices"
             :distance-enabled="hasGeolocation"
             @apply="applyFilters"
             @clear="clearFilters"

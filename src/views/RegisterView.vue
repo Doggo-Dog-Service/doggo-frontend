@@ -6,14 +6,14 @@ import ImageInput from '@/components/inputs/ImageInput.vue'
 import { onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useClientStore } from '@/stores/clients'
-import { useServiceStore } from '@/stores/serviceType'
+import { useServiceTypeStore } from '@/stores/serviceType'
 import { useMedia } from '@/composables/useMedia'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toast-notification'
 
 const authStore = useAuthStore()
 const clientStore = useClientStore()
-const serviceStore = useServiceStore()
+const serviceTypeStore = useServiceTypeStore()
 const { postImage } = useMedia()
 const router = useRouter()
 const $toast = useToast()
@@ -35,7 +35,7 @@ const changeProfileType = (type) => {
 }
 
 onMounted(async () => {
-  await serviceStore.getTypeServices()
+  await serviceTypeStore.getTypeServices()
 })
 
 const handleRegister = async () => {
@@ -107,7 +107,7 @@ const handleRegister = async () => {
         <div v-if="profileType === 'provider'" class="w-full flex flex-col gap-2">
           <h2 class="font-semibold">Tipo de serviço <span class="text-red-400">*</span></h2>
           <ChoseButton
-            v-for="(typeService, index) in serviceStore.typeServices"
+            v-for="(typeService, index) in serviceTypeStore.typeServices"
             :key="index"
             :text="typeService.name"
             :sub-text="typeService.description"

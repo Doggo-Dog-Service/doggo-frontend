@@ -2,7 +2,7 @@ import * as serviceService from '@/services/serviceType'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useServiceStore = defineStore('serviceStore', () => {
+export const useServiceTypeStore = defineStore('serviceTypeStore', () => {
   const loading = ref(false)
   const typeServices = ref([])
 

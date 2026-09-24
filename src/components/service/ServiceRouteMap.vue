@@ -32,10 +32,26 @@ function toCoordinates(points) {
   return points.map((point) => [Number(point.longitude), Number(point.latitude)])
 }
 
+function getRouteCenter(points) {
+  if (!points.length) return null
+
+  const lats = points.map((point) => Number(point.latitude))
+  const lngs = points.map((point) => Number(point.longitude))
+
+  const north = Math.max(...lats)
+  const south = Math.min(...lats)
+  const east = Math.max(...lngs)
+  const west = Math.min(...lngs)
+
+  return [(east + west) / 2, (north + south) / 2]
+}
+
 async function initializeMap() {
-  const center = store.providerLocation
-    ? [store.providerLocation.longitude, store.providerLocation.latitude]
-    : [0, 0]
+  const center =
+    getRouteCenter(store.routePoints) ??
+    (store.providerLocation
+      ? [store.providerLocation.longitude, store.providerLocation.latitude]
+      : [0, 0])
 
   await nextTick()
   createMap('service-route-map', center, 15)

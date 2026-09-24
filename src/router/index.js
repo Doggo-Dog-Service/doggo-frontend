@@ -17,7 +17,10 @@ const router = createRouter({
           meta: {
             id: 1,
             title: 'Início',
-            icon: HomeIcon,
+            icon: {
+              type: 'hero',
+              value: HomeIcon
+            },
             isView: true,
             requiresAuth: true,
           },
@@ -31,7 +34,10 @@ const router = createRouter({
             requiresAuth: true,
             isView: true,
             title: 'Profissionais',
-            icon: BriefcaseIcon
+            icon: {
+              type: 'hero',
+              value: BriefcaseIcon
+            }
           },
         },
         {
@@ -42,7 +48,7 @@ const router = createRouter({
           }
         },
         {
-          path: 'pets',
+          path: 'pets/',
           name: 'pets-view',
           component: () => import('@/views/PetView.vue'),
           meta: {
@@ -50,7 +56,10 @@ const router = createRouter({
             requiresAuth: true,
             requiresClient: true,
             title: 'Meus Pets',
-            icon: HeartIcon,
+            icon: {
+              type: 'mdi',
+              value: 'mdi mdi-paw-outline'
+            },
             isView: true,
           },
           beforeEnter: () => {
@@ -58,6 +67,21 @@ const router = createRouter({
             if(!authStore.isClient) {
               return '/'
             }
+          }
+        },
+        {
+          path: 'services/',
+          name: 'services-view',
+          component: () => import('@/views/ServicesView.vue'),
+          meta: {
+            id: 4,
+            requiresAuth: true,
+            title: 'Serviços',
+            icon: {
+              type: 'mdi',
+              value: 'mdi mdi-dog-service'
+            },
+            isView: true
           }
         },
         {
