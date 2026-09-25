@@ -69,7 +69,7 @@ const isRed = computed(() => props.color === 'red')
   <RouterLink
     :to="link"
     :class="[
-      'grid grid-rows-2 w-full h-50 rounded-xl p-4 bg-white border-l-4 border border-doggo-gray lg:border-l lg:border-l-doggo-gray lg:border-t-4 transition-transform',
+      'grid grid-rows-2 w-full h-50 rounded-xl p-4 bg-white border-l-4 border border-doggo-gray lg:border-l lg:border-l-doggo-gray lg:border-t-4 transition-transform hover:scale-98 active:scale-99',
       isYellow && 'border-l-yellow-400 lg:border-t-yellow-400',
       isBlue && 'border-l-blue-400 lg:border-t-blue-400',
       isGreen && 'border-l-doggo-green lg:border-t-doggo-green',
