@@ -1,17 +1,17 @@
 <script setup>
 import AppHeader from '@/components/layouts/AppHeader.vue'
-import AltHeader from '@/components/layouts/AltHeader.vue';
+import AltHeader from '@/components/layouts/AltHeader.vue'
 import MobileNavBar from '@/components/layouts/MobileNavBar.vue'
 import SideBar from '@/components/layouts/SideBar.vue'
-import { useRouter } from 'vue-router';
-const router = useRouter()
+import { useRoute } from 'vue-router'
+const route = useRoute()
 </script>
 
 <template>
   <div class="flex flex-col md:flex-row">
     <SideBar class="hidden md:block" />
-    <div class="md:ml-72">
-      <AppHeader v-if="router.currentRoute.value.name == 'home-view'" class="md:hidden" />
+    <div class="w-full md:ml-72">
+      <AppHeader v-if="route.name === 'home-view'" class="md:hidden"/>
       <AltHeader v-else/>
       <main>
         <RouterView v-slot="{ Component }">
@@ -29,6 +29,8 @@ const router = useRouter()
         </RouterView>
       </main>
     </div>
-    <MobileNavBar class="block md:hidden" />
+    <MobileNavBar
+     v-if="route.name !== 'provider-view'"
+     class="block md:hidden" />
   </div>
 </template>

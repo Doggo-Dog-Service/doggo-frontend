@@ -1,14 +1,23 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.js'
 import NavButton from '../buttons/NavButton.vue'
-const router = useRouter()
 
-const routes = router.getRoutes().filter((r) => r.meta.isView)
+const router = useRouter()
+const authStore = useAuthStore()
+
+const routes = router.getRoutes().filter((route) => {
+  if (!route.meta.isView) return false
+
+  if (route.meta.requiresClient && !authStore.isClient) return false
+
+  return true
+})
 
 const isRouteActive = (path) => router.currentRoute.value.path === path
 </script>
 <template>
-  <div class="fixed bottom-0 left-0 right-0 bg-background-light border-t border-doggo-gray py-2">
+  <div class="fixed bottom-0 left-0 right-0 bg-background-light border-t border-doggo-gray py-2 z-50">
     <nav class="flex justify-center gap-5">
       <NavButton
         v-for="(route, index) in routes"

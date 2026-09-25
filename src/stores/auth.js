@@ -1,15 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToast } from 'vue-toast-notification'
-import { useRouter } from 'vue-router'
 import * as authService from '@/services/authService'
 import { removeAccessToken } from '@/utils/token'
 
 export const useAuthStore = defineStore('authStore', () => {
   const $toast = useToast()
-  const router = useRouter()
 
   const user = ref(null)
+  const inicialized = ref(false)
   const loading = ref(false)
 
   const isAuthenticated = computed(() => !!user.value)
@@ -27,12 +26,14 @@ export const useAuthStore = defineStore('authStore', () => {
         duration: 3000,
         position: 'top-right'
       })
+      return true
     } catch (error) {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
         position: 'top-right',
       })
+      return false
     } finally {
       loading.value = false
     }
@@ -44,7 +45,6 @@ export const useAuthStore = defineStore('authStore', () => {
       user.value = await authService.getMe()
     } catch (error) {
       user.value = null
-      router.push('/auth/login')
       removeAccessToken()
     } finally {
       loading.value = false
@@ -59,7 +59,6 @@ export const useAuthStore = defineStore('authStore', () => {
       duration: 3000,
       position: 'top-right',
     })
-    router.push('/auth/login')
   }
 
   const createUser = async (data) => {
@@ -73,6 +72,7 @@ export const useAuthStore = defineStore('authStore', () => {
         duration: 3000,
         position: 'top-right'
       })
+      return null
     } finally {
       loading.value = false
     }
@@ -96,6 +96,13 @@ export const useAuthStore = defineStore('authStore', () => {
     }
   }
 
+  const inicialize = async() => {
+    if(inicialized.value) return
+
+    await fetchUser()
+    inicialized.value = true
+  }
+
   return {
     user,
     loading,
@@ -106,6 +113,7 @@ export const useAuthStore = defineStore('authStore', () => {
     fetchUser,
     createUser,
     logout,
-    deleteUser
+    deleteUser,
+    inicialize
   }
 })

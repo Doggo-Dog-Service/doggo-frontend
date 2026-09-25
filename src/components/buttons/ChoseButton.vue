@@ -23,6 +23,7 @@ const props = defineProps({
       props.selected ? 'bg-doggo-green border-doggo-green' : 'bg-white border-doggo-gray',
     ]"
     @click="emits('select')"
+    type="button"
   >
     <p :class="['font-semibold text-doggo-black', props.selected && 'text-white']">
       {{ props.text }}

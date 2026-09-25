@@ -14,10 +14,8 @@ const data = reactive({
 })
 
 const handleLogin = async () => {
-  await authStore.login(data)
-  if (authStore.isAuthenticated) {
-    router.push('/')
-  }
+  const ok = await authStore.login(data)
+  if (ok) router.push('/')
 }
 
 onMounted(() => {

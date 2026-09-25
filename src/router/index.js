@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, HeartIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,7 @@ const router = createRouter({
           name: 'home-view',
           component: () => import('@/views/HomeView.vue'),
           meta: {
+            id: 1,
             title: 'Início',
             icon: HomeIcon,
             isView: true,
@@ -21,12 +23,42 @@ const router = createRouter({
           },
         },
         {
-          path: 'provider/:id',
-          name: 'provider-view',
+          path: 'provider/',
+          name: 'provider-list-view',
+          component: () => import('@/views/ProviderListView.vue'),
+          meta: {
+            id: 2,
+            requiresAuth: true,
+            isView: true,
+            title: 'Profissionais',
+            icon: BriefcaseIcon
+          },
+        },
+        {
+          path: 'provider/:id/',
           component: () => import('@/views/ProviderView.vue'),
           meta: {
+            requiresAuth: true
+          }
+        },
+        {
+          path: 'pets',
+          name: 'pets-view',
+          component: () => import('@/views/PetView.vue'),
+          meta: {
+            id: 3,
             requiresAuth: true,
+            requiresClient: true,
+            title: 'Meus Pets',
+            icon: HeartIcon,
+            isView: true,
           },
+          beforeEnter: () => {
+            const authStore = useAuthStore()
+            if(!authStore.isClient) {
+              return '/'
+            }
+          }
         },
         {
           path: 'scheduling/:providerId',
@@ -65,11 +97,19 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   const isAuthenticated = !!getAccessToken()
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    return '/auth/login'
+    return {
+      name: 'login-view'
+    }
+  }
+
+  if(to.meta.requiresClient && !isAuthenticated) {
+    return {
+      name: 'home-view'
+    }
   }
 })
 

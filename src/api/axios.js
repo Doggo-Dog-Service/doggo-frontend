@@ -1,5 +1,4 @@
 import axios from "axios";
-import router from "@/router";
 import { getAccessToken } from "@/utils/token";
 
 const api = axios.create({

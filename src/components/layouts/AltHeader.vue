@@ -7,7 +7,7 @@ const route = useRoute();
 </script>
 <template>
   <div class="flex justify-between  p-4">
-    <button class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5" @click="router.back()">
+    <button class="text-2xl border border-doggo-gray text-doggo-green rounded-xl px-1.5 cursor-pointer" @click="router.back()">
       <span class="mdi mdi-arrow-left"></span>
     </button>
     <RouterLink to="/">

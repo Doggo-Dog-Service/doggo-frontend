@@ -9,6 +9,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  edit: {
+    type:Boolean,
+    default: false
+  }
 })
 
 const preview = ref(null)
@@ -38,7 +42,7 @@ function handleFileChange(event) {
       <template v-else>
         <div class="flex flex-col items-center gap-2 text-doggo-green">
           <CameraIcon class="h-8 w-8" />
-          <span class="text-xs font-medium"> Adicionar foto </span>
+          <span class="text-xs font-medium">{{ props.edit ? 'Alterar foto' : 'Adicionar foto'}}</span>
         </div>
       </template>
 

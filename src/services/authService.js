@@ -6,6 +6,7 @@ import {
   setRefreshToken,
   clearTokens,
 } from '@/utils/token'
+import { parseDjangoErrors } from '@/utils/errors'
 
 export const login = async (credentials) => {
   try {
@@ -19,7 +20,7 @@ export const login = async (credentials) => {
     }
   } catch (error) {
     throw {
-      message: error.response?.data?.detail || 'Erro ao fazer login',
+      message: parseDjangoErrors(error),
       status: error.response?.status,
     }
   }
@@ -49,7 +50,7 @@ export const getMe = async () => {
   } catch (error) {
     console.error(error)
     throw {
-      message: error.response?.data?.detail || 'Erro inesperado ao buscar perfil',
+      message: parseDjangoErrors(error),
       status: error.response?.status,
     }
   }
@@ -61,7 +62,7 @@ export const createBaseUser = async (payload) => {
     return data
   } catch(error) {
     throw {
-      message: error.response?.data?.detail || 'Erro ao criar usuário',
+      message: parseDjangoErrors(error),
       status: error.response?.status,
     }
   }
@@ -77,7 +78,7 @@ export const deleteUserById = async (id) => {
     return data
   } catch (error) {
     throw {
-      message: error.response?.data?.detail || 'Erro ao deletar usuário',
+      message: parseDjangoErrors(error),
       status: error.response?.status,
     }
   }
