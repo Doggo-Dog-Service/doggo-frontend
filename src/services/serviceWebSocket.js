@@ -112,6 +112,8 @@ export class WebSocketService {
   buildUrl() {
     const baseUrl = import.meta.env.VITE_WS_BASE_URL
 
+    console.log('🌐 WS BASE:', baseUrl)
+
     const url = new URL(`/ws/services/${this.serviceId}/`, baseUrl)
 
     url.searchParams.set('token', this.token)
