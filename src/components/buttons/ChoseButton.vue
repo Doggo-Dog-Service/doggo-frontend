@@ -25,9 +25,9 @@ const props = defineProps({
     @click="emits('select')"
     type="button"
   >
-    <p :class="['font-semibold text-doggo-black', props.selected && 'text-white']">
+    <p :class="['font-semibold text-doggo-black text-nowrap', props.selected && 'text-white']">
       {{ props.text }}
     </p>
-    <p :class="props.selected ? 'text-white/70' : 'text-doggo-black/70'">{{ props.subText }}</p>
+    <p v-if="props.subText" :class="props.selected ? 'text-white/70' : 'text-doggo-black/70'">{{ props.subText }}</p>
   </button>
 </template>
