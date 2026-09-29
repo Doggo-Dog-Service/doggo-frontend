@@ -9,7 +9,6 @@ import { useMap } from '@/composables/useMap'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatMeters } from '@/utils/distance'
 import { formatCurrency } from '@/utils/currency'
-import { formatElapsed } from '@/utils/time'
 
 defineProps({
   role: {
@@ -25,7 +24,7 @@ const { createMap, addMarker, loaded, drawRoute } = useMap()
 const mapLoading = ref(true)
 
 const distanceLabel = computed(() => formatMeters(store.totalDistance))
-const durationLabel = computed(() => formatElapsed(store.walkDuration))
+const durationLabel = computed(() => store.walkDuration)
 const priceLabel = computed(() => formatCurrency(store.price))
 
 function toCoordinates(points) {

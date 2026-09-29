@@ -10,6 +10,16 @@ const serviceStore = useServiceStore()
 const services = computed(() => serviceStore.serivces)
 const selectedStatus = ref(0)
 
+const titleLabel = computed(() => {
+  if(selectedStatus.value === 1) return 'Serviços Em Análise'
+  if(selectedStatus.value === 2) return 'Serviços Confirmados'
+  if(selectedStatus.value === 3) return 'Serviços Em Andamento'
+  if(selectedStatus.value === 4) return 'Serviços Concluídos'
+  if(selectedStatus.value === 5) return 'Serviços Cancelados'
+  if(selectedStatus.value === 6) return 'Serviços Recusados'
+  return 'Todos os Serviços'
+})
+
 const isSelected = (statusId) => selectedStatus.value === statusId
 function select(statusId) {
   if (statusId === selectedStatus.value) {
@@ -48,7 +58,7 @@ watch(selectedStatus, async (newSelected) => {
 <template>
   <div class="grid grid-cols-1 w-full p-6 gap-5">
     <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
-      Serviços
+      {{ titleLabel }}
       <span class="mdi mdi-dog-service text-doggo-green"></span>
     </h1>
     <ul class="flex gap-2 overflow-x-auto pb-4">

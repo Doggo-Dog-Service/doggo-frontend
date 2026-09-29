@@ -47,6 +47,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
       longitude: service.value.provider_longitude,
     }
   })
+
   const clientId = computed(() => service.value?.client_id ?? null)
   const clientName = computed(() => service.value?.client_name ?? null)
   const clientPicture = computed(() => service.value?.client_picture ?? null)
@@ -66,16 +67,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     return `${(currentDistance.value / 1000).toFixed(2)} km`
   })
 
-  const walkDuration = computed(() => {
-    if (!startDatetime.value || !endDatetime.value) return null
-
-    const start = new Date(startDatetime.value).getTime()
-    const end = new Date(endDatetime.value).getTime()
-
-    if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return null
-
-    return Math.floor((end - start) / 1000)
-  })
+  const walkDuration = computed(() => service.value?.duration ?? null)
 
   async function getService(serviceId) {
     loading.value = true
