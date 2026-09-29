@@ -3,13 +3,13 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import UserCard from '@/components/cards/UserCard.vue'
 import ProviderFilters from '@/components/filters/ProviderFilters.vue'
 import { useProviderStore } from '@/stores/provider'
-import { useServiceStore } from '@/stores/service'
+import { useServiceTypeStore } from '@/stores/serviceType'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { haversine } from '@/utils/distance'
 import { toFloat } from '@/utils/toFloat'
 
 const providerStore = useProviderStore()
-const serviceStore = useServiceStore()
+const serviceTypeStore = useServiceTypeStore()
 
 const { latitude, longitude, getCurrentPosition } = useGeolocation()
 
@@ -95,7 +95,7 @@ const clearFilters = () => {
 }
 
 onMounted(async () => {
-  await Promise.all([loadProviders(), serviceStore.getServices()])
+  await Promise.all([loadProviders(), serviceTypeStore.getTypeServices()])
 
   try {
     await getCurrentPosition()
@@ -109,7 +109,9 @@ onMounted(async () => {
 <template>
   <div class="p-6 mb-19 md:mb-0 text-doggo-black flex flex-col gap-5">
     <div class="flex items-center justify-between gap-4">
-      <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">Pr<span class="text-3xl md:text-4xl font-bold text-doggo-green">o</span>fissionais</h1>
+      <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
+        Pr<span class="text-3xl md:text-4xl font-bold text-doggo-green">o</span>fissionais
+      </h1>
       <button
         class="flex items-center gap-2 h-10 px-4 bg-white border border-doggo-gray rounded-lg text-sm font-semibold text-doggo-black/70 cursor-pointer transition-all duration-200 active:scale-98"
         @click="filtersOpen = !filtersOpen"
@@ -189,7 +191,7 @@ onMounted(async () => {
           <ProviderFilters
             v-model:open="filtersOpen"
             v-model:filters="filters"
-            :service-types="serviceStore.typeServices"
+            :service-types="serviceTypeStore.typeServices"
             :distance-enabled="hasGeolocation"
             @apply="applyFilters"
             @clear="clearFilters"
