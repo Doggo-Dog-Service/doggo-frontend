@@ -5,14 +5,14 @@ import CalendarPicker from '@/components/calendar/CalendarPicker.vue'
 import TimeSlotButton from '@/components/calendar/TimeSlotButton.vue'
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useProviderStore } from '@/stores/provider'
-import { useServiceStore } from '@/stores/service'
+import { createService } from '@/services/service'
 import { useRouter } from 'vue-router'
 
-const serviceStore = useServiceStore()
 const providerStore = useProviderStore()
 const router = useRouter()
 
 const provider = ref(null)
+const submitting = ref(false)
 const selectedDate = ref(null)
 const selectedTime = ref(null)
 
@@ -44,7 +44,7 @@ const availablePeriods = computed(() => {
   }))
 })
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!selectedDate.value || !selectedTime.value) return
 
   const [hours, minutes] = selectedTime.value.split(':')
@@ -57,8 +57,16 @@ function handleSubmit() {
   serviceData.start_datetime = startDatetime.toISOString()
   serviceData.end_datetime = endDatetime.toISOString()
 
-  serviceStore.postService(serviceData)
-  router.push('/')
+  submitting.value = true
+
+  try {
+    await createService(serviceData)
+    router.push('/')
+  } catch (error) {
+    console.log(error)
+  } finally {
+    submitting.value = false
+  }
 }
 
 const serviceData = reactive({
@@ -122,8 +130,8 @@ onMounted(async () => {
 
     <div class="fixed bottom-22 left-0 right-0 px-6 md:relative md:bottom-auto md:left-auto md:right-auto md:px-0 md:mt-2">
       <AppButton
-        :disabled="!selectedDate || !selectedTime"
-        :text="serviceStore.loading ? 'Enviando...' : 'Confirmar agendamento'"
+        :disabled="!selectedDate || !selectedTime || submitting"
+        :text="submitting ? 'Enviando...' : 'Confirmar agendamento'"
         mode="outline"
         @event="handleSubmit"
       />

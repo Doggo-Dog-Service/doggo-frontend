@@ -17,7 +17,10 @@ const router = createRouter({
           meta: {
             id: 1,
             title: 'Início',
-            icon: HomeIcon,
+            icon: {
+              type: 'hero',
+              value: HomeIcon
+            },
             isView: true,
             requiresAuth: true,
           },
@@ -31,7 +34,10 @@ const router = createRouter({
             requiresAuth: true,
             isView: true,
             title: 'Profissionais',
-            icon: BriefcaseIcon
+            icon: {
+              type: 'hero',
+              value: BriefcaseIcon
+            }
           },
         },
         {
@@ -42,7 +48,7 @@ const router = createRouter({
           }
         },
         {
-          path: 'pets',
+          path: 'pets/',
           name: 'pets-view',
           component: () => import('@/views/PetView.vue'),
           meta: {
@@ -50,7 +56,10 @@ const router = createRouter({
             requiresAuth: true,
             requiresClient: true,
             title: 'Meus Pets',
-            icon: HeartIcon,
+            icon: {
+              type: 'mdi',
+              value: 'mdi mdi-paw-outline'
+            },
             isView: true,
           },
           beforeEnter: () => {
@@ -61,11 +70,41 @@ const router = createRouter({
           }
         },
         {
+          path: 'services/',
+          name: 'services-view',
+          component: () => import('@/views/ServicesView.vue'),
+          meta: {
+            id: 4,
+            requiresAuth: true,
+            title: 'Serviços',
+            icon: {
+              type: 'mdi',
+              value: 'mdi mdi-dog-service'
+            },
+            isView: true
+          }
+        },
+        {
+          path: 'service/:id',
+          name: 'service-view',
+          component: () => import('@/views/ServiceView.vue'),
+          meta: {
+            requiresAuth: true,
+          }
+        },
+        {
           path: 'scheduling/:providerId',
           name: 'scheduling-view',
           component: () => import('@/views/SchedulingView.vue'),
           meta: {
-            requiresAuth: true
+            requiresAuth: true,
+            requiresClient: true,
+          },
+          beforeEnter: () => {
+            const authStore = useAuthStore()
+            if (!authStore.isClient) {
+              return '/'
+            }
           }
         }
       ],
