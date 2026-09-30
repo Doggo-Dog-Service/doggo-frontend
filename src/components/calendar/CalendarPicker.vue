@@ -1,97 +1,101 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
-  modelValue: {
-    type: Date,
-    default: null,
+  maxMonthsAhead: {
+    type: Number,
+    default: 1,
+    validator: (value) => value >= 0,
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const selectedDate = defineModel({ type: Date, default: null })
 
-const today = new Date()
-today.setHours(0, 0, 0, 0)
+const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
-const currentYear = today.getFullYear()
-const currentMonth = today.getMonth()
+function startOfDay(date) {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  return result
+}
 
-const currentMonthOffset = ref(0)
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1)
+}
 
-const displayYear = computed(() => {
-  const date = new Date(currentYear, currentMonth + currentMonthOffset.value, 1)
-  return date.getFullYear()
-})
+function addMonths(month, amount) {
+  return new Date(month.getFullYear(), month.getMonth() + amount, 1)
+}
 
-const displayMonth = computed(() => {
-  const date = new Date(currentYear, currentMonth + currentMonthOffset.value, 1)
-  return date.getMonth()
-})
+function isSameMonth(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()
+}
+
+const viewMonth = ref(startOfMonth(new Date()))
+
+const displayYear = computed(() => viewMonth.value.getFullYear())
+
+const displayMonth = computed(() => viewMonth.value.getMonth())
 
 const monthName = computed(() =>
-  new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(
-    new Date(displayYear.value, displayMonth.value)
-  )
+  new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(viewMonth.value),
 )
 
-const daysInMonth = computed(() =>
-  new Date(displayYear.value, displayMonth.value + 1, 0).getDate()
-)
-
-const firstDayOfWeek = computed(() =>
-  new Date(displayYear.value, displayMonth.value, 1).getDay()
-)
-
-const dayHeaders = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
+const daysInMonth = computed(() => new Date(displayYear.value, displayMonth.value + 1, 0).getDate())
 
 const calendarDays = computed(() => {
-  const days = []
-  for (let i = 0; i < firstDayOfWeek.value; i++) {
-    days.push(null)
+  const firstDayOfWeek = new Date(displayYear.value, displayMonth.value, 1).getDay()
+  const days = Array.from({ length: firstDayOfWeek }, () => null)
+
+  for (let day = 1; day <= daysInMonth.value; day++) {
+    days.push(day)
   }
-  for (let d = 1; d <= daysInMonth.value; d++) {
-    days.push(d)
-  }
+
   return days
 })
 
-function goToPrevMonth() {
-  if (currentMonthOffset.value > 0) currentMonthOffset.value--
-}
+const canGoToPrevMonth = computed(() => !isSameMonth(viewMonth.value, startOfMonth(new Date())))
 
-function goToNextMonth() {
-  if (currentMonthOffset.value < 1) currentMonthOffset.value++
+const canGoToNextMonth = computed(
+  () => !isSameMonth(viewMonth.value, addMonths(startOfMonth(new Date()), props.maxMonthsAhead)),
+)
+
+function dateOfDay(day) {
+  return startOfDay(new Date(displayYear.value, displayMonth.value, day))
 }
 
 function isPast(day) {
-  const date = new Date(displayYear.value, displayMonth.value, day)
-  date.setHours(0, 0, 0, 0)
-  return date < today
+  return dateOfDay(day) < startOfDay(new Date())
 }
 
 function isToday(day) {
-  return (
-    day === today.getDate() &&
-    displayMonth.value === today.getMonth() &&
-    displayYear.value === today.getFullYear()
-  )
+  return isSameMonth(viewMonth.value, new Date()) && day === new Date().getDate()
 }
 
 function isSelected(day) {
-  if (!props.modelValue) return false
   return (
-    day === props.modelValue.getDate() &&
-    displayMonth.value === props.modelValue.getMonth() &&
-    displayYear.value === props.modelValue.getFullYear()
+    !!selectedDate.value &&
+    isSameMonth(viewMonth.value, selectedDate.value) &&
+    day === selectedDate.value.getDate()
   )
+}
+
+function goToPrevMonth() {
+  if (!canGoToPrevMonth.value) return
+
+  viewMonth.value = addMonths(viewMonth.value, -1)
+}
+
+function goToNextMonth() {
+  if (!canGoToNextMonth.value) return
+
+  viewMonth.value = addMonths(viewMonth.value, 1)
 }
 
 function selectDay(day) {
   if (isPast(day)) return
-  const selected = new Date(displayYear.value, displayMonth.value, day)
-  selected.setHours(0, 0, 0, 0)
-  emit('update:modelValue', selected)
-  console.log(selected)
+
+  selectedDate.value = dateOfDay(day)
 }
 </script>
 
@@ -99,26 +103,32 @@ function selectDay(day) {
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
       <button
+        type="button"
         :class="[
           'text-lg border border-doggo-gray rounded-xl px-1.5 py-0.5 transition-all duration-200',
-          currentMonthOffset > 0
+          canGoToPrevMonth
             ? 'text-doggo-green cursor-pointer hover:bg-doggo-green/5 active:scale-95'
             : 'text-gray-300 cursor-not-allowed',
         ]"
-        :disabled="currentMonthOffset === 0"
+        :disabled="!canGoToPrevMonth"
+        aria-label="Mês anterior"
         @click="goToPrevMonth"
       >
         <span class="mdi mdi-chevron-left"></span>
       </button>
-      <h3 class="text-base font-bold text-doggo-green capitalize">{{ monthName }} {{ displayYear }}</h3>
+      <h3 class="text-base font-bold text-doggo-green capitalize">
+        {{ monthName }} {{ displayYear }}
+      </h3>
       <button
+        type="button"
         :class="[
           'text-lg border border-doggo-gray rounded-xl px-1.5 py-0.5 transition-all duration-200',
-          currentMonthOffset < 1
+          canGoToNextMonth
             ? 'text-doggo-green cursor-pointer hover:bg-doggo-green/5 active:scale-95'
             : 'text-gray-300 cursor-not-allowed',
         ]"
-        :disabled="currentMonthOffset === 1"
+        :disabled="!canGoToNextMonth"
+        aria-label="Próximo mês"
         @click="goToNextMonth"
       >
         <span class="mdi mdi-chevron-right"></span>
@@ -137,11 +147,17 @@ function selectDay(day) {
       <div v-for="(day, index) in calendarDays" :key="index" class="flex justify-center">
         <button
           v-if="day"
+          type="button"
           :class="[
             'h-9 w-9 rounded-full text-sm transition-all duration-200 cursor-pointer',
             isSelected(day) && 'bg-doggo-green text-white font-bold scale-105',
-            !isSelected(day) && isToday(day) && 'bg-doggo-light-green/50 text-doggo-green font-semibold',
-            !isSelected(day) && !isToday(day) && !isPast(day) && 'text-doggo-black hover:bg-doggo-green/10',
+            !isSelected(day) &&
+              isToday(day) &&
+              'bg-doggo-light-green/50 text-doggo-green font-semibold',
+            !isSelected(day) &&
+              !isToday(day) &&
+              !isPast(day) &&
+              'text-doggo-black hover:bg-doggo-green/10',
             isPast(day) && 'text-gray-300 cursor-not-allowed',
           ]"
           :disabled="isPast(day)"

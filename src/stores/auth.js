@@ -12,8 +12,8 @@ export const useAuthStore = defineStore('authStore', () => {
   const loading = ref(false)
 
   const isAuthenticated = computed(() => !!user.value)
-  const isProvider = computed(() => user.value.provider_profile)
-  const isClient = computed(() => user.value.client_profile)
+  const isProvider = computed(() => user.value?.provider_profile ?? false)
+  const isClient = computed(() => user.value?.client_profile ?? false)
 
   const login = async (credentials) => {
     try {
@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('authStore', () => {
       $toast.success(`Bem vindo ${user.value.full_name}`, {
         type: 'success',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
       return true
     } catch (error) {
@@ -70,7 +70,7 @@ export const useAuthStore = defineStore('authStore', () => {
       $toast.error(error.message, {
         type: 'error',
         duration: 3000,
-        position: 'top-right'
+        position: 'top-right',
       })
       return null
     } finally {
@@ -96,8 +96,8 @@ export const useAuthStore = defineStore('authStore', () => {
     }
   }
 
-  const inicialize = async() => {
-    if(inicialized.value) return
+  const inicialize = async () => {
+    if (inicialized.value) return
 
     await fetchUser()
     inicialized.value = true
@@ -114,6 +114,6 @@ export const useAuthStore = defineStore('authStore', () => {
     createUser,
     logout,
     deleteUser,
-    inicialize
+    inicialize,
   }
 })

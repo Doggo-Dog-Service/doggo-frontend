@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon, HeartIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
