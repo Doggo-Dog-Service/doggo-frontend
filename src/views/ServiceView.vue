@@ -89,7 +89,9 @@ const statusInfo = computed(() => {
   return { title: 'Serviço', subtitle: '' }
 })
 
-const showActions = computed(() => serviceWebSocketStore.isReview || serviceWebSocketStore.isWaiting)
+const showActions = computed(
+  () => serviceWebSocketStore.isReview || serviceWebSocketStore.isWaiting,
+)
 
 async function load() {
   pageLoading.value = true
@@ -136,14 +138,14 @@ watch(
       stopTracking()
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(
   () => serviceWebSocketStore.isFinished,
   (finished) => {
     if (finished) loadRoute()
-  }
+  },
 )
 
 watch(serviceId, () => {
@@ -176,7 +178,11 @@ load()
       @cancel="serviceWebSocketStore.cancelService"
     />
 
-    <ServiceRouteMap v-else-if="serviceWebSocketStore.isFinished" :role="role" />
+    <ServiceRouteMap
+      v-else-if="serviceWebSocketStore.isFinished"
+      :role="role"
+      :is-service-rating="serviceWebSocketStore.isRating"
+    />
 
     <div v-else class="w-full flex flex-col items-center gap-4 p-4 pb-30 md:p-8 md:pb-4">
       <div class="w-full max-w-160 flex flex-col gap-4">
