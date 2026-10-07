@@ -56,6 +56,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const startDatetime = computed(() => service.value?.start_datetime ?? null)
   const endDatetime = computed(() => service.value?.end_datetime ?? null)
   const pets = computed(() => service.value?.pets ?? [])
+  const isRating = computed(() => service.value?.is_rating ?? false)
 
   const formattedDistance = computed(() => {
     if (currentDistance.value == null) return '0 m'
@@ -86,6 +87,23 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     } catch (err) {
       error.value = err.message || 'Erro ao carregar o serviço.'
 
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function rateService() {
+    if(!service.value) return
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const data = await serviceService.rateService(service.value.id)
+      return data
+    } catch (err) {
+      error.value = err.message || 'Erro ao avaliar o serviço.'
       throw err
     } finally {
       loading.value = false
@@ -247,6 +265,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     startDatetime,
     endDatetime,
     pets,
+    isRating,
     currentLocation,
     currentDistance,
     route,
@@ -265,6 +284,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     rejectService,
     completeService,
     cancelService,
+    rateService,
     setService,
     setConnected,
     setTracking,

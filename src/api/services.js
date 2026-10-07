@@ -43,3 +43,7 @@ export const cancelService = (id) => {
 export const getServiceRoute = (id) => {
     return api.get(`/services/${id}/route/`)
 }
+
+export const rateService = (id) => {
+    return api.post(`/services/${id}/rate/`)
+}
