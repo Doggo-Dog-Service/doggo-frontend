@@ -125,6 +125,19 @@ export const cancelService = async (id) => {
   }
 }
 
+export const rateService = async (id) => {
+  try {
+    const response = await serviceApi.rateService(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
 export const getServiceRoute = async (id) => {
   try {
     const response = await serviceApi.getServiceRoute(id)

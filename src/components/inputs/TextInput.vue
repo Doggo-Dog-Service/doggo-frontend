@@ -8,6 +8,10 @@ const props = defineProps({
   label: {
     type: String,
     required: false
+  },
+  required: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
@@ -22,6 +26,7 @@ const props = defineProps({
       class="w-full min-h-35 max-h-35 text-base border-2 border-doggo-gray rounded-xl py-3 px-4 focus:outline-none focus:border-doggo-green transition-all duration-200"
       v-model="model"
       :placeholder="props.placeholder"
+      :required="props.required"
     ></textarea>
   </div>
 </template>

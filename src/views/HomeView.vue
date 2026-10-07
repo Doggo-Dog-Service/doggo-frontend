@@ -126,7 +126,7 @@ watch(searchBarData, (value) => {
                     :profile_photo="provider.profile_picture"
                     :service="provider.service_type_name"
                     :classification="provider.classification ? provider.classification : '--'"
-                    :link="`/provider/${provider.id}`"
+                    link="/provider/"
                   />
                 </div>
                 <div

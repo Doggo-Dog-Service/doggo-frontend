@@ -39,3 +39,17 @@ export const formatMeters = (meters) => {
 
   return `${(value / 1000).toFixed(2)} km`
 }
+
+export function getRouteCenter(points) {
+  if (!points.length) return null
+
+  const lats = points.map((point) => Number(point.latitude))
+  const lngs = points.map((point) => Number(point.longitude))
+
+  const north = Math.max(...lats)
+  const south = Math.min(...lats)
+  const east = Math.max(...lngs)
+  const west = Math.min(...lngs)
+
+  return [(east + west) / 2, (north + south) / 2]
+}
