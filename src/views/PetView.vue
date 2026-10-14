@@ -1,7 +1,7 @@
 <script setup>
 import AppButton from '@/components/buttons/AppButton.vue'
 import PetCard from '@/components/cards/PetCard.vue'
-import PetModal from '@/components/modals/PetModal.vue'
+import PetModal from '@/components/pet/PetModal.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePetStore } from '@/stores/pet'
@@ -58,12 +58,12 @@ onMounted(async () => {
     <PetModal
       v-if="modalOpen"
       :mode="modalMode"
-      :pet_id="modalPetId"
+      :petId="modalPetId"
       @close="closeModal"
       @change-mode="changeModalMode"
     />
     <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
-        Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
+      Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
     </h1>
     <ul
       v-if="petStore.pets.length > 0"
