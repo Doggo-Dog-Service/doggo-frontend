@@ -25,7 +25,7 @@ const emit = defineEmits(['submit'])
 
 <template>
   <div
-    class="fixed bottom-22 left-0 right-0 px-6 md:relative md:bottom-auto md:left-auto md:right-auto md:px-0 md:mt-2"
+    class="fixed bottom-22 left-0 right-0 px-6 pb-[env(safe-area-inset-bottom)] md:relative md:bottom-auto md:left-auto md:right-auto md:px-0 md:pb-0 md:mt-2"
   >
     <p v-if="props.error" class="text-red-700 text-sm font-semibold mb-2">{{ props.error }}</p>
     <AppButton

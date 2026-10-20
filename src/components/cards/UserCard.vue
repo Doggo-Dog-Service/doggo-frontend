@@ -75,7 +75,7 @@ const distanceLabel = computed(() => {
     class="w-full flex justify-between bg-white p-4 border border-doggo-gray rounded-xl transition-all duration-200 active:scale-98 active:opacity-70 hover:scale-99"
     :to="`/provider/${props.id}`"
   >
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 min-w-0">
       <img
         v-if="props.profile_photo"
         class="h-15 w-15 rounded-xl object-cover shrink-0"
@@ -89,7 +89,7 @@ const distanceLabel = computed(() => {
         <p class="text-white text-xl">{{ props.full_name.charAt() }}</p>
       </div>
       <div class="min-w-0">
-        <h3 class="text-base font-semibold truncate w-40">{{ props.full_name }}</h3>
+        <h3 class="text-base font-semibold truncate w-full">{{ props.full_name }}</h3>
         <div v-if="distanceLabel" class="flex items-center gap-1 mt-0.5">
           <span class="mdi mdi-map-marker text-sm text-doggo-green"></span>
           <p class="text-sm text-zinc-400 truncate">{{ distanceLabel }}</p>

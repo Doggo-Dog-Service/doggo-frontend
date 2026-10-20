@@ -1,8 +1,5 @@
 <script setup>
-import { computed } from 'vue'
-
-import ChoseButton from '@/components/buttons/ChoseButton.vue'
-import { petSizeConverter } from '@/utils/petSize'
+import SelectablePetCard from '@/components/cards/SelectablePetCard.vue'
 
 const props = defineProps({
   pets: {
@@ -20,13 +17,6 @@ const props = defineProps({
 })
 
 const selectedPets = defineModel({ type: Array, default: () => [] })
-
-const options = computed(() =>
-  props.pets.map((pet) => ({
-    ...pet,
-    subText: [pet.breed, petSizeConverter(pet.size)].filter(Boolean).join(' · '),
-  })),
-)
 
 function toggle(petId) {
   selectedPets.value = selectedPets.value.includes(petId)
@@ -47,7 +37,7 @@ function toggle(petId) {
       {{ props.error }}
     </p>
 
-    <div v-else-if="options.length === 0" class="flex flex-col gap-2">
+    <div v-else-if="props.pets.length === 0" class="flex flex-col gap-2">
       <p class="text-doggo-black/50 text-sm">
         Você ainda não possui pets cadastrados. Cadastre um pet para fazer o agendamento.
       </p>
@@ -61,14 +51,15 @@ function toggle(petId) {
     </div>
 
     <template v-else>
-      <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
-        <ChoseButton
-          v-for="pet in options"
+      <div class="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <SelectablePetCard
+          v-for="pet in props.pets"
           :key="pet.id"
-          :text="pet.name"
-          :sub-text="pet.subText"
+          :name="pet.name"
+          :breed="pet.breed"
+          :pet_picture="pet.pet_picture"
           :selected="selectedPets.includes(pet.id)"
-          @select="toggle(pet.id)"
+          @click="toggle(pet.id)"
         />
       </div>
 

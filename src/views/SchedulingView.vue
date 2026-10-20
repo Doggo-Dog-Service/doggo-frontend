@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import CalendarPicker from '@/components/calendar/CalendarPicker.vue'
-import SchedulingPetSelector from '@/components/scheduling/SchedulingPetSelector.vue'
-import SchedulingProviderSummary from '@/components/scheduling/SchedulingProviderSummary.vue'
-import SchedulingSlots from '@/components/scheduling/SchedulingSlots.vue'
-import SchedulingSubmitBar from '@/components/scheduling/SchedulingSubmitBar.vue'
+import SchedulingPetCardSelector from '@/components/inputs/SchedulingPetCardSelector.vue'
+import SchedulingProviderSummary from '@/components/cards/SchedulingProviderSummary.vue'
+import SchedulingSlots from '@/components/inputs/SchedulingSlots.vue'
+import SchedulingSubmitBar from '@/components/layouts/SchedulingSubmitBar.vue'
 import { useScheduling } from '@/composables/useScheduling'
 
 const route = useRoute()
@@ -35,7 +35,7 @@ const {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-6 mb-19 text-doggo-black pb-22">
+  <div class="flex flex-col gap-6 p-4 md:p-6 mb-19 text-doggo-black pb-22">
     <SchedulingProviderSummary
       :provider="provider"
       :loading="providerLoading"
@@ -58,7 +58,7 @@ const {
       :error="slotsError"
     />
 
-    <SchedulingPetSelector
+    <SchedulingPetCardSelector
       v-model="selectedPets"
       :pets="pets"
       :loading="petsLoading"
