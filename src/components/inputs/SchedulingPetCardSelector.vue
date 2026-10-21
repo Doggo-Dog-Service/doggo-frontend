@@ -51,7 +51,7 @@ function toggle(petId) {
     </div>
 
     <template v-else>
-      <div class="grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div class="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <SelectablePetCard
           v-for="pet in props.pets"
           :key="pet.id"

@@ -51,7 +51,7 @@ const periods = computed(() => groupSlotsByPeriod(props.slots))
     <div v-else class="flex flex-col gap-4">
       <div v-for="period in periods" :key="period.label" class="flex flex-col gap-2">
         <p class="text-sm text-doggo-black/50 font-semibold">{{ period.label }}</p>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
           <TimeSlotButton
             v-for="slot in period.slots"
             :key="slot"

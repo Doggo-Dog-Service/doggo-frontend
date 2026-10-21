@@ -26,14 +26,19 @@ const props = defineProps({
       v-if="props.pet_picture"
       :src="props.pet_picture"
       alt="pet-picture"
-      class="h-50 object-cover rounded-t-xl"
+      class="w-full aspect-[4/3] object-cover rounded-t-xl"
     />
-    <div v-else class="h-50 grid justify-center items-center bg-doggo-green/20 rounded-t-xl">
-      <span class="mdi mdi-dog text-doggo-green text-5xl"></span>
+    <div
+      v-else
+      class="aspect-[4/3] grid justify-center items-center bg-doggo-green/20 rounded-t-xl"
+    >
+      <span class="mdi mdi-dog text-doggo-green text-4xl md:text-5xl"></span>
     </div>
-    <div class="p-4">
-      <p class="text-xl font-semibold">{{ props.name }}</p>
-      <p class="text-gray-500 font-semibold"><span class="mdi mdi-paw"></span> {{ props.breed }}</p>
+    <div class="p-3 md:p-4">
+      <p class="text-base md:text-xl font-semibold">{{ props.name }}</p>
+      <p class="text-sm md:text-base text-gray-500 font-semibold">
+        <span class="mdi mdi-paw"></span> {{ props.breed }}
+      </p>
     </div>
   </button>
 </template>

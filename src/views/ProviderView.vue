@@ -47,7 +47,7 @@ watch(
       :text="provider.full_name"
       :price="provider.price_per_hour"
       :to="`/scheduling/${provider.id}`"
-      class="fixed bottom-4 left-4 right-4 z-50 md:left-75 md:2-1/3"
+      class="fixed bottom-4 left-4 right-4 z-50 md:left-78 md:right-6"
     />
   </div>
 </template>
