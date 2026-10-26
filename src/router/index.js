@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon, HeartIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
+import { HomeIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -90,6 +90,21 @@ const router = createRouter({
           component: () => import('@/views/ServiceView.vue'),
           meta: {
             requiresAuth: true,
+          }
+        },
+        {
+          path: 'scheduling/:providerId',
+          name: 'scheduling-view',
+          component: () => import('@/views/SchedulingView.vue'),
+          meta: {
+            requiresAuth: true,
+            requiresClient: true,
+          },
+          beforeEnter: () => {
+            const authStore = useAuthStore()
+            if (!authStore.isClient) {
+              return '/'
+            }
           }
         }
       ],
