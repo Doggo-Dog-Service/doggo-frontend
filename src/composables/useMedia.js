@@ -11,7 +11,7 @@ export function useMedia() {
       const data = await mediaService.postImage({ file, description })
       return data
     } catch (error) {
-      notify.error(error)
+      notify.error(error?.message)
     } finally {
       loading.value = false
     }
