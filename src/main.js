@@ -5,9 +5,12 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ToastPlugin from 'vue-toast-notification'
 import { useAuthStore } from './stores/auth.js'
+import { useTheme } from './composables/useTheme.js'
 
 import App from './App.vue'
 import router from './router'
+
+useTheme()
 
 const app = createApp(App)
 const pinia = createPinia()
