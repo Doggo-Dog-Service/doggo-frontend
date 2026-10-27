@@ -62,9 +62,9 @@ const distanceFor = (provider) => {
 const cardProviders = computed(() =>
   providerStore.providers.map((provider) => ({
     id: provider.id,
-    full_name: provider.full_name ?? provider.user?.full_name ?? 'Profissional',
+    full_name: provider.full_name ?? 'Profissional',
     service_name: provider.service_type_name ?? provider.service_type_detail?.name ?? '',
-    profile_photo: provider.profile_picture ?? provider.user?.profile_picture?.url ?? '',
+    profile_photo: provider.profile_picture ?? '',
     price_per_hour: provider.price_per_hour,
     price_per_day: provider.price_per_day,
     classification: provider.classification,

@@ -1,11 +1,8 @@
 import { defineStore } from 'pinia'
-import { useToast } from 'vue-toast-notification'
 import * as reviewService from '@/services/reviews'
 import { computed, ref } from 'vue'
 
 export const useReviewStore = defineStore('reviewStore', () => {
-  const $toast = useToast()
-
   const loading = ref(false)
   const reviews = ref([])
   const media = computed(() => {
@@ -22,32 +19,10 @@ export const useReviewStore = defineStore('reviewStore', () => {
     loading.value = false
   }
 
-  async function postReview(data) {
-    try {
-      loading.value = true
-      const response = await reviewService.postReview(data)
-      $toast.success('Agradecemos pelo feedback!', {
-        type: 'success',
-        position: 'top-right',
-        duration: 3000,
-      })
-      return response
-    } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        position: 'top-right',
-        duration: 3000,
-      })
-    } finally {
-      loading.value = false
-    }
-  }
-
   return {
     loading,
     reviews,
     media,
     getReviews,
-    postReview,
   }
 })

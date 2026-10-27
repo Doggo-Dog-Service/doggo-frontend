@@ -9,13 +9,11 @@ import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceTypeStore } from '@/stores/serviceType'
-import { useClientStore } from '@/stores/clients'
 import { useSearchStore } from '@/stores/search'
 
 const providerStore = useProviderStore()
 const authStore = useAuthStore()
 const serviceTypeStore = useServiceTypeStore()
-const clientStore = useClientStore()
 const searchStore = useSearchStore()
 
 const services = [
@@ -50,7 +48,6 @@ onMounted(async () => {
   await Promise.all([
     providerStore.fetchProviders(),
     providerStore.countProviders(),
-    clientStore.countClients(),
     serviceTypeStore.getTypeServices(),
   ])
   selectTypeService(serviceTypeStore.typeServices[0].id)
@@ -144,11 +141,6 @@ watch(searchBarData, (value) => {
           icon="mdi mdi-briefcase-variant"
           :info="providerStore.totalProviders"
           :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
-        />
-        <InfoCard
-          icon="mdi mdi-account"
-          :info="clientStore.totalClients"
-          :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'"
         />
       </div>
     </section>

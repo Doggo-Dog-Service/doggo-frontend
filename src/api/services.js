@@ -16,10 +16,6 @@ export const updateService = (id, payload) => {
     return api.patch(`/services/${id}/`, payload)
 }
 
-export const deleteService = (id) => {
-    return api.delete(`/services/${id}/`)
-}
-
 export const startService = (id) => {
     return api.post(`/services/${id}/start/`)
 }
@@ -44,6 +40,6 @@ export const getServiceRoute = (id) => {
     return api.get(`/services/${id}/route/`)
 }
 
-export const rateService = (id) => {
-    return api.post(`/services/${id}/rate/`)
+export const rateService = (id, payload) => {
+    return api.post(`/services/${id}/rate/`, payload)
 }

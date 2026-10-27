@@ -48,18 +48,6 @@ export const updateService = async (id, payload) => {
   }
 }
 
-export const deleteService = async (id) => {
-  try {
-    const response = await serviceApi.deleteService(id)
-    return response.data
-  } catch (error) {
-    throw {
-      message: error.response?.data?.detail,
-      status: error.response?.status,
-    }
-  }
-}
-
 export const startService = async (id) => {
   try {
     const response = await serviceApi.startService(id)
@@ -125,9 +113,9 @@ export const cancelService = async (id) => {
   }
 }
 
-export const rateService = async (id) => {
+export const rateService = async (id, payload) => {
   try {
-    const response = await serviceApi.rateService(id)
+    const response = await serviceApi.rateService(id, payload)
 
     return response.data
   } catch (error) {

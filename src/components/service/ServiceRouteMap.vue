@@ -9,7 +9,6 @@ import ReviewModal from '../modals/ReviewModal.vue'
 
 import { useMap } from '@/composables/useMap'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
-import { useReviewStore } from '@/stores/review.js'
 import { formatMeters } from '@/utils/distance'
 import { formatCurrency } from '@/utils/currency'
 
@@ -25,7 +24,6 @@ const props = defineProps({
 })
 
 const serviceStore = useServiceWebSocketStore()
-const reviewStore = useReviewStore()
 
 const { createMap, addMarker, loaded, drawRoute } = useMap()
 
@@ -79,14 +77,15 @@ function renderRouteOnMap() {
 async function submitReview() {
   if(props.role !== 'client') return
 
-  await serviceStore.rateService()
-  await reviewStore.postReview({
-    provider: serviceStore.providerId,
-    rating: reviewRating.value,
-    comment: reviewComment.value
-  })
-
-  reviewOpen.value = false
+  try {
+    await serviceStore.rateService({
+      rating: reviewRating.value,
+      comment: reviewComment.value,
+    })
+    reviewOpen.value = false
+  } catch {
+    // erro já tratado na store; o modal continua aberto para nova tentativa
+  }
 }
 
 onMounted(() => {

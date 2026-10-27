@@ -38,6 +38,28 @@ onMounted(async () => {
   await serviceTypeStore.getTypeServices()
 })
 
+const saveProfilePicture = async (userId) => {
+  const newImage = await postImage({
+    file: profilePicture.value,
+    description: userData.email,
+  })
+
+  if (!newImage?.attachment_key) {
+    $toast.error('Não foi possível enviar a foto de perfil. Você poderá adicioná-la depois.', {
+      type: 'error',
+      duration: 3000,
+      position: 'top-right',
+    })
+    return false
+  }
+
+  const updatedUser = await authStore.updateUser(userId, {
+    profile_picture_attachment_key: newImage.attachment_key,
+  })
+
+  return !!updatedUser
+}
+
 const handleRegister = async () => {
   if (userData.password !== confirmPassword.value) {
     $toast.error('As senhas não coincidem', {
@@ -48,18 +70,6 @@ const handleRegister = async () => {
     return
   }
 
-  if (profilePicture.value) {
-    const newImage = await postImage({
-      file: profilePicture.value,
-      description: userData.email,
-    })
-    if (newImage?.attachment_key) {
-      userData.profile_picture = newImage.attachment_key
-    } else {
-      return
-    }
-  }
-
   const user = await authStore.createUser(userData)
   if (!user) return
 
@@ -68,6 +78,14 @@ const handleRegister = async () => {
     password: userData.password,
   })
   if (!loggedIn) return
+
+  // O upload exige login; falha na foto não bloqueia o cadastro.
+  if (profilePicture.value) {
+    const pictureSaved = await saveProfilePicture(user.id)
+    if (pictureSaved) {
+      await authStore.fetchUser()
+    }
+  }
 
   if (profileType.value === 'provider') {
     router.push(`/auth/register/location/${typeServiceId.value}`)

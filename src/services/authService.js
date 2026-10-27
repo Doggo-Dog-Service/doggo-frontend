@@ -1,4 +1,11 @@
-import { accessTokenRequest, refreshTokenRequest, meRequest, createUser, deleteUser } from '@/api/auth'
+import {
+  accessTokenRequest,
+  refreshTokenRequest,
+  meRequest,
+  createUser,
+  updateUser as updateUserRequest,
+  deleteUser,
+} from '@/api/auth'
 import {
   getRefreshToken,
   getAccessToken,
@@ -61,6 +68,18 @@ export const createBaseUser = async (payload) => {
     const { data } = await createUser(payload);
     return data
   } catch(error) {
+    throw {
+      message: parseDjangoErrors(error),
+      status: error.response?.status,
+    }
+  }
+}
+
+export const updateUser = async (id, payload) => {
+  try {
+    const { data } = await updateUserRequest(id, payload)
+    return data
+  } catch (error) {
     throw {
       message: parseDjangoErrors(error),
       status: error.response?.status,

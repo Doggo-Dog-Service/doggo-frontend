@@ -20,7 +20,7 @@ const provider = ref(null)
 const providerId = computed(() => Number(route.params.id))
 
 const isOwnProfile = computed(
-  () => !!provider.value?.user?.id && provider.value.user.id === authStore.user?.id,
+  () => !!provider.value?.id && provider.value.id === authStore.user?.provider_profile?.id,
 )
 
 watch(

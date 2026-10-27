@@ -57,33 +57,11 @@ export const useServiceStore = defineStore('serviceStore', () => {
     }
   }
 
-  async function deleteSerivce(id) {
-    try {
-      loading.value = true
-      await serviceService.deleteService(id)
-      await getServices()
-      $toast.success('Serviço deletado com sucesso', {
-        duration: 3000,
-        type: 'success',
-        position: 'top-left',
-      })
-    } catch (error) {
-      $toast.success(error.message, {
-        duration: 3000,
-        type: 'error',
-        position: 'top-left',
-      })
-    } finally {
-      loading.value = false
-    }
-  }
-
   return {
     loading,
     serivces,
     getServices,
     getService,
     updateService,
-    deleteSerivce
   }
 })

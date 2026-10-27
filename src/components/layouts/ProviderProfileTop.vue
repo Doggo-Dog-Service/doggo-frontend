@@ -53,7 +53,7 @@ onMounted(async () => {
       </div>
     </div>
     <button
-      v-if="authStore.user?.id === props.provider.user?.id"
+      v-if="authStore.user?.provider_profile?.id === props.provider.id"
       class="self-start sm:self-center border rounded-full px-4 py-2 font-bold text-doggo-green bg-green-100 whitespace-nowrap"
     >
       Editar

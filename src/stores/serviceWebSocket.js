@@ -93,17 +93,31 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
-  async function rateService() {
+  async function rateService({ rating, comment }) {
     if(!service.value) return
 
     loading.value = true
     error.value = null
 
     try {
-      const data = await serviceService.rateService(service.value.id)
+      const data = await serviceService.rateService(service.value.id, { rating, comment })
+
+      $toast.success('Agradecemos pelo feedback!', {
+        type: 'success',
+        duration: 3000,
+        position: 'top-right',
+      })
+
       return data
     } catch (err) {
       error.value = err.message || 'Erro ao avaliar o serviço.'
+
+      $toast.error(error.value, {
+        type: 'error',
+        duration: 3000,
+        position: 'top-right',
+      })
+
       throw err
     } finally {
       loading.value = false
@@ -122,7 +136,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
       const data = await serviceService.getServiceRoute(service.value.id)
 
       routePoints.value = data.points
-      totalDistance.value = data.total_distance
+      totalDistance.value = data.distance_meters
 
       return data
     } catch (err) {
