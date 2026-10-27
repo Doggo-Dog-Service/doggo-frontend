@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 import * as serviceService from '@/services/service'
 
 export const useServiceStore = defineStore('serviceStore', () => {
-  const $toast = useToast()
 
   const loading = ref(false)
   const serviceError = ref('')
@@ -41,17 +40,9 @@ export const useServiceStore = defineStore('serviceStore', () => {
       loading.value = true
       await serviceService.updateService(id, payload)
       await getServices()
-      $toast.success('Serviço atualizado com sucesso!', {
-        duration: 3000,
-        type: 'success',
-        position: 'top-left',
-      })
+      notify.success('Serviço atualizado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        duration: 3000,
-        type: 'error',
-        position: 'top-left',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }

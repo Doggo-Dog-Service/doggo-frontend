@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import * as petService from '@/services/pet'
 import { ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 export const usePetStore = defineStore('petStore', () => {
-  const $toast = useToast()
 
   const loading = ref(false)
   const error = ref('')
@@ -39,13 +38,9 @@ export const usePetStore = defineStore('petStore', () => {
     try {
       loading.value = true
       const data = await petService.createPet(payload)
-      $toast.success(`${data.name} adicionado!`, {
-        type: 'success',
-        position: 'top-right',
-        duration: 3000
-      })
+      notify.success(`${data.name} adicionado!`)
     } catch(error) {
-      $toast.error()
+      notify.error()
     }
   }
 
@@ -53,11 +48,7 @@ export const usePetStore = defineStore('petStore', () => {
     try {
       loading.value = true
       const data = await petService.updatePet(id, payload)
-      $toast.success('Pet alterado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Pet alterado com sucesso!')
       return data
     } catch (err) {
       error.value = err.message
@@ -70,11 +61,7 @@ export const usePetStore = defineStore('petStore', () => {
     try {
       loading.value = true
       const data = await petService.deletePet(id)
-      $toast.success('Pet deletado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Pet deletado com sucesso!')
       return data
     } catch (err) {
       error.value = err.message

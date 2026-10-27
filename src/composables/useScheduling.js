@@ -1,7 +1,7 @@
 import { computed, shallowRef, toValue, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 import { useAuthStore } from '@/stores/auth'
 import { useAvailabilityStore } from '@/stores/availability'
@@ -10,12 +10,6 @@ import { useProviderStore } from '@/stores/provider'
 import { useServiceTypeStore } from '@/stores/serviceType'
 import { createService } from '@/services/service'
 import { fromDateAndTime, toLocalIsoString } from '@/utils/date'
-
-const TOAST_OPTIONS = {
-  type: 'error',
-  duration: 4000,
-  position: 'top-right',
-}
 
 /**
  * Orquestra a tela de agendamento: carrega os dados necessários,
@@ -28,8 +22,6 @@ const TOAST_OPTIONS = {
  */
 export function useScheduling(options = {}) {
   const { providerId: providerIdInput } = options
-
-  const $toast = useToast()
   const router = useRouter()
 
   const authStore = useAuthStore()
@@ -107,7 +99,7 @@ export function useScheduling(options = {}) {
     }
 
     if (!serviceTypeId.value) {
-      $toast.error('Não foi possível identificar o tipo de serviço do profissional.', TOAST_OPTIONS)
+      notify.error('Não foi possível identificar o tipo de serviço do profissional.')
     }
   }
 
@@ -140,17 +132,13 @@ export function useScheduling(options = {}) {
         start_datetime: toLocalIsoString(startDatetime),
       })
 
-      $toast.success('Solicitação enviada! Aguarde a resposta do profissional.', {
-        ...TOAST_OPTIONS,
-        type: 'success',
-        duration: 3000,
-      })
+      notify.success('Solicitação enviada! Aguarde a resposta do profissional.')
 
       await router.push({ name: 'services-view' })
     } catch (error) {
       submitError.value =
         error?.message || 'Não foi possível enviar a solicitação. Tente novamente.'
-      $toast.error(submitError.value, TOAST_OPTIONS)
+      notify.error(submitError.value)
 
       if (error?.status === 409) {
         await refreshSlots()

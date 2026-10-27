@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 import * as authService from '@/services/authService'
 import { removeAccessToken } from '@/utils/token'
 
 export const useAuthStore = defineStore('authStore', () => {
-  const $toast = useToast()
 
   const user = ref(null)
   const inicialized = ref(false)
@@ -21,18 +20,10 @@ export const useAuthStore = defineStore('authStore', () => {
 
       await authService.login(credentials)
       user.value = await authService.getMe()
-      $toast.success(`Bem vindo ${user.value.full_name}`, {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success(`Bem vindo ${user.value.full_name}`)
       return true
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
       return false
     } finally {
       loading.value = false
@@ -54,11 +45,7 @@ export const useAuthStore = defineStore('authStore', () => {
   const logout = () => {
     authService.logout()
     user.value = null
-    $toast.success('Logout realizado!', {
-      type: 'success',
-      duration: 3000,
-      position: 'top-right',
-    })
+    notify.success('Logout realizado!')
   }
 
   const createUser = async (data) => {
@@ -67,11 +54,7 @@ export const useAuthStore = defineStore('authStore', () => {
       const userData = await authService.createBaseUser(data)
       return userData
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
       return null
     } finally {
       loading.value = false
@@ -83,11 +66,7 @@ export const useAuthStore = defineStore('authStore', () => {
       loading.value = true
       return await authService.updateUser(id, data)
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
       return null
     } finally {
       loading.value = false
@@ -98,17 +77,9 @@ export const useAuthStore = defineStore('authStore', () => {
     try {
       loading.value = true
       authService.deleteUserById(id)
-      $toast.success('Usuário deletado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Usuário deletado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     }
   }
 

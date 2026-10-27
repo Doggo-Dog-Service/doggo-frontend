@@ -1,10 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 import * as providerService from '@/services/providerService'
 
 export const useProviderStore = defineStore('providerStore', () => {
-  const $toast = useToast()
 
   const providers = ref([])
   const currentProvider = ref(null)
@@ -27,11 +26,7 @@ export const useProviderStore = defineStore('providerStore', () => {
       providers.value = fetchedProviders
     } catch (error) {
       error.value = error.message
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -44,11 +39,7 @@ export const useProviderStore = defineStore('providerStore', () => {
       currentProvider.value = response
       return response
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -74,11 +65,7 @@ export const useProviderStore = defineStore('providerStore', () => {
       loading.value = true
       const newProvider = await providerService.createProvider(data)
       if (newProvider) {
-        $toast.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`, {
-          type: 'success',
-          duration: 3000,
-          position: 'top-right',
-        })
+        notify.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`)
         return true
       }
     } catch (error) {
@@ -93,17 +80,9 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       await providerService.deleteProvider(id)
-      $toast.success('Perfil deletado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Perfil deletado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }

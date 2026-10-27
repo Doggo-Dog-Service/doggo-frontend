@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 import * as serviceService from '@/services/service'
 
 export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
-  const $toast = useToast()
 
   const service = ref(null)
 
@@ -102,21 +101,13 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     try {
       const data = await serviceService.rateService(service.value.id, { rating, comment })
 
-      $toast.success('Agradecemos pelo feedback!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Agradecemos pelo feedback!')
 
       return data
     } catch (err) {
       error.value = err.message || 'Erro ao avaliar o serviço.'
 
-      $toast.error(error.value, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.value)
 
       throw err
     } finally {
@@ -162,22 +153,14 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
       service.value = data
 
       if (successMessage) {
-        $toast.success(successMessage, {
-          type: 'success',
-          duration: 3000,
-          position: 'top-right',
-        })
+        notify.success(successMessage)
       }
 
       return data
     } catch (err) {
       error.value = err.message || 'Não foi possível atualizar o serviço.'
 
-      $toast.error(error.value, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.value)
 
       throw err
     } finally {

@@ -9,14 +9,13 @@ import { useClientStore } from '@/stores/clients'
 import { useServiceTypeStore } from '@/stores/serviceType'
 import { useMedia } from '@/composables/useMedia'
 import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 const authStore = useAuthStore()
 const clientStore = useClientStore()
 const serviceTypeStore = useServiceTypeStore()
 const { postImage } = useMedia()
 const router = useRouter()
-const $toast = useToast()
 
 const profileType = ref('client')
 const userData = reactive({
@@ -45,11 +44,7 @@ const saveProfilePicture = async (userId) => {
   })
 
   if (!newImage?.attachment_key) {
-    $toast.error('Não foi possível enviar a foto de perfil. Você poderá adicioná-la depois.', {
-      type: 'error',
-      duration: 3000,
-      position: 'top-right',
-    })
+    notify.error('Não foi possível enviar a foto de perfil. Você poderá adicioná-la depois.')
     return false
   }
 
@@ -62,11 +57,7 @@ const saveProfilePicture = async (userId) => {
 
 const handleRegister = async () => {
   if (userData.password !== confirmPassword.value) {
-    $toast.error('As senhas não coincidem', {
-      type: 'error',
-      duration: 3000,
-      position: 'top-right',
-    })
+    notify.error('As senhas não coincidem')
     return
   }
 
