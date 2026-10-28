@@ -12,6 +12,8 @@ const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 
 const showNav = computed(() => !route.meta.hideNav)
+// Telas com mapa (meta.fullBleed) ocupam a largura toda; cada uma cuida do próprio espaçamento.
+const fullBleed = computed(() => !!route.meta.fullBleed)
 
 // Contador de pedidos pendentes: carrega ao entrar no modo passeador e ao abrir Pedidos.
 // Depois de confirmar/recusar/cancelar, quem o atualiza é a store serviceWebSocket (tela de serviço).
@@ -36,10 +38,14 @@ watch(
     <div class="md:pl-68">
       <AppTopBar />
       <main
-        :class="[
-          'mx-auto w-full max-w-5xl px-4 py-5 md:px-8 md:py-8',
-          showNav && 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-8',
-        ]"
+        :class="
+          fullBleed
+            ? 'w-full'
+            : [
+                'mx-auto w-full max-w-5xl px-4 py-5 md:px-8 md:py-8',
+                showNav && 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-8',
+              ]
+        "
       >
         <RouterView v-slot="{ Component }">
           <Transition

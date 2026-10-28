@@ -153,7 +153,7 @@ watch(loaded, (value) => {
     @createReview="submitReview"
     @closeModal="reviewOpen = false"
   />
-  <div class="relative flex flex-col w-full h-[calc(100vh-4.5rem)] md:flex-row md:overflow-hidden">
+  <div class="relative flex w-full flex-col md:h-[calc(100dvh-5rem)] md:flex-row md:overflow-hidden">
     <div
       id="service-route-map"
       class="relative w-full h-[45vh] min-h-87.5 overflow-hidden md:h-full md:min-h-0 md:w-2/3 md:shrink-0"

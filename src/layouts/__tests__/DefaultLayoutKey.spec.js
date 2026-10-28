@@ -38,3 +38,29 @@ describe('DefaultLayout route key', () => {
     expect(mounted).toHaveBeenCalledTimes(2)
   })
 })
+
+describe('DefaultLayout full-bleed', () => {
+  it('rota com meta.fullBleed não usa coluna centralizada nem padding', async () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    useAuthStore().user = { client_profile: { id: 1 }, provider_profile: null }
+    const View = { template: '<div />' }
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/service/:id', name: 'service-view', component: View, meta: { fullBleed: true } },
+        { path: '/pets', name: 'pets-view', component: View },
+      ],
+    })
+    router.push('/service/1')
+    await router.isReady()
+    const w = mount(DefaultLayout, { global: { plugins: [pinia, router] } })
+    await flushPromises()
+    expect(w.find('main').classes()).not.toContain('max-w-5xl')
+    expect(w.find('main').classes()).not.toContain('md:px-8')
+
+    await router.push('/pets')
+    await flushPromises()
+    expect(w.find('main').classes()).toContain('max-w-5xl')
+  })
+})

@@ -47,7 +47,7 @@ const router = createRouter({
           path: 'service/:id',
           name: 'service-view',
           component: () => import('@/views/ServiceView.vue'),
-          meta: { title: 'Passeio', requiresAuth: true, hideNav: true },
+          meta: { title: 'Passeio', requiresAuth: true, hideNav: true, fullBleed: true },
         },
         {
           path: 'scheduling/:providerId',

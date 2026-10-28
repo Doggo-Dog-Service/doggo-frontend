@@ -167,3 +167,24 @@ describe('ServicesView agrupada', () => {
     expect(services.getServices).toHaveBeenCalledTimes(1)
   })
 })
+
+// Itens de grid têm largura mínima = conteúdo; com texto `truncate` (nowrap) o card estoura a tela no mobile.
+// grid-cols-1 (minmax(0,1fr)) deixa o card encolher.
+describe('ServicesView layout mobile', () => {
+  beforeEach(() => {
+    route.meta = { filter: 'ativos' }
+    route.query = {}
+  })
+
+  it('listas usam grid-cols-1 para não estourar a largura', async () => {
+    const today = new Date().toISOString()
+    const w = mountView([{ id: 1, status: 2, start_datetime: today, created_at: today, pets: [] }], {
+      mode: 'provider',
+      provider_profile: { id: 2, verification_status: 'approved' },
+    })
+    await flushPromises()
+    const lists = w.findAll('ul.grid')
+    expect(lists.length).toBeGreaterThan(0)
+    for (const list of lists) expect(list.classes()).toContain('grid-cols-1')
+  })
+})

@@ -133,7 +133,7 @@ watch(selectedStatus, load)
       </li>
     </ul>
 
-    <div v-if="serviceStore.loading" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Carregando serviços">
+    <div v-if="serviceStore.loading" class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Carregando serviços">
       <UiSkeleton v-for="n in 3" :key="n" shape="rect" />
     </div>
     <UiEmptyState
@@ -162,7 +162,7 @@ watch(selectedStatus, load)
             {{ group.items.length }}
           </span>
         </h2>
-        <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <ul class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           <li v-for="service in group.items" :key="service.id">
             <ServiceCard
               :id="service.id"
