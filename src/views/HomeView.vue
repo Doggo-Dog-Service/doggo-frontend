@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { CloudOff, History, MapPinOff, PawPrint } from 'lucide-vue-next'
 import HomeHighlightCard from '@/components/home/HomeHighlightCard.vue'
 import NearbyProviders from '@/components/home/NearbyProviders.vue'
@@ -15,6 +15,7 @@ import { buildServiceParams } from '@/utils/serviceFilters'
 import { pickHomeHighlight } from '@/utils/homeHighlight'
 
 const MAX_PROVIDERS = 8
+const GEO_TIMEOUT_MS = 5000
 
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
@@ -31,19 +32,38 @@ const today = new Intl.DateTimeFormat('pt-BR', {
 const highlight = computed(() => pickHomeHighlight(serviceStore.serivces))
 const nearby = computed(() => (providerStore.providers ?? []).slice(0, MAX_PROVIDERS))
 
-const loadServices = () =>
-  serviceStore.getServices(buildServiceParams({ mode: 'client', user: authStore.user }))
+const servicesLoaded = ref(false)
+const providersLoaded = ref(false)
+
+async function loadServices() {
+  await serviceStore.getServices(buildServiceParams({ mode: 'client', user: authStore.user }))
+  servicesLoaded.value = true
+}
+
+// Permissão ignorada não pode travar a lista: desiste da localização após o timeout.
+function locate() {
+  let timer
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error('timeout')), GEO_TIMEOUT_MS)
+  })
+  return Promise.race([getCurrentPosition(), timeout]).finally(() => clearTimeout(timer))
+}
+
+const isCoord = (v) => v != null && v !== '' && Number.isFinite(Number(v))
 
 async function loadProviders() {
   const params = {}
   try {
-    await getCurrentPosition()
-    params.lat = latitude.value
-    params.lon = longitude.value
+    await locate()
+    if (isCoord(latitude.value) && isCoord(longitude.value)) {
+      params.lat = latitude.value
+      params.lon = longitude.value
+    }
   } catch {
-    // Sem permissão: lista padrão, sem distância.
+    // Sem permissão ou sem resposta: lista padrão, sem distância.
   }
   await providerStore.fetchProviders(params)
+  providersLoaded.value = true
 }
 
 const load = () => Promise.all([loadServices(), loadProviders()])
@@ -63,7 +83,7 @@ const SHORTCUTS = [
       <p class="text-body capitalize text-fg-muted">{{ today }}</p>
     </header>
 
-    <div v-if="serviceStore.loading && !serviceStore.serivces.length" data-testid="home-skeleton">
+    <div v-if="!servicesLoaded" data-testid="home-skeleton">
       <UiSkeleton shape="rect" class="!h-40" />
     </div>
     <UiEmptyState
@@ -100,7 +120,8 @@ const SHORTCUTS = [
           Ver todos
         </RouterLink>
       </div>
-      <div v-if="providerStore.loading && !nearby.length" class="flex gap-3 overflow-hidden" aria-hidden="true">
+      <div v-if="!providersLoaded" class="flex gap-3 overflow-hidden" role="status">
+        <span class="sr-only">Carregando</span>
         <UiSkeleton v-for="n in 3" :key="n" shape="rect" class="!h-40 !w-44 shrink-0" />
       </div>
       <UiEmptyState

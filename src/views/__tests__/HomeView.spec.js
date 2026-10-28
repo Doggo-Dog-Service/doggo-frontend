@@ -6,13 +6,21 @@ import { useAuthStore } from '@/stores/auth'
 import { useServiceStore } from '@/stores/services'
 import { useProviderStore } from '@/stores/provider'
 
+const geo = vi.hoisted(() => ({ impl: null, lat: null, lon: null }))
+
 vi.mock('@/composables/useGeolocation', async () => {
   const { ref } = await import('vue')
+  const latitude = ref(null)
+  const longitude = ref(null)
   return {
     useGeolocation: () => ({
-      latitude: ref(null),
-      longitude: ref(null),
-      getCurrentPosition: () => Promise.reject(new Error('negado')),
+      latitude,
+      longitude,
+      getCurrentPosition: () => {
+        latitude.value = geo.lat
+        longitude.value = geo.lon
+        return geo.impl()
+      },
     }),
   }
 })
@@ -22,6 +30,9 @@ const RouterLinkStub = { props: ['to'], template: '<a><slot /></a>' }
 let auth, services, providers
 
 function setup() {
+  geo.impl = () => Promise.reject(new Error('negado'))
+  geo.lat = null
+  geo.lon = null
   setActivePinia(createPinia())
   auth = useAuthStore()
   auth.user = { full_name: 'Maria da Silva', client_profile: { id: 3 } }
@@ -99,5 +110,40 @@ describe('HomeView', () => {
     const w = mountWithPinia()
     await flushPromises()
     expect(w.findAll('[data-testid="nearby-provider"]').length).toBe(8)
+  })
+
+  it('geolocalizacao que nunca responde: busca sem lat/lon apos timeout', async () => {
+    vi.useFakeTimers()
+    geo.impl = () => new Promise(() => {})
+    mountWithPinia()
+    await vi.advanceTimersByTimeAsync(4900)
+    expect(providers.fetchProviders).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(200)
+    expect(providers.fetchProviders).toHaveBeenCalledWith({})
+    vi.useRealTimers()
+  })
+
+  it('geolocalizacao ok: envia lat/lon', async () => {
+    geo.lat = '-23.550000'
+    geo.lon = '-46.630000'
+    geo.impl = () => Promise.resolve()
+    mountWithPinia()
+    await flushPromises()
+    expect(providers.fetchProviders).toHaveBeenCalledWith({ lat: '-23.550000', lon: '-46.630000' })
+  })
+
+  it('geolocalizacao indisponivel (sem coordenadas): nao envia lat/lon nulos', async () => {
+    geo.impl = () => Promise.resolve()
+    mountWithPinia()
+    await flushPromises()
+    expect(providers.fetchProviders).toHaveBeenCalledWith({})
+  })
+
+  it('nao mostra estado vazio antes do primeiro carregamento de passeios', async () => {
+    services.getServices = vi.fn(() => new Promise(() => {}))
+    const w = mountWithPinia()
+    await flushPromises()
+    expect(w.text()).not.toContain('Agendar passeio')
+    expect(w.find('[data-testid="home-skeleton"]').exists()).toBe(true)
   })
 })

@@ -33,7 +33,7 @@ export const useProviderStore = defineStore('providerStore', () => {
     }
   }
 
-  const fetchProvider =async (id) => {
+  const fetchProvider = async (id) => {
     try {
       loading.value = true
       const response = await providerService.fetchProvider(id)
