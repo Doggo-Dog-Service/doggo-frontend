@@ -51,7 +51,8 @@ watch(
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
           >
-            <component :is="Component" :key="$route.fullPath" />
+            <!-- path (não fullPath): mudar só a query, como ?etapa= do agendamento, não pode recriar a tela e perder a seleção. -->
+            <component :is="Component" :key="$route.path" />
           </Transition>
         </RouterView>
       </main>
