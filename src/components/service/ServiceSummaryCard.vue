@@ -23,8 +23,10 @@ defineProps({
 
 const store = useServiceWebSocketStore()
 
-// O backend só envia contact_phone nos status 2 e 3.
-const contactPhone = computed(() => store.service?.contact_phone ?? null)
+// WhatsApp no resumo só no confirmado (status 2); em andamento o contato fica no passeio ao vivo.
+const contactPhone = computed(() =>
+  store.status === 2 ? (store.service?.contact_phone ?? null) : null,
+)
 </script>
 
 <template>

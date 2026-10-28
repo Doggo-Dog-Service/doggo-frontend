@@ -7,7 +7,7 @@ import ServicePetsList from '@/components/service/ServicePetsList.vue'
 import { computed } from 'vue'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatCurrency } from '@/utils/currency'
-import { formatDateTime } from '@/utils/time'
+import { formatDateTime, formatPlannedDuration } from '@/utils/time'
 
 const store = useServiceWebSocketStore()
 
@@ -21,7 +21,9 @@ defineProps({
 const priceLabel = computed(() => formatCurrency(store.price))
 const startLabel = computed(() => formatDateTime(store.startDatetime))
 const endLabel = computed(() => formatDateTime(store.endDatetime))
-const durationLabel = computed(() => store.walkDuration)
+const durationLabel = computed(
+  () => store.walkDuration || formatPlannedDuration(store.startDatetime, store.endDatetime),
+)
 </script>
 
 <template>

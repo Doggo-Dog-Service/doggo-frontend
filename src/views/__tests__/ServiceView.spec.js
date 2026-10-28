@@ -122,4 +122,19 @@ describe('ServiceView por status', () => {
     expect(w.find('[data-route]').exists()).toBe(true)
     expect(serviceApi.getService.mock.calls.length).toBe(calls)
   })
+
+  it.each([1, 5, 6])('status %i com contact_phone: sem WhatsApp', async (status) => {
+    const w = await setup('client', { status, contact_phone: '(47) 99999-0001' })
+    expect(w.find('a[href^="https://wa.me/"]').exists()).toBe(false)
+  })
+
+  it('status 1 e 2: mostra duração prevista (end - start)', async () => {
+    const w1 = await setup('client', { status: 1 })
+    expect(w1.text()).toContain('1h')
+    const w2 = await setup('client', {
+      status: 2,
+      end_datetime: '2026-10-28T11:30:00Z',
+    })
+    expect(w2.text()).toContain('1h30')
+  })
 })
