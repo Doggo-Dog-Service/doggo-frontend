@@ -8,6 +8,7 @@ describe('UiSteps', () => {
     expect(wrapper.text()).toContain('Etapa 2 de 4')
     const bar = wrapper.get('[role="progressbar"]')
     expect(bar.attributes('aria-valuenow')).toBe('2')
+    expect(bar.attributes('aria-label')).toBe('Progresso')
     expect(bar.attributes('aria-valuemin')).toBe('1')
     expect(bar.attributes('aria-valuemax')).toBe('4')
     expect(bar.get('div').attributes('style')).toContain('50%')

@@ -221,6 +221,37 @@ describe('useSignupWizard', () => {
     })
   })
 
+  describe('resetIfSessionLost', () => {
+    it('estado antigo (conta criada) sem sessao volta limpo para a etapa 1', async () => {
+      fillAccount(w)
+      await w.next()
+      fillPersonal(w)
+      await w.next()
+      expect(w.step.value).toBe(3)
+      mocks.auth.user = null // logout / troca de conta
+      w.resetIfSessionLost()
+      expect(w.step.value).toBe(1)
+      expect(w.account.email).toBe('')
+      expect(w.canEnter(3)).toBe(false)
+    })
+
+    it('com sessao ativa preserva o estado', async () => {
+      fillAccount(w)
+      await w.next()
+      fillPersonal(w)
+      await w.next()
+      mocks.auth.user = { id: 7 }
+      w.resetIfSessionLost()
+      expect(w.step.value).toBe(3)
+    })
+
+    it('visitante no meio da etapa 1 nao perde o que digitou', () => {
+      fillAccount(w)
+      w.resetIfSessionLost()
+      expect(w.account.email).toBe('ana@doggo.com')
+    })
+  })
+
   describe('canEnter', () => {
     it('4 e falso sem a etapa 3 concluida', async () => {
       expect(w.canEnter(4)).toBe(false)

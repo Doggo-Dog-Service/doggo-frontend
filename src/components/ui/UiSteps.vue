@@ -5,6 +5,7 @@ const props = defineProps({
   current: { type: Number, required: true },
   total: { type: Number, required: true },
   label: { type: String, default: 'Etapa' },
+  ariaLabel: { type: String, default: 'Progresso' },
 })
 
 const percent = computed(() => Math.min(100, Math.max(0, (props.current / props.total) * 100)))
@@ -15,6 +16,7 @@ const percent = computed(() => Math.min(100, Math.max(0, (props.current / props.
     <p class="text-caption font-semibold text-fg-muted">{{ props.label }} {{ props.current }} de {{ props.total }}</p>
     <div
       role="progressbar"
+      :aria-label="props.ariaLabel"
       :aria-valuemin="1"
       :aria-valuemax="props.total"
       :aria-valuenow="props.current"

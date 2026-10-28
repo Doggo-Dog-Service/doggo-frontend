@@ -31,6 +31,8 @@ const current = computed(() => STEPS[stepKey.value] ?? STEPS[1])
 const canGoBack = computed(() => wizard.canEnter(step.value - 1))
 const continueText = computed(() => (isLastStep.value ? 'Concluir cadastro' : 'Continuar'))
 
+wizard.resetIfSessionLost()
+
 // URL -> etapa: aponta sempre para a primeira etapa permitida.
 watch(
   () => route.query.etapa,
@@ -69,7 +71,7 @@ function onBack() {
 
 <template>
   <form class="flex flex-col gap-6 pb-24 md:pb-0" novalidate @submit.prevent="onNext">
-    <UiSteps :current="step" :total="totalSteps" />
+    <UiSteps :current="step" :total="totalSteps" aria-label="Progresso do cadastro" />
     <header class="flex flex-col gap-1">
       <h1 class="text-title text-fg">{{ current.title }}</h1>
       <p v-if="current.subtitle" class="text-body text-fg-muted">{{ current.subtitle }}</p>
