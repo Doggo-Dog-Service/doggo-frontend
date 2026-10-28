@@ -96,6 +96,11 @@ export function parseDjangoErrors(error) {
 
   if (typeof response === 'string') return response
 
+  if (Array.isArray(response)) {
+    const items = response.filter((m) => typeof m === 'string').map(translateError)
+    if (items.length > 0) return items.join(' ')
+  }
+
   if (response.detail) return translateError(response.detail)
 
   const messages = flattenErrors(response)

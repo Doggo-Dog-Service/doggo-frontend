@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { LogOut, Monitor, Moon, Phone, Save, Sun, User } from 'lucide-vue-next'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
@@ -28,7 +28,15 @@ const theme = computed({
 })
 
 // O telefone não volta da API (write-only): começa vazio e só é enviado se preenchido.
-const form = reactive({ full_name: authStore.user?.full_name ?? '', phone: '' })
+const form = reactive({ full_name: '', phone: '' })
+// O usuário pode carregar depois da montagem; só preenche enquanto o campo está vazio.
+watch(
+  () => authStore.user?.full_name,
+  (name) => {
+    if (name && !form.full_name) form.full_name = name
+  },
+  { immediate: true },
+)
 const errors = reactive({ full_name: '', phone: '' })
 const saving = ref(false)
 
