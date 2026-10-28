@@ -55,7 +55,7 @@ const handleLogin = async () => {
     </form>
     <p class="flex flex-wrap justify-center gap-2 text-body text-fg-muted">
       Não possui uma conta ainda?
-      <RouterLink class="font-semibold text-primary hover:underline" to="/auth/register">Registrar-se</RouterLink>
+      <RouterLink class="font-semibold text-primary hover:underline" :to="{ name: 'signup-view' }">Registrar-se</RouterLink>
     </p>
   </div>
 </template>

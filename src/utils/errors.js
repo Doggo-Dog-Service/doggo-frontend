@@ -109,3 +109,14 @@ export function parseDjangoErrors(error) {
   if (status) return `Erro do servidor (${status}).`
   return 'Erro desconhecido.'
 }
+
+// Primeira mensagem traduzida de cada campo ({ email: ['...'] } -> { email: '...' }).
+export function parseFieldErrors(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {}
+  const result = {}
+  for (const [field, value] of Object.entries(data)) {
+    const first = Array.isArray(value) ? value[0] : value
+    if (typeof first === 'string') result[field] = translateError(first)
+  }
+  return result
+}

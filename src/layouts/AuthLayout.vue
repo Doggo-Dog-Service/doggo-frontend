@@ -1,16 +1,16 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useSignupWizard } from '@/composables/useSignupWizard'
 
 const route = useRoute()
+const wizard = useSignupWizard()
 
-// Cadastro tem duas colunas; a localização precisa de espaço para o mapa.
-const WIDTHS = {
-  'register-view': 'max-w-3xl',
-  'register-location-view': 'max-w-5xl',
-}
-const widthClass = computed(() => WIDTHS[route.name] ?? 'max-w-md')
-const isMapPage = computed(() => route.name === 'register-location-view')
+// Cadastro em etapas: coluna única; o perfil do passeador (mapa) precisa de mais largura.
+const widthClass = computed(() => {
+  if (route.name !== 'signup-view') return 'max-w-md'
+  return wizard.stepKey.value === 'provider' ? 'max-w-3xl' : 'max-w-xl'
+})
 </script>
 
 <template>
@@ -19,12 +19,7 @@ const isMapPage = computed(() => route.name === 'register-location-view')
       <RouterLink to="/" class="self-center rounded-control focus-visible:ring-2 focus-visible:ring-primary">
         <img class="h-10 w-auto" src="/logo.png" alt="Doggo" />
       </RouterLink>
-      <main
-        :class="[
-          'overflow-hidden rounded-card border border-line bg-surface shadow-card',
-          !isMapPage && 'p-6 md:p-8',
-        ]"
-      >
+      <main class="overflow-hidden rounded-card border border-line bg-surface p-6 shadow-card md:p-8">
         <RouterView v-slot="{ Component }">
           <Transition
             mode="out-in"
@@ -35,7 +30,7 @@ const isMapPage = computed(() => route.name === 'register-location-view')
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
           >
-            <component :is="Component" :key="$route.fullPath" />
+            <component :is="Component" :key="$route.name" />
           </Transition>
         </RouterView>
       </main>

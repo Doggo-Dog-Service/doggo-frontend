@@ -93,22 +93,22 @@ const router = createRouter({
           component: () => import('@/views/LoginView.vue'),
         },
         {
-          path: 'register',
-          name: 'register-view',
-          component: () => import('@/views/RegisterView.vue'),
+          path: 'cadastro',
+          name: 'signup-view',
+          component: () => import('@/views/SignupView.vue'),
         },
-        {
-          path: 'register/location/:serviceTypeId',
-          name: 'register-location-view',
-          component: () => import('@/views/RegisterLocationView.vue'),
-          meta: {
-            requiresAuth: true,
-          },
-        },
+        { path: 'register', redirect: { name: 'signup-view' } },
+        { path: 'register/location/:serviceTypeId', redirect: { name: 'signup-view' } },
       ],
     },
   ],
 })
+
+// ?etapa= inválida (ou ausente) vale 1.
+function signupStep(to) {
+  const n = Number.parseInt(to.query?.etapa, 10)
+  return Number.isInteger(n) && n >= 1 ? n : 1
+}
 
 export function createGuard(authStore) {
   return (to) => {
@@ -119,7 +119,19 @@ export function createGuard(authStore) {
     }
 
     const mode = authStore.mode
-    if (isAuthenticated && ['login-view', 'register-view'].includes(to.name)) {
+
+    if (to.name === 'signup-view') {
+      if (!isAuthenticated && signupStep(to) >= 3) return { name: 'signup-view', query: { etapa: '1' } }
+      if (isAuthenticated && mode) return homeRouteFor(mode)
+      return
+    }
+
+    // Conta criada, mas sem perfil de tutor/passeador: retoma o cadastro na etapa 3.
+    if (isAuthenticated && !mode && to.meta.requiresAuth) {
+      return { name: 'signup-view', query: { etapa: '3' } }
+    }
+
+    if (isAuthenticated && to.name === 'login-view') {
       return homeRouteFor(mode)
     }
     if (to.meta.mode && mode && to.meta.mode !== mode) {

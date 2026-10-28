@@ -50,21 +50,72 @@ describe('router guard', () => {
   })
 })
 
+const signupRoute = (etapa) => ({
+  name: 'signup-view',
+  meta: {},
+  query: etapa === undefined ? {} : { etapa },
+  fullPath: '/auth/cadastro' + (etapa === undefined ? '' : '?etapa=' + etapa),
+})
+
 describe('router guard (usuário logado em telas de auth)', () => {
   beforeEach(() => getAccessToken.mockReturnValue('token'))
 
-  it('login-view e register-view redirecionam para a home do modo', () => {
+  it('login-view e signup-view redirecionam para a home do modo', () => {
     expect(createGuard({ mode: 'client' })(routeOf('login-view'))).toEqual({ name: 'home-view' })
-    expect(createGuard({ mode: 'provider' })(routeOf('register-view'))).toEqual({ name: 'provider-today-view' })
-  })
-
-  it('register-location-view nao redireciona', () => {
-    const to = { name: 'register-location-view', meta: { requiresAuth: true }, fullPath: '/auth/register/location/1' }
-    expect(createGuard({ mode: 'client' })(to)).toBeUndefined()
+    expect(createGuard({ mode: 'provider' })(signupRoute('2'))).toEqual({ name: 'provider-today-view' })
   })
 
   it('sem token, login-view passa', () => {
     getAccessToken.mockReturnValue(null)
     expect(createGuard({ mode: null })(routeOf('login-view'))).toBeUndefined()
+  })
+})
+
+describe('router guard (retomada do cadastro)', () => {
+  beforeEach(() => getAccessToken.mockReturnValue('token'))
+
+  it('autenticado sem perfil em rota protegida -> signup etapa 3', () => {
+    expect(createGuard({ mode: null })(routeOf('home-view'))).toEqual({
+      name: 'signup-view',
+      query: { etapa: '3' },
+    })
+  })
+
+  it('autenticado sem perfil em signup-view passa (sem loop)', () => {
+    expect(createGuard({ mode: null })(signupRoute('3'))).toBeUndefined()
+  })
+
+  it('rota protegida sem modo especifico tambem retoma', () => {
+    expect(createGuard({ mode: null })(routeOf('services-view'))).toEqual({
+      name: 'signup-view',
+      query: { etapa: '3' },
+    })
+  })
+
+  it('visitante em signup etapa 1 e 2 passa', () => {
+    getAccessToken.mockReturnValue(null)
+    expect(createGuard({ mode: null })(signupRoute('1'))).toBeUndefined()
+    expect(createGuard({ mode: null })(signupRoute('2'))).toBeUndefined()
+    expect(createGuard({ mode: null })(signupRoute(undefined))).toBeUndefined()
+  })
+
+  it('visitante em signup etapa >= 3 -> etapa 1', () => {
+    getAccessToken.mockReturnValue(null)
+    for (const etapa of ['3', '4', '5']) {
+      expect(createGuard({ mode: null })(signupRoute(etapa))).toEqual({
+        name: 'signup-view',
+        query: { etapa: '1' },
+      })
+    }
+  })
+
+  it('etapa invalida e tratada como 1', () => {
+    getAccessToken.mockReturnValue(null)
+    expect(createGuard({ mode: null })(signupRoute('abc'))).toBeUndefined()
+  })
+
+  it('redirects antigos de cadastro apontam para signup-view', () => {
+    expect(router.resolve('/auth/register').matched.at(-1).redirect).toEqual({ name: 'signup-view' })
+    expect(router.resolve('/auth/register/location/2').matched.at(-1).redirect).toEqual({ name: 'signup-view' })
   })
 })

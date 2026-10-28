@@ -22,3 +22,18 @@ describe('parseDjangoErrors', () => {
     expect(parseDjangoErrors(err({ detail: 'Not found.' }, 404))).toBe('Não encontrado.')
   })
 })
+
+describe('parseFieldErrors', () => {
+  it('traduz a primeira mensagem de cada campo', async () => {
+    const { parseFieldErrors } = await import('../errors')
+    expect(
+      parseFieldErrors({ email: ['User with this Email already exists.'], cpf: ['CPF inválido.'] }),
+    ).toEqual({ email: 'Já existe um usuário com este email.', cpf: 'CPF inválido.' })
+  })
+
+  it('ignora entradas que nao sao objeto', async () => {
+    const { parseFieldErrors } = await import('../errors')
+    expect(parseFieldErrors(null)).toEqual({})
+    expect(parseFieldErrors('x')).toEqual({})
+  })
+})

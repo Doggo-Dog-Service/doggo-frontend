@@ -71,6 +71,7 @@ export const createBaseUser = async (payload) => {
     throw {
       message: parseDjangoErrors(error),
       status: error.response?.status,
+      fields: error.response?.data,
     }
   }
 }

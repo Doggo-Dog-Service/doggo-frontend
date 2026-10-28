@@ -99,13 +99,15 @@ export const useAuthStore = defineStore('authStore', () => {
     user.value = null
   }
 
-  const createUser = async (data) => {
+  // onError (opcional) recebe o erro bruto no lugar do toast, para o chamador mapear campos.
+  const createUser = async (data, { onError } = {}) => {
     try {
       loading.value = true
       const userData = await authService.createBaseUser(data)
       return userData
     } catch (error) {
-      notify.error(error.message)
+      if (onError) onError(error)
+      else notify.error(error.message)
       return null
     } finally {
       loading.value = false
