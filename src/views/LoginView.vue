@@ -6,6 +6,7 @@ import { onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRoute, useRouter } from 'vue-router'
 import { safeRedirect } from '@/utils/safeRedirect'
+import { homeRouteFor } from '@/router/navigation'
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
@@ -17,7 +18,7 @@ const data = reactive({
 
 const handleLogin = async () => {
   const ok = await authStore.login(data)
-  if (ok) router.push(safeRedirect(route.query.redirect) ?? '/')
+  if (ok) router.push(safeRedirect(route.query.redirect) ?? homeRouteFor(authStore.mode))
 }
 
 onMounted(() => {

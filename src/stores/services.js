@@ -8,6 +8,7 @@ export const useServiceStore = defineStore('serviceStore', () => {
   const loading = ref(false)
   const serviceError = ref('')
   const serivces = ref([])
+  const pendingCount = ref(0)
 
   async function getServices(params) {
     try {
@@ -19,6 +20,16 @@ export const useServiceStore = defineStore('serviceStore', () => {
       console.error(error.message)
     } finally {
       loading.value = false
+    }
+  }
+
+  // Contador de pedidos em análise (status 1) para a navegação; não altera a lista exibida.
+  async function fetchPendingCount() {
+    try {
+      const data = await serviceService.getServices({ status: 1 })
+      pendingCount.value = data.count ?? data.results?.length ?? 0
+    } catch {
+      pendingCount.value = 0
     }
   }
 
@@ -51,7 +62,9 @@ export const useServiceStore = defineStore('serviceStore', () => {
   return {
     loading,
     serivces,
+    pendingCount,
     getServices,
+    fetchPendingCount,
     getService,
     updateService,
   }

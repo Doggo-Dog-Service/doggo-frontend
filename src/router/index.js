@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
-import { HomeIcon, BriefcaseIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
+import { homeRouteFor } from './navigation'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,99 +14,73 @@ const router = createRouter({
           path: '',
           name: 'home-view',
           component: () => import('@/views/HomeView.vue'),
-          meta: {
-            id: 1,
-            title: 'Início',
-            icon: {
-              type: 'hero',
-              value: HomeIcon
-            },
-            isView: true,
-            requiresAuth: true,
-          },
+          meta: { title: 'Início', requiresAuth: true, mode: 'client' },
         },
         {
           path: 'provider/',
           name: 'provider-list-view',
           component: () => import('@/views/ProviderListView.vue'),
-          meta: {
-            id: 2,
-            requiresAuth: true,
-            isView: true,
-            title: 'Profissionais',
-            icon: {
-              type: 'hero',
-              value: BriefcaseIcon
-            }
-          },
+          meta: { title: 'Buscar', requiresAuth: true, mode: 'client' },
         },
         {
           path: 'provider/:id/',
           component: () => import('@/views/ProviderView.vue'),
-          meta: {
-            requiresAuth: true
-          }
+          meta: { title: 'Profissional', requiresAuth: true, mode: 'client', tab: 'provider-list-view' },
         },
         {
           path: 'pets/',
           name: 'pets-view',
           component: () => import('@/views/PetView.vue'),
-          meta: {
-            id: 3,
-            requiresAuth: true,
-            requiresClient: true,
-            title: 'Meus Pets',
-            icon: {
-              type: 'mdi',
-              value: 'mdi mdi-paw-outline'
-            },
-            isView: true,
-          },
-          beforeEnter: () => {
-            const authStore = useAuthStore()
-            if(!authStore.isClient) {
-              return '/'
-            }
-          }
+          meta: { title: 'Meus pets', requiresAuth: true, mode: 'client' },
         },
         {
           path: 'services/',
           name: 'services-view',
           component: () => import('@/views/ServicesView.vue'),
-          meta: {
-            id: 4,
-            requiresAuth: true,
-            title: 'Serviços',
-            icon: {
-              type: 'mdi',
-              value: 'mdi mdi-dog-service'
-            },
-            isView: true
-          }
+          meta: { title: 'Passeios', requiresAuth: true },
         },
         {
           path: 'service/:id',
           name: 'service-view',
           component: () => import('@/views/ServiceView.vue'),
-          meta: {
-            requiresAuth: true,
-          }
+          meta: { title: 'Passeio', requiresAuth: true, hideNav: true },
         },
         {
           path: 'scheduling/:providerId',
           name: 'scheduling-view',
           component: () => import('@/views/SchedulingView.vue'),
           meta: {
+            title: 'Agendar passeio',
             requiresAuth: true,
-            requiresClient: true,
+            mode: 'client',
+            hideNav: true,
+            tab: 'provider-list-view',
           },
-          beforeEnter: () => {
-            const authStore = useAuthStore()
-            if (!authStore.isClient) {
-              return '/'
-            }
-          }
-        }
+        },
+        {
+          path: 'hoje',
+          name: 'provider-today-view',
+          component: () => import('@/views/ServicesView.vue'),
+          meta: { title: 'Hoje', requiresAuth: true, mode: 'provider', filter: 'ativos' },
+        },
+        {
+          path: 'pedidos',
+          name: 'provider-requests-view',
+          component: () => import('@/views/ServicesView.vue'),
+          meta: { title: 'Pedidos', requiresAuth: true, mode: 'provider', filter: 'pendentes' },
+        },
+        {
+          path: 'agenda',
+          name: 'agenda-view',
+          component: () => import('@/views/AgendaView.vue'),
+          meta: { title: 'Agenda', requiresAuth: true, mode: 'provider' },
+        },
+        {
+          path: 'perfil',
+          name: 'profile-view',
+          component: () => import('@/views/ProfileView.vue'),
+          meta: { title: 'Perfil', requiresAuth: true },
+        },
       ],
     },
     {
@@ -136,21 +110,21 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
-  const isAuthenticated = !!getAccessToken()
+export function createGuard(authStore) {
+  return (to) => {
+    const isAuthenticated = !!getAccessToken()
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    return {
-      name: 'login-view',
-      query: { redirect: to.fullPath },
+    if (to.meta.requiresAuth && !isAuthenticated) {
+      return { name: 'login-view', query: { redirect: to.fullPath } }
+    }
+
+    const mode = authStore.mode
+    if (to.meta.mode && mode && to.meta.mode !== mode) {
+      return homeRouteFor(mode)
     }
   }
+}
 
-  if(to.meta.requiresClient && !isAuthenticated) {
-    return {
-      name: 'home-view'
-    }
-  }
-})
+router.beforeEach((to) => createGuard(useAuthStore())(to))
 
 export default router

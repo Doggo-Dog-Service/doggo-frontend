@@ -1,8 +1,28 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import notify from '@/utils/notify'
 import * as authService from '@/services/authService'
 import { removeAccessToken } from '@/utils/token'
+
+const MODE_KEY = 'doggo-mode'
+const MODES = ['client', 'provider']
+
+function readSavedMode() {
+  try {
+    const value = localStorage.getItem(MODE_KEY)
+    return MODES.includes(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+function saveMode(mode) {
+  try {
+    localStorage.setItem(MODE_KEY, mode)
+  } catch {
+    // armazenamento bloqueado: segue sem persistir
+  }
+}
 
 export const useAuthStore = defineStore('authStore', () => {
 
@@ -13,6 +33,33 @@ export const useAuthStore = defineStore('authStore', () => {
   const isAuthenticated = computed(() => !!user.value)
   const isProvider = computed(() => user.value?.provider_profile ?? false)
   const isClient = computed(() => user.value?.client_profile ?? false)
+
+  const hasBothProfiles = computed(() => !!(user.value?.provider_profile && user.value?.client_profile))
+  const mode = ref(null)
+
+  const resolveMode = () => {
+    const hasProvider = !!user.value?.provider_profile
+    const hasClient = !!user.value?.client_profile
+    if (hasProvider && hasClient) {
+      mode.value = readSavedMode() ?? 'client'
+    } else if (hasProvider) {
+      mode.value = 'provider'
+    } else if (hasClient) {
+      mode.value = 'client'
+    } else {
+      mode.value = null
+    }
+  }
+  watch(user, resolveMode, { flush: 'sync' })
+
+  // Só troca para um modo que o usuário possui. A navegação fica com quem chama.
+  const setMode = (next) => {
+    if (!MODES.includes(next)) return
+    if (next === 'provider' && !isProvider.value) return
+    if (next === 'client' && !isClient.value) return
+    mode.value = next
+    if (hasBothProfiles.value) saveMode(next)
+  }
 
   const login = async (credentials) => {
     try {
@@ -100,6 +147,9 @@ export const useAuthStore = defineStore('authStore', () => {
     isAuthenticated,
     isClient,
     isProvider,
+    mode,
+    hasBothProfiles,
+    setMode,
     login,
     fetchUser,
     createUser,
