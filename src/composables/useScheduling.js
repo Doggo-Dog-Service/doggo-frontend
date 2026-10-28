@@ -59,6 +59,12 @@ export function useScheduling(options = {}) {
     return typeServices.value.find((type) => type.name === name)?.id ?? null
   })
 
+  const durationMinutes = computed(() => {
+    const name = provider.value?.service_type_name
+
+    return typeServices.value.find((type) => type.name === name)?.duration_minutes ?? 60
+  })
+
   const isReadyToSubmit = computed(
     () =>
       !!provider.value &&
@@ -114,12 +120,23 @@ export function useScheduling(options = {}) {
     await availabilityStore.getSlots(providerId.value, selectedDate.value)
   }
 
+  async function reloadPets() {
+    if (!clientId.value) return
+
+    petStore.error = ''
+    await petStore.getPets({ owner_id: clientId.value })
+  }
+
+  /**
+   * Envia a solicitação. Retorna 'ok', 'conflict' (horário ocupado),
+   * 'error' ou null quando não há o que enviar (ou já está enviando).
+   */
   async function submit() {
-    if (!isReadyToSubmit.value) return
+    if (!isReadyToSubmit.value) return null
 
     const startDatetime = fromDateAndTime(selectedDate.value, selectedTime.value)
 
-    if (!startDatetime) return
+    if (!startDatetime) return null
 
     submitting.value = true
     submitError.value = ''
@@ -132,17 +149,19 @@ export function useScheduling(options = {}) {
         start_datetime: toLocalIsoString(startDatetime),
       })
 
-      notify.success('Solicitação enviada! Aguarde a resposta do profissional.')
-
-      await router.push({ name: 'services-view' })
+      return 'ok'
     } catch (error) {
+      if (error?.status === 409) {
+        submitError.value = 'Esse horário acabou de ser ocupado. Escolha outro.'
+        notify.error(submitError.value)
+        await refreshSlots()
+        return 'conflict'
+      }
+
       submitError.value =
         error?.message || 'Não foi possível enviar a solicitação. Tente novamente.'
       notify.error(submitError.value)
-
-      if (error?.status === 409) {
-        await refreshSlots()
-      }
+      return 'error'
     } finally {
       submitting.value = false
     }
@@ -175,8 +194,11 @@ export function useScheduling(options = {}) {
     selectedPets,
     submitError,
     submitting,
+    durationMinutes,
     isReadyToSubmit,
     reload: load,
+    reloadPets,
+    refreshSlots,
     submit,
   }
 }

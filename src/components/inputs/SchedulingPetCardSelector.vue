@@ -18,6 +18,8 @@ const props = defineProps({
   },
 })
 
+defineEmits(['add-pet'])
+
 const selectedPets = defineModel({ type: Array, default: () => [] })
 
 function toggle(petId) {
@@ -46,13 +48,14 @@ function toggle(petId) {
       description="Você ainda não possui pets cadastrados. Cadastre um pet para fazer o agendamento."
     >
       <template #action>
-        <RouterLink
-          to="/pets/"
+        <button
+          type="button"
+          @click="$emit('add-pet')"
           class="inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-body font-semibold text-primary hover:bg-primary-soft focus-visible:ring-2 focus-visible:ring-primary"
         >
           <PawPrint :size="20" :stroke-width="2" aria-hidden="true" />
           Cadastrar pet
-        </RouterLink>
+        </button>
       </template>
     </UiEmptyState>
 
