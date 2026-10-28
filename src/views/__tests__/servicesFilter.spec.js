@@ -32,3 +32,30 @@ describe('filterServices', () => {
     expect(filterServices(list, undefined)).toEqual(list)
   })
 })
+
+import { buildServiceParams } from '@/utils/serviceFilters'
+
+describe('buildServiceParams', () => {
+  const provider = { provider_profile: { id: 7 }, client_profile: { id: 3 } }
+  const clientOnly = { client_profile: { id: 3 } }
+
+  it('pedidos: status 1 do prestador', () => {
+    expect(buildServiceParams({ filter: 'pendentes', mode: 'provider', user: provider })).toEqual({ status: 1, provider: 7 })
+  })
+
+  it('hoje: prestador com page_size maximo', () => {
+    expect(buildServiceParams({ filter: 'ativos', mode: 'provider', user: provider })).toEqual({ provider: 7, page_size: 100 })
+  })
+
+  it('tutor: client com page_size maximo', () => {
+    expect(buildServiceParams({ filter: 'todos', mode: 'client', user: clientOnly })).toEqual({ client: 3, page_size: 100 })
+  })
+
+  it('prestador em services-view escopa por provider', () => {
+    expect(buildServiceParams({ filter: 'todos', mode: 'provider', user: provider })).toEqual({ provider: 7, page_size: 100 })
+  })
+
+  it('chip de status acrescenta status', () => {
+    expect(buildServiceParams({ filter: 'todos', mode: 'client', user: clientOnly, status: 4 })).toEqual({ client: 3, page_size: 100, status: 4 })
+  })
+})

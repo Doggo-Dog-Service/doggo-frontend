@@ -23,6 +23,7 @@ export function homeRouteFor(mode) {
 // Aba do menu que representa a rota atual (inclui telas internas, como detalhe de serviço).
 export function activeTabName(route, mode) {
   if (route.meta?.tab) return route.meta.tab
+  if (route.name === 'services-view' && mode === 'provider') return 'provider-today-view'
   if (route.name === 'service-view') return mode === 'provider' ? 'provider-today-view' : 'services-view'
   return route.name
 }

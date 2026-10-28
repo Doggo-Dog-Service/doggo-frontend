@@ -37,3 +37,29 @@ describe('services store (erro de carregamento)', () => {
     expect(s.serivces).toEqual([{ id: 1 }])
   })
 })
+
+import { useAuthStore } from '../auth'
+
+describe('services store (contador de pedidos)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    setActivePinia(createPinia())
+  })
+
+  it('fetchPendingCount escopa por status 1 e prestador e usa count', async () => {
+    useAuthStore().user = { provider_profile: { id: 7 } }
+    serviceService.getServices.mockResolvedValue({ count: 12, results: [{}] })
+    const s = useServiceStore()
+    await s.fetchPendingCount()
+    expect(serviceService.getServices).toHaveBeenCalledWith({ status: 1, provider: 7 })
+    expect(s.pendingCount).toBe(12)
+  })
+
+  it('sem perfil de prestador nao consulta e zera', async () => {
+    useAuthStore().user = { client_profile: { id: 3 } }
+    const s = useServiceStore()
+    await s.fetchPendingCount()
+    expect(serviceService.getServices).not.toHaveBeenCalled()
+    expect(s.pendingCount).toBe(0)
+  })
+})

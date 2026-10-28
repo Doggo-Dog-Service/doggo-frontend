@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import notify from '@/utils/notify'
+import { useAuthStore } from '@/stores/auth'
 import * as serviceService from '@/services/service'
 
 export const useServiceStore = defineStore('serviceStore', () => {
@@ -27,7 +28,12 @@ export const useServiceStore = defineStore('serviceStore', () => {
   // Contador de pedidos em análise (status 1) para a navegação; não altera a lista exibida.
   async function fetchPendingCount() {
     try {
-      const data = await serviceService.getServices({ status: 1 })
+      const providerId = useAuthStore().user?.provider_profile?.id
+      if (!providerId) {
+        pendingCount.value = 0
+        return
+      }
+      const data = await serviceService.getServices({ status: 1, provider: providerId })
       pendingCount.value = data.count ?? data.results?.length ?? 0
     } catch {
       pendingCount.value = 0

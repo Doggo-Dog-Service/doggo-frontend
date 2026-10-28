@@ -7,11 +7,13 @@ import AppButton from '@/components/buttons/AppButton.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import ServiceCard from '@/components/cards/ServiceCard.vue'
 import { serviceStatus } from '@/utils/serviceStatus'
-import { filterServices } from '@/utils/serviceFilters'
+import { filterServices, buildServiceParams } from '@/utils/serviceFilters'
 import { useServiceStore } from '@/stores/services'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const serviceStore = useServiceStore()
+const authStore = useAuthStore()
 
 // Filtro vindo da rota (/hoje, /pedidos) ou de ?filtro=. Sem filtro: lista completa + chips de status.
 const routeFilter = computed(() => route.meta.filter ?? route.query.filtro ?? 'todos')
@@ -49,8 +51,14 @@ function select(statusId) {
 const statusById = (statusId) => serviceStatus.find((status) => status.id === statusId)
 
 function load() {
-  if (hasRouteFilter.value || selectedStatus.value === 0) return serviceStore.getServices()
-  return serviceStore.getServices({ status: selectedStatus.value })
+  return serviceStore.getServices(
+    buildServiceParams({
+      filter: routeFilter.value,
+      mode: authStore.mode,
+      user: authStore.user,
+      status: hasRouteFilter.value ? 0 : selectedStatus.value,
+    }),
+  )
 }
 
 onMounted(load)

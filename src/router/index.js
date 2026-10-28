@@ -119,6 +119,9 @@ export function createGuard(authStore) {
     }
 
     const mode = authStore.mode
+    if (isAuthenticated && ['login-view', 'register-view'].includes(to.name)) {
+      return homeRouteFor(mode)
+    }
     if (to.meta.mode && mode && to.meta.mode !== mode) {
       return homeRouteFor(mode)
     }

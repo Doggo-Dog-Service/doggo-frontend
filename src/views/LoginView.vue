@@ -32,13 +32,15 @@ const handleLogin = async () => {
       <AppInput
         :icon="Mail"
         type="email"
+        autocomplete="email"
         label="Email"
         placeholder="seu@email.com"
         v-model="data.email"
       />
       <AppInput
         :icon="Lock"
-        label="Password"
+        label="Senha"
+        autocomplete="current-password"
         type="password"
         placeholder="sua senha"
         v-model="data.password"

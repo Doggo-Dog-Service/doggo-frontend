@@ -13,3 +13,17 @@ export function filterServices(list, filter) {
   }
   return list
 }
+
+const MAX_PAGE_SIZE = 100 // max_page_size do backend (app/pagination.py)
+
+// Parâmetros de listagem escopados pelo perfil do modo atual (a API pagina em 10 por padrão).
+export function buildServiceParams({ filter, mode, user, status }) {
+  if (filter === 'pendentes') {
+    return { status: PENDING_STATUS, provider: user?.provider_profile?.id }
+  }
+  const params = { page_size: MAX_PAGE_SIZE }
+  if (filter === 'ativos' || mode === 'provider') params.provider = user?.provider_profile?.id
+  else params.client = user?.client_profile?.id
+  if (status) params.status = status
+  return params
+}

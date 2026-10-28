@@ -10,6 +10,7 @@ const props = defineProps({
     default: 'text',
   },
   placeholder: String,
+  autocomplete: String,
   icon: {
     type: [Object, Function],
     default: null,
@@ -49,6 +50,7 @@ const describedBy = computed(() => (props.error ? errorId : props.hint ? hintId 
         :class="[props.icon ? 'pl-12' : 'pl-4', props.error ? 'border-danger' : 'border-line focus:border-primary']"
         :type="props.type"
         :placeholder="props.placeholder"
+        :autocomplete="props.autocomplete"
         :required="props.required"
         :step="props.type === 'number' ? '0.01' : ''"
         :aria-invalid="props.error ? 'true' : undefined"

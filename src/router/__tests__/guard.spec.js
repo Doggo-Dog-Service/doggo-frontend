@@ -49,3 +49,22 @@ describe('router guard', () => {
     }
   })
 })
+
+describe('router guard (usuário logado em telas de auth)', () => {
+  beforeEach(() => getAccessToken.mockReturnValue('token'))
+
+  it('login-view e register-view redirecionam para a home do modo', () => {
+    expect(createGuard({ mode: 'client' })(routeOf('login-view'))).toEqual({ name: 'home-view' })
+    expect(createGuard({ mode: 'provider' })(routeOf('register-view'))).toEqual({ name: 'provider-today-view' })
+  })
+
+  it('register-location-view nao redireciona', () => {
+    const to = { name: 'register-location-view', meta: { requiresAuth: true }, fullPath: '/auth/register/location/1' }
+    expect(createGuard({ mode: 'client' })(to)).toBeUndefined()
+  })
+
+  it('sem token, login-view passa', () => {
+    getAccessToken.mockReturnValue(null)
+    expect(createGuard({ mode: null })(routeOf('login-view'))).toBeUndefined()
+  })
+})

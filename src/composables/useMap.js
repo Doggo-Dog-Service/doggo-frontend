@@ -1,6 +1,7 @@
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { onUnmounted, ref } from 'vue'
+import { useTheme } from '@/composables/useTheme'
 
 const styles = {
   light: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
@@ -22,11 +23,12 @@ export const useMap = () => {
   const map = ref(null)
   const markers = ref([])
   const loaded = ref(false)
+  const { resolved } = useTheme()
 
   function createMap(container, center = [0, 0], zoom = 12, options) {
     map.value = new maplibregl.Map({
       container,
-      style: styles.light,
+      style: styles[resolved.value] ?? styles.light,
       center,
       zoom,
       ...options,
