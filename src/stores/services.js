@@ -1,18 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
+import { useAuthStore } from '@/stores/auth'
 import * as serviceService from '@/services/service'
 
 export const useServiceStore = defineStore('serviceStore', () => {
-  const $toast = useToast()
 
   const loading = ref(false)
   const serviceError = ref('')
   const serivces = ref([])
+  const pendingCount = ref(0)
 
   async function getServices(params) {
     try {
       loading.value = true
+      serviceError.value = ''
       const data  = await serviceService.getServices(params)
       serivces.value = data.results ?? []
     } catch (error) {
@@ -20,6 +22,21 @@ export const useServiceStore = defineStore('serviceStore', () => {
       console.error(error.message)
     } finally {
       loading.value = false
+    }
+  }
+
+  // Contador de pedidos em análise (status 1) para a navegação; não altera a lista exibida.
+  async function fetchPendingCount() {
+    try {
+      const providerId = useAuthStore().user?.provider_profile?.id
+      if (!providerId) {
+        pendingCount.value = 0
+        return
+      }
+      const data = await serviceService.getServices({ status: 1, provider: providerId })
+      pendingCount.value = data.count ?? data.results?.length ?? 0
+    } catch {
+      pendingCount.value = 0
     }
   }
 
@@ -41,38 +58,9 @@ export const useServiceStore = defineStore('serviceStore', () => {
       loading.value = true
       await serviceService.updateService(id, payload)
       await getServices()
-      $toast.success('Serviço atualizado com sucesso!', {
-        duration: 3000,
-        type: 'success',
-        position: 'top-left',
-      })
+      notify.success('Serviço atualizado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        duration: 3000,
-        type: 'error',
-        position: 'top-left',
-      })
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function deleteSerivce(id) {
-    try {
-      loading.value = true
-      await serviceService.deleteService(id)
-      await getServices()
-      $toast.success('Serviço deletado com sucesso', {
-        duration: 3000,
-        type: 'success',
-        position: 'top-left',
-      })
-    } catch (error) {
-      $toast.success(error.message, {
-        duration: 3000,
-        type: 'error',
-        position: 'top-left',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -81,9 +69,11 @@ export const useServiceStore = defineStore('serviceStore', () => {
   return {
     loading,
     serivces,
+    serviceError,
+    pendingCount,
     getServices,
+    fetchPendingCount,
     getService,
     updateService,
-    deleteSerivce
   }
 })

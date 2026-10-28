@@ -1,4 +1,5 @@
 <script setup>
+import { AlertCircle } from 'lucide-vue-next'
 import AppButton from '@/components/buttons/AppButton.vue'
 
 defineEmits(['retry'])
@@ -13,8 +14,8 @@ defineProps({
 
 <template>
   <div class="w-full h-full flex flex-col items-center justify-center gap-4 p-8 text-center">
-    <span class="mdi mdi-alert-circle-outline text-5xl text-doggo-green"></span>
-    <p class="text-doggo-black/70 font-semibold">
+    <AlertCircle :size="48" :stroke-width="1.75" class="text-danger" aria-hidden="true" />
+    <p class="text-body text-fg-muted" role="alert">
       {{ message || 'Não foi possível carregar o serviço.' }}
     </p>
     <AppButton text="Tentar novamente" mode="outline" @event="$emit('retry')" />

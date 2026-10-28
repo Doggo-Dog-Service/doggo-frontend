@@ -1,9 +1,9 @@
 import * as mediaService from '@/services/mediaService'
 import { ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
+import { parseDjangoErrors } from '@/utils/errors'
 
 export function useMedia() {
-  const $toast = useToast()
 
   const loading = ref(false)
   const postImage = async ({ file, description }) => {
@@ -12,11 +12,18 @@ export function useMedia() {
       const data = await mediaService.postImage({ file, description })
       return data
     } catch (error) {
-      $toast.error(error, {
-        position: 'top-right',
-        duration: 3000,
-        type: 'error',
-      })
+      notify.error(parseDjangoErrors(error))
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const postDocument = async ({ file, description }) => {
+    try {
+      loading.value = true
+      return await mediaService.postDocument({ file, description })
+    } catch (error) {
+      notify.error(parseDjangoErrors(error))
     } finally {
       loading.value = false
     }
@@ -24,6 +31,7 @@ export function useMedia() {
 
   return {
     loading,
-    postImage
+    postImage,
+    postDocument
   }
 }

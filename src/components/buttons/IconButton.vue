@@ -1,38 +1,66 @@
 <script setup>
+import { computed } from 'vue'
+import UiIcon from '@/components/ui/UiIcon.vue'
+
 const emits = defineEmits(['event'])
 const props = defineProps({
+  // Componente Lucide.
   icon: {
-    type: String,
+    type: [Object, Function],
     required: true,
+  },
+  label: {
+    type: String,
+    default: undefined,
+  },
+  variant: {
+    type: String,
+    default: undefined,
+    validator: (value) => ['ghost', 'secondary', 'primary'].includes(value),
   },
   type: {
     type: String,
     default: 'button',
     validator: (value) => ['button', 'submit', 'reset'].includes(value),
   },
+  // Legado: 'red' mantém o botão vermelho dos chamadores atuais.
   mode: {
     type: String,
     default: 'default',
     validator: (value) => ['default', 'red'].includes(value),
   },
+  // Legado: usado como rótulo quando `label` não é informado.
   tooltip: {
     type: String,
-    required: false
-  }
+    required: false,
+  },
 })
+
+const VARIANTS = {
+  ghost: 'bg-transparent text-fg hover:bg-surface-muted',
+  secondary: 'bg-surface-muted text-fg hover:opacity-80',
+  primary: 'bg-primary text-primary-fg hover:opacity-90',
+  danger: 'bg-danger text-primary-fg hover:opacity-90',
+}
+
+const accessibleLabel = computed(() => props.label ?? props.tooltip)
+// Chamadores legados (sem `variant`) mantêm o visual preenchido atual.
+const resolvedVariant = computed(
+  () => props.variant ?? (props.mode === 'red' ? 'danger' : 'ghost'),
+)
 </script>
 
 <template>
   <button
     :class="[
-      'rounded-full h-15 w-15 transition-all duration-200 cursor-pointer hover:scale-98 hover:opacity-60 active:scale-98 active:opacity-60',
-      props.mode == 'default' && 'bg-doggo-green text-white',
-      props.mode == 'red' && 'bg-red-400 text-white'
+      'inline-flex size-11 items-center justify-center rounded-full transition-all duration-200 cursor-pointer active:scale-98 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+      VARIANTS[resolvedVariant],
     ]"
     :type="props.type"
-    :title="props.tooltip"
+    :aria-label="accessibleLabel"
+    :title="accessibleLabel"
     @click="emits('event')"
   >
-    <span :class="props.icon" class="text-3xl"></span>
+    <UiIcon :icon="props.icon" :size="22" />
   </button>
 </template>

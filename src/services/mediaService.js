@@ -13,3 +13,13 @@ export const postImage = async ({ file, description }) => {
     throw error
   }
 }
+
+export const postDocument = async ({ file, description }) => {
+  const formData = new FormData()
+
+  formData.append('file', file)
+  formData.append('description', description)
+
+  const { data } = await mediaApi.postDocument(formData)
+  return data
+}

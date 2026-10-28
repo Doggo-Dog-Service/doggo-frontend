@@ -1,19 +1,12 @@
 import * as clientService from '@/services/clientService'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 export const useClientStore = defineStore('clientStore', () => {
-  const $toast = useToast()
 
   const clients = ref([])
-  const totalClients = ref(0) 
   const loading = ref(false)
-
-  const countClients = async () => {
-    const response = await clientService.fetchClients()
-    totalClients.value = response.count
-  }
 
   const fetchClients = async (params) => {
     try {
@@ -21,11 +14,7 @@ export const useClientStore = defineStore('clientStore', () => {
       const response = await clientService.fetchClients(params)
       clients.value = response.results
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -37,11 +26,7 @@ export const useClientStore = defineStore('clientStore', () => {
       const client = await clientService.fetchClient(id)
       return client
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -52,19 +37,11 @@ export const useClientStore = defineStore('clientStore', () => {
       loading.value = true
       const newClient = await clientService.createClient(data)
       if (newClient) {
-        $toast.success(`Perfil de cliente criado! Bem-vindo ${newClient.user?.full_name}`, {
-          type: 'success',
-          duration: 3000,
-          position: 'top-right',
-        })
+        notify.success(`Perfil de cliente criado! Bem-vindo ${newClient.user?.full_name}`)
         return true
       }
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
       return false
     } finally {
       loading.value = false
@@ -90,17 +67,9 @@ export const useClientStore = defineStore('clientStore', () => {
     try {
       loading.value = true
       await clientService.deleteClient(id)
-      $toast.success('Perfil deletado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Perfil deletado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -109,8 +78,6 @@ export const useClientStore = defineStore('clientStore', () => {
   return {
     loading,
     clients,
-    totalClients,
-    countClients,
     fetchClients,
     fetchClient,
     createClient,

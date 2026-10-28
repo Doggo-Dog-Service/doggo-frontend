@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
+import { parseDjangoErrors } from '@/utils/errors'
 import * as providerService from '@/services/providerService'
 
 export const useProviderStore = defineStore('providerStore', () => {
-  const $toast = useToast()
 
   const providers = ref([])
   const currentProvider = ref(null)
@@ -25,13 +25,9 @@ export const useProviderStore = defineStore('providerStore', () => {
       const response = await providerService.fetchProviders(params)
       const fetchedProviders = response.results
       providers.value = fetchedProviders
-    } catch (error) {
-      error.value = error.message
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+    } catch (e) {
+      error.value = e.message
+      notify.error(e.message)
     } finally {
       loading.value = false
     }
@@ -44,11 +40,7 @@ export const useProviderStore = defineStore('providerStore', () => {
       currentProvider.value = response
       return response
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }
@@ -69,20 +61,15 @@ export const useProviderStore = defineStore('providerStore', () => {
     }
   }
 
-  const createProvider = async (data) => {
+  // onError (opcional) recebe o erro bruto no lugar do toast, para o chamador mapear campos.
+  const createProvider = async (data, { onError } = {}) => {
     try {
       loading.value = true
       const newProvider = await providerService.createProvider(data)
-      if (newProvider) {
-        $toast.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`, {
-          type: 'success',
-          duration: 3000,
-          position: 'top-right',
-        })
-        return true
-      }
+      return !!newProvider
     } catch (error) {
-      console.log(error)
+      if (onError) onError(error)
+      else notify.error(parseDjangoErrors(error))
       return false
     } finally {
       loading.value = false
@@ -93,17 +80,9 @@ export const useProviderStore = defineStore('providerStore', () => {
     try {
       loading.value = true
       await providerService.deleteProvider(id)
-      $toast.success('Perfil deletado com sucesso!', {
-        type: 'success',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.success('Perfil deletado com sucesso!')
     } catch (error) {
-      $toast.error(error.message, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.message)
     } finally {
       loading.value = false
     }

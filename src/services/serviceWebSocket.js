@@ -1,3 +1,5 @@
+import { getAccessToken } from '@/utils/token'
+
 export class WebSocketService {
   constructor(serviceId, token, handlers = {}, options = {}) {
     this.serviceId = serviceId
@@ -114,7 +116,7 @@ export class WebSocketService {
 
     const url = new URL(`/ws/services/${this.serviceId}/`, baseUrl)
 
-    url.searchParams.set('token', this.token)
+    url.searchParams.set('token', getAccessToken() ?? this.token)
 
     return url.toString()
   }

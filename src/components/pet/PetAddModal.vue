@@ -20,7 +20,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <form @submit.prevent="emits('submit')" class="grid gap-4 lg:grid-cols-2 lg:items-end">
+  <form @submit.prevent="emits('submit')" class="flex flex-col gap-4">
     <ImageInput v-model="picture" />
     <div class="grid grid-cols-2 gap-4">
       <AppInput
@@ -33,9 +33,9 @@ const props = defineProps({
       <AppInput label="Raça" placeholder="Raça do seu Pet" v-model="form.breed" />
       <AppInput label="Peso (kg)" placeholder="0" type="number" v-model="form.weight" />
     </div>
-    <div class="flex flex-col gap-2">
-      <p class="font-semibold text-sm">Porte</p>
-      <div class="flex gap-4 items-center lg:flex-col">
+    <fieldset class="flex flex-col gap-2">
+      <legend class="mb-2 text-caption font-semibold text-fg">Porte</legend>
+      <div class="grid grid-cols-3 gap-2">
         <ChoseButton
           v-for="(choice, index) in PET_SIZE_OPTIONS"
           :key="index"
@@ -44,19 +44,16 @@ const props = defineProps({
           @select="form.size = choice.value"
         />
       </div>
-    </div>
+    </fieldset>
     <TextInput
       placeholder="Adicione alguma nota importante sobre seu pet"
       label="Notas"
       v-model="form.notes"
     />
-    <div class="absolute bottom-6 right-6 left-6 lg:left-20 lg:right-20">
-      <AppButton
-        class="md:w-50"
-        :text="props.loading ? 'Criando...' : 'Criar'"
-        mode="outline"
-        type="submit"
-      />
-    </div>
+    <AppButton
+      :text="props.loading ? 'Criando...' : 'Criar'"
+      variant="primary"
+      type="submit"
+    />
   </form>
 </template>

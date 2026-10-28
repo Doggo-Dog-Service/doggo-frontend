@@ -2,22 +2,20 @@
 const props = defineProps({
   description: {
     type: String,
-    required: false
-  }
-});
+    required: false,
+  },
+})
 </script>
 <template>
-  <div class="mx-2">
-    <h1 class="text-xl">
-      Sobre
-    </h1>
-    <div class="mt-4 border border-doggo-gray bg-white px-6 py-6 rounded-2xl">
-      <p v-if="!props.description">
-      Esse usuário não tem uma descrição ainda.
+  <section>
+    <h2 class="text-title text-fg">Sobre</h2>
+    <div class="mt-3 rounded-card border border-line bg-surface p-5 shadow-card">
+      <p v-if="!props.description" class="text-body text-fg-muted">
+        Esse usuário não tem uma descrição ainda.
       </p>
-      <p v-else class="wrap-break-word whitespace-pre-wrap">
+      <p v-else class="text-body text-fg wrap-break-word whitespace-pre-wrap">
         {{ props.description }}
       </p>
     </div>
-  </div>
+  </section>
 </template>

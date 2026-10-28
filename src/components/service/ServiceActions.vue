@@ -43,7 +43,6 @@ const buttons = computed(() => {
     return props.role === 'provider'
       ? [
           { key: 'complete', text: 'Concluir passeio', mode: 'outline' },
-          { key: 'cancel', text: 'Cancelar', mode: 'red' },
         ]
       : []
   }

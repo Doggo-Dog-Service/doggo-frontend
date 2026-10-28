@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
+import { useMedia } from '@/composables/useMedia'
 
 import * as serviceService from '@/services/service'
+import { useAuthStore } from '@/stores/auth'
+import { useServiceStore } from '@/stores/services'
 
 export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
-  const $toast = useToast()
 
   const service = ref(null)
 
@@ -14,10 +16,14 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
 
   const currentLocation = ref(null)
   const currentDistance = ref(null)
+  const lastLocationAt = ref(null)
   const route = ref([])
 
   const routePoints = ref([])
   const totalDistance = ref(null)
+
+  const events = ref([])
+  const eventSending = ref(false)
 
   const routeLoading = ref(false)
   const error = ref(null)
@@ -34,6 +40,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const isRejected = computed(() => status.value === 6)
   const isTerminal = computed(() => isFinished.value || isCancelled.value || isRejected.value)
 
+  const providerNote = computed(() => service.value?.provider_note ?? '')
   const providerId = computed(() => service.value?.provider_id ?? null)
   const providerName = computed(() => service.value?.provider_name ?? null)
   const providerPicture = computed(() => service.value?.provider_picture ?? null)
@@ -93,17 +100,23 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
-  async function rateService() {
+  async function rateService({ rating, comment }) {
     if(!service.value) return
 
     loading.value = true
     error.value = null
 
     try {
-      const data = await serviceService.rateService(service.value.id)
+      const data = await serviceService.rateService(service.value.id, { rating, comment })
+
+      notify.success('Agradecemos pelo feedback!')
+
       return data
     } catch (err) {
       error.value = err.message || 'Erro ao avaliar o serviço.'
+
+      notify.error(error.value)
+
       throw err
     } finally {
       loading.value = false
@@ -122,7 +135,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
       const data = await serviceService.getServiceRoute(service.value.id)
 
       routePoints.value = data.points
-      totalDistance.value = data.total_distance
+      totalDistance.value = data.distance_meters
 
       return data
     } catch (err) {
@@ -134,7 +147,93 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
-  async function runServiceAction(action, successMessage) {
+  function pushEvent(event) {
+    if (!event || events.value.some((item) => item.id === event.id)) {
+      return
+    }
+
+    events.value.push(event)
+  }
+
+  function handleWalkEvent(message) {
+    if (!service.value || message?.service_id !== service.value.id) {
+      return
+    }
+
+    pushEvent(message.event)
+  }
+
+  async function loadEvents() {
+    if (!service.value) {
+      return
+    }
+
+    const serviceId = service.value.id
+
+    try {
+      const data = await serviceService.getServiceEvents(serviceId)
+
+      // Eventos do WS que chegaram antes do GET ficam; o dedupe é por id.
+      if (service.value?.id === serviceId) {
+        data.forEach(pushEvent)
+      }
+    } catch (err) {
+      error.value = err.message || 'Não foi possível carregar os marcadores.'
+    }
+  }
+
+  async function addEvent(kind, file = null) {
+    if (!service.value || eventSending.value) {
+      return null
+    }
+
+    eventSending.value = true
+
+    try {
+      const payload = { kind }
+
+      if (currentLocation.value) {
+        payload.latitude = currentLocation.value.latitude
+        payload.longitude = currentLocation.value.longitude
+      }
+
+      if (file) {
+        const uploaded = await useMedia().postImage({ file, description: 'Foto do passeio' })
+
+        if (!uploaded?.attachment_key) {
+          return null
+        }
+
+        payload.image_attachment_key = uploaded.attachment_key
+      }
+
+      const event = await serviceService.postServiceEvent(service.value.id, payload)
+
+      pushEvent(event)
+
+      return event
+    } catch (err) {
+      notify.error(err.message || 'Não foi possível salvar o marcador.')
+
+      return null
+    } finally {
+      eventSending.value = false
+    }
+  }
+
+  async function saveNote(note) {
+    if (!service.value) {
+      return null
+    }
+
+    const data = await serviceService.patchServiceNote(service.value.id, { provider_note: note })
+
+    service.value = data
+
+    return data
+  }
+
+  async function runServiceAction(action, successMessage, { refreshPending = false } = {}) {
     if (!service.value) {
       return null
     }
@@ -147,23 +246,20 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
 
       service.value = data
 
+      // O contador de "Pedidos" (status 1) muda quando um pedido é confirmado, recusado ou cancelado.
+      if (refreshPending && useAuthStore().mode === 'provider') {
+        useServiceStore().fetchPendingCount()
+      }
+
       if (successMessage) {
-        $toast.success(successMessage, {
-          type: 'success',
-          duration: 3000,
-          position: 'top-right',
-        })
+        notify.success(successMessage)
       }
 
       return data
     } catch (err) {
       error.value = err.message || 'Não foi possível atualizar o serviço.'
 
-      $toast.error(error.value, {
-        type: 'error',
-        duration: 3000,
-        position: 'top-right',
-      })
+      notify.error(error.value)
 
       throw err
     } finally {
@@ -174,13 +270,13 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const startService = () =>
     runServiceAction(serviceService.startService, 'Passeio iniciado!')
   const confirmService = () =>
-    runServiceAction(serviceService.confirmService, 'Passeio confirmado!')
+    runServiceAction(serviceService.confirmService, 'Passeio confirmado!', { refreshPending: true })
   const rejectService = () =>
-    runServiceAction(serviceService.rejectService, 'Passeio recusado.')
+    runServiceAction(serviceService.rejectService, 'Passeio recusado.', { refreshPending: true })
   const completeService = () =>
     runServiceAction(serviceService.completeService, 'Passeio concluído!')
   const cancelService = () =>
-    runServiceAction(serviceService.cancelService, 'Passeio cancelado.')
+    runServiceAction(serviceService.cancelService, 'Passeio cancelado.', { refreshPending: true })
 
   function setService(data) {
     service.value = data
@@ -205,6 +301,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   function updateLocation(location, distance) {
     currentLocation.value = location
     currentDistance.value = distance
+    lastLocationAt.value = Date.now()
     route.value.push(location)
   }
 
@@ -227,7 +324,9 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   function resetLocationState() {
     currentLocation.value = null
     currentDistance.value = null
+    lastLocationAt.value = null
     route.value = []
+    events.value = []
     routePoints.value = []
     totalDistance.value = null
     connected.value = false
@@ -254,6 +353,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     isRejected,
     isTerminal,
     providerId,
+    providerNote,
     providerName,
     providerPicture,
     providerLocation,
@@ -268,9 +368,12 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     isRating,
     currentLocation,
     currentDistance,
+    lastLocationAt,
     route,
     routePoints,
     totalDistance,
+    events,
+    eventSending,
     routeLoading,
     error,
     loading,
@@ -279,6 +382,10 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     walkDuration,
     getService,
     getRoute,
+    loadEvents,
+    addEvent,
+    saveNote,
+    handleWalkEvent,
     startService,
     confirmService,
     rejectService,

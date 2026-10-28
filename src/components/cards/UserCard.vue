@@ -1,5 +1,7 @@
 <script setup>
 import { computed } from 'vue'
+import { BriefcaseBusiness, Circle, MapPin, Star } from 'lucide-vue-next'
+import UiAvatar from '@/components/ui/UiAvatar.vue'
 import { formatDistance } from '@/utils/distance'
 
 const props = defineProps({
@@ -72,50 +74,38 @@ const distanceLabel = computed(() => {
 
 <template>
   <RouterLink
-    class="w-full flex justify-between bg-white p-4 border border-doggo-gray rounded-xl transition-all duration-200 active:scale-98 active:opacity-70 hover:scale-99"
+    class="flex w-full justify-between gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition-colors duration-200 hover:bg-surface-muted active:scale-98 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
     :to="`/provider/${props.id}`"
   >
-    <div class="flex items-center gap-4">
-      <img
-        v-if="props.profile_photo"
-        class="h-15 w-15 rounded-xl object-cover shrink-0"
-        :src="props.profile_photo"
-        :alt="`${props.full_name.toLowerCase()}-photo`"
-      />
-      <div
-        v-else
-        class="flex flex-col items-center justify-center h-15 w-15 rounded-xl bg-doggo-light-green shrink-0"
-      >
-        <p class="text-white text-xl">{{ props.full_name.charAt() }}</p>
-      </div>
+    <div class="flex min-w-0 items-center gap-4">
+      <UiAvatar :src="props.profile_photo" :name="props.full_name" size="lg" />
       <div class="min-w-0">
-        <h3 class="text-base font-semibold truncate w-40">{{ props.full_name }}</h3>
-        <div v-if="distanceLabel" class="flex items-center gap-1 mt-0.5">
-          <span class="mdi mdi-map-marker text-sm text-doggo-green"></span>
-          <p class="text-sm text-zinc-400 truncate">{{ distanceLabel }}</p>
+        <h3 class="w-full truncate text-subtitle text-fg">{{ props.full_name }}</h3>
+        <div v-if="distanceLabel" class="mt-0.5 flex items-center gap-1 text-caption text-fg-muted">
+          <MapPin :size="14" :stroke-width="2" class="shrink-0 text-primary" aria-hidden="true" />
+          <p class="truncate">{{ distanceLabel }}</p>
         </div>
-        <div v-if="props.service_name" class="flex text-sm text-zinc-400 gap-2">
-          <span class="mdi mdi-briefcase-variant"></span>
+        <div v-if="props.service_name" class="flex items-center gap-1 text-caption text-fg-muted">
+          <BriefcaseBusiness :size="14" :stroke-width="2" class="shrink-0" aria-hidden="true" />
           <p class="truncate">{{ props.service_name }}</p>
         </div>
-        <div class="flex text-sm gap-1">
-          <span class="mdi mdi-star text-amber-400"></span>
-          <p v-if="ratingLabel" class="font-semibold">{{ ratingLabel }}</p>
-          <p v-else class="font-semibold">--</p>
+        <div class="flex items-center gap-1 text-caption text-fg">
+          <Star :size="14" :stroke-width="2" fill="currentColor" class="text-warning" aria-hidden="true" />
+          <p class="font-semibold">{{ ratingLabel || '--' }}</p>
         </div>
       </div>
     </div>
-    <div class="flex flex-col justify-between items-end">
+    <div class="flex shrink-0 flex-col items-end justify-between">
       <div
         :class="[
-          'flex items-center gap-1 text-sm rounded-full px-2',
-          props.is_active ? 'text-doggo-green' : 'text-red-700',
+          'flex items-center gap-1 text-caption font-semibold',
+          props.is_active ? 'text-success' : 'text-danger',
         ]"
       >
-        <span class="mdi mdi-circle text-[10px]"></span>
+        <Circle :size="10" :stroke-width="2" fill="currentColor" aria-hidden="true" />
         <p>{{ props.is_active ? 'Online' : 'Offline' }}</p>
       </div>
-      <p class="text-doggo-green text-sm font-semibold">
+      <p class="text-body font-semibold text-primary">
         {{ priceLabel }}
       </p>
     </div>

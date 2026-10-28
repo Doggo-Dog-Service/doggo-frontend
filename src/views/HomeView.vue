@@ -1,203 +1,137 @@
 <script setup>
-import InfoCard from '@/components/cards/InfoCard.vue'
-import ServicesCard from '@/components/cards/ServicesCard.vue'
-import SearchBar from '@/components/inputs/SearchBar.vue'
-import SearchCard from '@/components/cards/SearchCard.vue'
-import ChoseButton from '@/components/buttons/ChoseButton.vue'
-import UserCard from '@/components/cards/UserCard.vue'
-import { onMounted, ref, watch } from 'vue'
-import { useProviderStore } from '@/stores/provider'
+import { computed, onMounted, ref } from 'vue'
+import { CloudOff, History, MapPinOff, PawPrint } from 'lucide-vue-next'
+import HomeHighlightCard from '@/components/home/HomeHighlightCard.vue'
+import NearbyProviders from '@/components/home/NearbyProviders.vue'
+import AppButton from '@/components/buttons/AppButton.vue'
+import UiEmptyState from '@/components/ui/UiEmptyState.vue'
+import UiIcon from '@/components/ui/UiIcon.vue'
+import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useServiceTypeStore } from '@/stores/serviceType'
-import { useClientStore } from '@/stores/clients'
-import { useSearchStore } from '@/stores/search'
+import { useServiceStore } from '@/stores/services'
+import { useProviderStore } from '@/stores/provider'
+import { useGeolocation } from '@/composables/useGeolocation'
+import { buildServiceParams } from '@/utils/serviceFilters'
+import { pickHomeHighlight } from '@/utils/homeHighlight'
+import { withTimeout } from '@/utils/withTimeout'
 
-const providerStore = useProviderStore()
+const MAX_PROVIDERS = 8
+const GEO_TIMEOUT_MS = 5000
+
 const authStore = useAuthStore()
-const serviceTypeStore = useServiceTypeStore()
-const clientStore = useClientStore()
-const searchStore = useSearchStore()
+const serviceStore = useServiceStore()
+const providerStore = useProviderStore()
+const { latitude, longitude, getCurrentPosition } = useGeolocation()
 
-const services = [
-  {
-    title: 'Dog Sitter',
-    description: 'Cuidador do pet na sua própria casa',
-    icon: 'mdi mdi-home',
-    type: 'green',
-    link: '/',
-  },
-  {
-    title: 'Dog Walking',
-    description: 'Passeio para os pets gastarem a energia, caso sua rotina esteja muito corrida',
-    icon: 'mdi mdi-paw',
-    type: 'default',
-    link: '/',
-  },
-]
+const firstName = computed(() => authStore.user?.full_name?.trim().split(/\s+/)[0] ?? '')
+const today = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+}).format(new Date())
 
-const currentTypeService = ref(0)
-const searchedList = ref(false)
-const searchBarData = ref('')
+const highlight = computed(() => pickHomeHighlight(serviceStore.serivces))
+// Quem também é passeador não aparece na própria lista de sugestões.
+const nearby = computed(() => {
+  const ownId = authStore.user?.provider_profile?.id
+  return (providerStore.providers ?? []).filter((p) => ownId == null || p.id !== ownId).slice(0, MAX_PROVIDERS)
+})
 
-async function selectTypeService(typeId) {
-  await providerStore.fetchProviders({
-    service_type: typeId,
-  })
-  currentTypeService.value = typeId
+const servicesLoaded = ref(false)
+const providersLoaded = ref(false)
+
+async function loadServices() {
+  await serviceStore.getServices(buildServiceParams({ mode: 'client', user: authStore.user }))
+  servicesLoaded.value = true
 }
 
-onMounted(async () => {
-  await Promise.all([
-    providerStore.fetchProviders(),
-    providerStore.countProviders(),
-    clientStore.countClients(),
-    serviceTypeStore.getTypeServices(),
-  ])
-  selectTypeService(serviceTypeStore.typeServices[0].id)
-})
+const isCoord = (v) => v != null && v !== '' && Number.isFinite(Number(v))
 
-let timeout = null
-
-watch(searchBarData, (value) => {
-  clearTimeout(timeout)
-
-  timeout = setTimeout(() => {
-    if (value.length >= 3) {
-      searchStore.globalSearch(value.trim())
+async function loadProviders() {
+  const params = {}
+  try {
+    // Permissão ignorada não pode travar a lista: desiste da localização após o timeout.
+    await withTimeout(getCurrentPosition(), GEO_TIMEOUT_MS)
+    if (isCoord(latitude.value) && isCoord(longitude.value)) {
+      params.lat = latitude.value
+      params.lon = longitude.value
     }
-  }, 300)
-})
+  } catch {
+    // Sem permissão ou sem resposta: lista padrão, sem distância.
+  }
+  await providerStore.fetchProviders(params)
+  providersLoaded.value = true
+}
+
+const load = () => Promise.all([loadServices(), loadProviders()])
+
+onMounted(load)
+
+const SHORTCUTS = [
+  { label: 'Meus pets', to: { name: 'pets-view' }, icon: PawPrint },
+  { label: 'Histórico', to: { name: 'services-view' }, icon: History },
+]
 </script>
+
 <template>
-  <div
-    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:grid md:grid-cols-2 lg:gap-10 md:justify-start md:max-h-screen"
-  >
-    <section class="flex flex-col gap-4">
-      <div class="flex flex-col">
-        <h1 v-if="authStore.user" class="text-2xl font-bold">
-          Olá {{ authStore.user?.full_name }}!
-        </h1>
-        <h1 class="text-2xl font-bold">
-          O que seu <span class="text-doggo-green">pet</span> precisa?
-        </h1>
-        <p class="text-doggo-black/50 font-semibold">
-          Encontre profissionais de confiança perto de você.
-        </p>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <SearchBar
-          class="col-span-2"
-          placeholder="Buscar profissionais ou clientes"
-          v-model="searchBarData"
-          @focus="searchedList = true"
-          @out="searchedList = false"
-        >
-          <template #list>
-            <transition
-              enter-active-class="transition duration-200 ease-out"
-              enter-from-class="opacity-0 translate-y-2"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-150 ease-in"
-              leave-from-class="opacity-100 translate-y-0"
-              leave-to-class="opacity-0 translate-y-2"
-            >
-              <div
-                v-if="searchedList"
-                class="absolute w-full h-100 top-16 right-0 bg-white rounded-xl border border-doggo-gray transition-all duration-200 p-3 overflow-y-auto"
-                @mousedown.prevent
-              >
-                <div
-                  v-if="searchStore.loading"
-                  class="w-full h-full flex flex-col items-center justify-center"
-                >
-                  <div
-                    class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"
-                  ></div>
-                </div>
-                <div
-                  v-else-if="searchStore.searched.providers?.length > 0"
-                  class="w-full h-full flex flex-col gap-2"
-                >
-                  <SearchCard
-                    v-for="(provider, index) in searchStore.searched.providers"
-                    :key="index"
-                    :id="provider.id"
-                    :full_name="provider.full_name"
-                    :profile_photo="provider.profile_picture"
-                    :service="provider.service_type_name"
-                    :classification="provider.classification ? provider.classification : '--'"
-                    link="/provider/"
-                  />
-                </div>
-                <div
-                  v-else
-                  class="w-full h-full flex flex-col items-center justify-center text-doggo-green"
-                >
-                  <p v-if="searchBarData.length > 0">Nenhum resultado encontrado</p>
-                  <p v-else>Procure por algum provedor ou usuário</p>
-                </div>
-              </div>
-            </transition>
-          </template>
-        </SearchBar>
-        <InfoCard
-          icon="mdi mdi-briefcase-variant"
-          :info="providerStore.totalProviders"
-          :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
-        />
-        <InfoCard
-          icon="mdi mdi-account"
-          :info="clientStore.totalClients"
-          :description="clientStore.totalClients == 1 ? 'Cliente' : 'Clientes'"
-        />
-      </div>
-    </section>
-    <section class="flex flex-col gap-2">
-      <h2 class="text-lg font-bold">Serviços</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <ServicesCard
-          v-for="(service, index) in services"
-          :key="index"
-          :title="service.title"
-          :description="service.description"
-          :icon="service.icon"
-          :type="service.type"
-        />
-      </div>
-    </section>
-    <section class="flex flex-col gap-4">
-      <h2 class="text-lg font-bold">Perto de você</h2>
-      <div class="flex gap-2">
-        <ChoseButton
-          v-for="(typeService, index) in serviceTypeStore.typeServices"
-          :key="index"
-          :text="typeService.name"
-          :selected="typeService.id === currentTypeService"
-          @select="selectTypeService(typeService.id)"
-        />
-      </div>
-      <div
-        class="flex flex-col gap-2 max-h-110 overflow-y-auto"
-        v-if="providerStore.providers && providerStore.providers.length > 0"
+  <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <header class="flex flex-col gap-1">
+      <h1 class="text-display text-fg">Olá, {{ firstName }}</h1>
+      <p class="text-body capitalize text-fg-muted">{{ today }}</p>
+    </header>
+
+    <div v-if="!servicesLoaded" data-testid="home-skeleton">
+      <UiSkeleton shape="rect" class="!h-40" />
+    </div>
+    <UiEmptyState
+      v-else-if="serviceStore.serviceError"
+      :icon="CloudOff"
+      title="Não foi possível carregar seus passeios"
+      description="Verifique sua conexão e tente novamente."
+    >
+      <template #action>
+        <AppButton text="Tentar novamente" variant="primary" :block="false" @event="load" />
+      </template>
+    </UiEmptyState>
+    <HomeHighlightCard v-else :kind="highlight.kind" :service="highlight.service" />
+
+    <nav class="flex flex-wrap gap-2" aria-label="Atalhos">
+      <RouterLink
+        v-for="item in SHORTCUTS"
+        :key="item.label"
+        :to="item.to"
+        class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-body font-semibold text-fg transition-colors hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
       >
-        <UserCard
-          v-for="(provider, index) in providerStore.providers"
-          :key="index"
-          :id="provider.id"
-          :full_name="provider.full_name"
-          :service_name="provider.service_type_name"
-          :price_per_hour="provider.price_per_hour"
-          :price_per_day="provider.price_per_day"
-          :is_active="provider.is_active"
-          :profile_photo="provider.profile_picture"
-          :classification="provider.classification"
-        />
+        <UiIcon :icon="item.icon" :size="18" class="text-primary" />
+        {{ item.label }}
+      </RouterLink>
+    </nav>
+
+    <section class="flex flex-col gap-3" aria-labelledby="nearby-title">
+      <div class="flex items-center justify-between gap-3">
+        <h2 id="nearby-title" class="text-title text-fg">Passeadores perto de você</h2>
+        <RouterLink
+          :to="{ name: 'provider-list-view' }"
+          class="text-body font-semibold text-primary underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          Ver todos
+        </RouterLink>
       </div>
-      <div v-else class="text-center flex flex-col items-center justify-center py-10">
-        <p class="text-xl text-doggo-green font-semibold md:text-base">
-          Não conseguimos encontrar nenhum provedor perto da sua região
-        </p>
+      <div v-if="!providersLoaded" class="flex gap-3 overflow-hidden" role="status">
+        <span class="sr-only">Carregando</span>
+        <UiSkeleton v-for="n in 3" :key="n" shape="rect" class="!h-40 !w-44 shrink-0" />
       </div>
+      <UiEmptyState
+        v-else-if="providerStore.error && !nearby.length"
+        :icon="CloudOff"
+        title="Não foi possível carregar os passeadores"
+      >
+        <template #action>
+          <AppButton text="Tentar novamente" variant="primary" :block="false" @event="load" />
+        </template>
+      </UiEmptyState>
+      <NearbyProviders v-else-if="nearby.length" :providers="nearby" />
+      <UiEmptyState v-else :icon="MapPinOff" title="Nenhum passeador perto de você ainda" />
     </section>
   </div>
 </template>

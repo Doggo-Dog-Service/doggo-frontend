@@ -16,6 +16,10 @@ export const createUser = (data) => {
     return api.post('/register/', data)
 }
 
+export const updateUser = (id, data) => {
+    return api.patch(`/users/${id}/`, data)
+}
+
 export const deleteUser = (id) => {
     return api.delete(`/users/${id}/`)
 }
