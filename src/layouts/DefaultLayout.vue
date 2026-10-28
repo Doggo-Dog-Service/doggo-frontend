@@ -14,7 +14,7 @@ const serviceStore = useServiceStore()
 const showNav = computed(() => !route.meta.hideNav)
 
 // Contador de pedidos pendentes: carrega ao entrar no modo passeador e ao abrir Pedidos.
-// A store o atualiza depois de confirmar/recusar/cancelar um serviço.
+// Depois de confirmar/recusar/cancelar, quem o atualiza é a store serviceWebSocket (tela de serviço).
 watch(
   () => authStore.mode,
   (mode) => {

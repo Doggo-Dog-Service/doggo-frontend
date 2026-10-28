@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import notify from '@/utils/notify'
 
 import * as serviceService from '@/services/service'
+import { useAuthStore } from '@/stores/auth'
+import { useServiceStore } from '@/stores/services'
 
 export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
 
@@ -139,7 +141,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
-  async function runServiceAction(action, successMessage) {
+  async function runServiceAction(action, successMessage, { refreshPending = false } = {}) {
     if (!service.value) {
       return null
     }
@@ -151,6 +153,11 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
       const data = await action(service.value.id)
 
       service.value = data
+
+      // O contador de "Pedidos" (status 1) muda quando um pedido é confirmado, recusado ou cancelado.
+      if (refreshPending && useAuthStore().mode === 'provider') {
+        useServiceStore().fetchPendingCount()
+      }
 
       if (successMessage) {
         notify.success(successMessage)
@@ -171,13 +178,13 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const startService = () =>
     runServiceAction(serviceService.startService, 'Passeio iniciado!')
   const confirmService = () =>
-    runServiceAction(serviceService.confirmService, 'Passeio confirmado!')
+    runServiceAction(serviceService.confirmService, 'Passeio confirmado!', { refreshPending: true })
   const rejectService = () =>
-    runServiceAction(serviceService.rejectService, 'Passeio recusado.')
+    runServiceAction(serviceService.rejectService, 'Passeio recusado.', { refreshPending: true })
   const completeService = () =>
     runServiceAction(serviceService.completeService, 'Passeio concluído!')
   const cancelService = () =>
-    runServiceAction(serviceService.cancelService, 'Passeio cancelado.')
+    runServiceAction(serviceService.cancelService, 'Passeio cancelado.', { refreshPending: true })
 
   function setService(data) {
     service.value = data

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import notify from '@/utils/notify'
-import { useAuthStore } from '@/stores/auth'
 import * as serviceService from '@/services/service'
 
 export const useServiceStore = defineStore('serviceStore', () => {
@@ -52,7 +51,6 @@ export const useServiceStore = defineStore('serviceStore', () => {
       loading.value = true
       await serviceService.updateService(id, payload)
       await getServices()
-      if (useAuthStore().mode === 'provider') await fetchPendingCount()
       notify.success('Serviço atualizado com sucesso!')
     } catch (error) {
       notify.error(error.message)

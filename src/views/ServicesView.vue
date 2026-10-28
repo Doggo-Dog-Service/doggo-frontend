@@ -1,80 +1,91 @@
 <script setup>
-import ChoseButton from '@/components/buttons/ChoseButton.vue'
-import { serviceStatus } from '@/utils/serviceStatus'
-import { useServiceStore } from '@/stores/services'
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { Footprints, SearchX } from 'lucide-vue-next'
+import UiEmptyState from '@/components/ui/UiEmptyState.vue'
+import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import ServiceCard from '@/components/cards/ServiceCard.vue'
+import { serviceStatus } from '@/utils/serviceStatus'
+import { filterServices } from '@/utils/serviceFilters'
+import { useServiceStore } from '@/stores/services'
 
+const route = useRoute()
 const serviceStore = useServiceStore()
 
-const services = computed(() => serviceStore.serivces)
+// Filtro vindo da rota (/hoje, /pedidos) ou de ?filtro=. Sem filtro: lista completa + chips de status.
+const routeFilter = computed(() => route.meta.filter ?? route.query.filtro ?? 'todos')
+const hasRouteFilter = computed(() => ['ativos', 'pendentes'].includes(routeFilter.value))
+
 const selectedStatus = ref(0)
 
+const services = computed(() => filterServices(serviceStore.serivces, routeFilter.value))
+
+const TITLES = {
+  1: 'Serviços Em Análise',
+  2: 'Serviços Confirmados',
+  3: 'Serviços Em Andamento',
+  4: 'Serviços Concluídos',
+  5: 'Serviços Cancelados',
+  6: 'Serviços Recusados',
+}
 const titleLabel = computed(() => {
-  if(selectedStatus.value === 1) return 'Serviços Em Análise'
-  if(selectedStatus.value === 2) return 'Serviços Confirmados'
-  if(selectedStatus.value === 3) return 'Serviços Em Andamento'
-  if(selectedStatus.value === 4) return 'Serviços Concluídos'
-  if(selectedStatus.value === 5) return 'Serviços Cancelados'
-  if(selectedStatus.value === 6) return 'Serviços Recusados'
-  return 'Todos os Serviços'
+  if (routeFilter.value === 'ativos') return 'Passeios de hoje'
+  if (routeFilter.value === 'pendentes') return 'Pedidos'
+  return TITLES[selectedStatus.value] ?? 'Todos os Serviços'
+})
+
+const emptyText = computed(() => {
+  if (routeFilter.value === 'ativos') return 'Nenhum passeio confirmado ou em andamento.'
+  if (routeFilter.value === 'pendentes') return 'Nenhum pedido aguardando resposta.'
+  return 'Nenhum serviço encontrado.'
 })
 
 const isSelected = (statusId) => selectedStatus.value === statusId
 function select(statusId) {
-  if (statusId === selectedStatus.value) {
-    selectedStatus.value = 0
-    return
-  }
-  selectedStatus.value = statusId
+  selectedStatus.value = statusId === selectedStatus.value ? 0 : statusId
 }
 
-function getStatusName(statusId) {
-  const status = serviceStatus.find((status) => status.id === statusId)
-  return status.name
+const statusById = (statusId) => serviceStatus.find((status) => status.id === statusId)
+
+function load() {
+  if (hasRouteFilter.value || selectedStatus.value === 0) return serviceStore.getServices()
+  return serviceStore.getServices({ status: selectedStatus.value })
 }
 
-function getStatusColor(statusId) {
-  const status = serviceStatus.find((status) => status.id === statusId)
-  return status.color
-}
-
-onMounted(async () => {
-  await serviceStore.getServices()
-})
-
-watch(selectedStatus, async (newSelected) => {
-  if (newSelected === 0) {
-    await serviceStore.getServices()
-    return
-  }
-
-  await serviceStore.getServices({
-    status: newSelected,
-  })
-})
+onMounted(load)
+watch(selectedStatus, load)
 </script>
 
 <template>
-  <div class="grid grid-cols-1 w-full p-6 gap-5">
-    <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
-      {{ titleLabel }}
-      <span class="mdi mdi-dog-service text-doggo-green"></span>
-    </h1>
-    <ul class="flex gap-2 overflow-x-auto pb-4">
-      <li v-for="status in serviceStatus" :key="status.id">
-        <ChoseButton
-          :text="status.name"
-          :selected="isSelected(status.id)"
-          @select="select(status.id)"
-        />
+  <section class="flex flex-col gap-5">
+    <h1 class="hidden text-display text-fg md:block">{{ titleLabel }}</h1>
+
+    <ul
+      v-if="!hasRouteFilter"
+      class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0"
+      aria-label="Filtrar por status"
+    >
+      <li v-for="status in serviceStatus" :key="status.id" class="shrink-0">
+        <button
+          type="button"
+          :aria-pressed="isSelected(status.id)"
+          :class="[
+            'min-h-11 cursor-pointer rounded-full border px-4 text-body font-semibold whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-primary',
+            isSelected(status.id)
+              ? 'border-primary bg-primary text-primary-fg'
+              : 'border-line bg-surface text-fg hover:bg-surface-muted',
+          ]"
+          @click="select(status.id)"
+        >
+          {{ status.name }}
+        </button>
       </li>
     </ul>
-    <div v-if="serviceStore.loading" class="w-full grid gap-2 justify-center text-doggo-green">
-      <span class="mdi mdi-loading text-6xl text-center animate-spin"></span>
-      <p>Carregando</p>
+
+    <div v-if="serviceStore.loading" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Carregando serviços">
+      <UiSkeleton v-for="n in 3" :key="n" shape="rect" />
     </div>
-    <ul v-else-if="services.length > 0" class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+    <ul v-else-if="services.length > 0" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       <li v-for="service in services" :key="service.id">
         <ServiceCard
           :id="service.id"
@@ -85,17 +96,18 @@ watch(selectedStatus, async (newSelected) => {
           :service-type="service.service_type"
           :pets="service.pets"
           :price="service.price"
-          :status="getStatusName(service.status)"
+          :status="statusById(service.status)?.name"
           :start-date-time="service.start_datetime"
           :end-date-time="service.end_datetime"
           :created-at="service.created_at"
-          :color="getStatusColor(service.status)"
+          :color="statusById(service.status)?.color"
         />
       </li>
     </ul>
-    <div v-else class="w-full grid gap-2 justify-center text-doggo-green">
-      <span class="mdi mdi-magnify text-6xl text-center"></span>
-      <p>Nenhum serviço encontrado</p>
-    </div>
-  </div>
+    <UiEmptyState
+      v-else
+      :icon="hasRouteFilter ? Footprints : SearchX"
+      :title="emptyText"
+    />
+  </section>
 </template>

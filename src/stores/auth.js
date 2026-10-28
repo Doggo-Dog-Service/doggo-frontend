@@ -124,6 +124,23 @@ export const useAuthStore = defineStore('authStore', () => {
     }
   }
 
+  // Atualiza nome e telefone do usuário logado. O telefone é write-only na API, então só o nome volta.
+  const updateProfile = async ({ full_name, phone }) => {
+    if (!user.value) return false
+    try {
+      loading.value = true
+      const payload = phone ? { full_name, phone } : { full_name }
+      const data = await authService.updateUser(user.value.id, payload)
+      user.value = { ...user.value, full_name: data?.full_name ?? full_name }
+      return true
+    } catch (error) {
+      notify.error(error.message)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   const deleteUser = async (id) => {
     try {
       loading.value = true
@@ -154,6 +171,7 @@ export const useAuthStore = defineStore('authStore', () => {
     fetchUser,
     createUser,
     updateUser,
+    updateProfile,
     logout,
     clearSession,
     deleteUser,
