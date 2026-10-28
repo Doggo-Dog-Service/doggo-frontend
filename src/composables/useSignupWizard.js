@@ -6,6 +6,7 @@ import { useProviderStore } from '@/stores/provider'
 import { useMedia } from '@/composables/useMedia'
 import { onlyDigits } from '@/utils/masks'
 import { parseDjangoErrors, parseFieldErrors } from '@/utils/errors'
+import { buildProviderPayload, mapProviderErrors, validateProviderForm } from '@/utils/providerForm'
 import notify from '@/utils/notify'
 import { homeRouteFor } from '@/router/navigation'
 import { clearSignupPending, hasPendingProvider, setProviderPending } from '@/utils/signupPending'
@@ -235,38 +236,15 @@ export function useSignupWizard() {
 
   // Erros de campo do backend voltam para o formulário; o toast garante feedback mesmo fora da tela.
   function handleProviderError(error) {
-    const fields = parseFieldErrors(error?.response?.data)
-    if (fields.fixed_latitude || fields.fixed_longitude) {
-      state.errors.location = fields.fixed_latitude || fields.fixed_longitude
-    }
-    if (fields.service_type) state.errors.service_type = fields.service_type
-    if (fields.price_per_hour || fields.price_per_day) state.errors.price = fields.price_per_hour || fields.price_per_day
-    if (fields.description) state.errors.description = fields.description
+    Object.assign(state.errors, mapProviderErrors(error?.response?.data))
     notify.error(parseDjangoErrors(error))
   }
 
   async function submitProvider() {
-    const { latitude, longitude, service_type, price_per_hour, price_per_day, description } = state.provider
-    const filled = (value) => String(value ?? '').trim() !== ''
-    if (!filled(latitude) || !filled(longitude) || !Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude))) {
-      state.errors.location = 'Marque no mapa onde você atende.'
-    }
-    if (!service_type) state.errors.service_type = 'Escolha o tipo de serviço.'
-    if (!filled(price_per_hour) && !filled(price_per_day)) {
-      state.errors.price = 'Informe o preço por hora ou por dia.'
-    }
-    const invalidPrice = [price_per_hour, price_per_day].some((v) => filled(v) && !(Number(v) > 0))
-    if (invalidPrice) state.errors.price = 'O preço precisa ser maior que zero.'
+    Object.assign(state.errors, validateProviderForm(state.provider))
     if (Object.keys(state.errors).length) return false
 
-    const payload = {
-      fixed_latitude: Number(latitude).toFixed(6),
-      fixed_longitude: Number(longitude).toFixed(6),
-      service_type,
-    }
-    if (filled(price_per_hour)) payload.price_per_hour = price_per_hour
-    if (filled(price_per_day)) payload.price_per_day = price_per_day
-    if (description.trim()) payload.description = description.trim()
+    const payload = buildProviderPayload(state.provider)
 
     const ok = await providerStore.createProvider(payload, { onError: handleProviderError })
     if (!ok) return false

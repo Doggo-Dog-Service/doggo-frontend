@@ -9,7 +9,14 @@ import ProviderLocationPicker from '@/components/signup/ProviderLocationPicker.v
 import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useServiceTypeStore } from '@/stores/serviceType'
 
-const { provider, errors } = useSignupWizard()
+// Sem props usa o estado do cadastro; o perfil passa o próprio formulário.
+const props = defineProps({
+  form: { type: Object, default: null },
+  formErrors: { type: Object, default: null },
+})
+const wizard = useSignupWizard()
+const provider = props.form ?? wizard.provider
+const errors = props.formErrors ?? wizard.errors
 const serviceTypeStore = useServiceTypeStore()
 const locationHint = ref('')
 

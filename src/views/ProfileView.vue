@@ -1,18 +1,24 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { LogOut, Monitor, Moon, Phone, Save, Sun, User } from 'lucide-vue-next'
+import { Footprints, LogOut, Monitor, Moon, Phone, Save, Sun, User } from 'lucide-vue-next'
 import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiSegmented from '@/components/ui/UiSegmented.vue'
+import UiSheet from '@/components/ui/UiSheet.vue'
+import SignupStepProvider from '@/components/signup/SignupStepProvider.vue'
 import ModeSwitch from '@/components/shell/ModeSwitch.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
 import notify from '@/utils/notify'
 import { useAuthStore } from '@/stores/auth'
+import { useProviderStore } from '@/stores/provider'
+import { buildProviderPayload, mapProviderErrors, validateProviderForm } from '@/utils/providerForm'
+import { parseDjangoErrors } from '@/utils/errors'
 import { useTheme } from '@/composables/useTheme'
 
 const authStore = useAuthStore()
+const providerStore = useProviderStore()
 const router = useRouter()
 const { preference, setPreference } = useTheme()
 
@@ -58,6 +64,37 @@ async function save() {
   if (ok) notify.success('Perfil atualizado')
 }
 
+// Tutor que também quer passear: mesmo formulário e payload do cadastro.
+const canBecomeProvider = computed(() => !!authStore.user?.client_profile && !authStore.user?.provider_profile)
+const providerOpen = ref(false)
+const providerSaving = ref(false)
+const providerForm = reactive({ latitude: null, longitude: null, service_type: null, price_per_hour: '', price_per_day: '', description: '' })
+const providerErrors = reactive({})
+
+function setProviderErrors(errs) {
+  for (const key of Object.keys(providerErrors)) delete providerErrors[key]
+  Object.assign(providerErrors, errs)
+}
+
+async function createProviderProfile() {
+  const invalid = validateProviderForm(providerForm)
+  setProviderErrors(invalid)
+  if (Object.keys(invalid).length) return
+  providerSaving.value = true
+  const ok = await providerStore.createProvider(buildProviderPayload(providerForm), {
+    onError: (error) => {
+      setProviderErrors(mapProviderErrors(error?.response?.data))
+      notify.error(parseDjangoErrors(error))
+    },
+  })
+  if (ok) {
+    await authStore.fetchUser()
+    notify.success('Perfil de passeador criado')
+    providerOpen.value = false
+  }
+  providerSaving.value = false
+}
+
 function logout() {
   authStore.logout()
   router.push({ name: 'login-view' })
@@ -98,6 +135,19 @@ function logout() {
       <p class="text-body text-fg-muted">Você é tutor e passeador. Escolha como quer usar o DOGGO agora.</p>
       <ModeSwitch />
     </UiCard>
+
+    <UiCard v-if="canBecomeProvider" padding="lg" class="flex flex-col gap-3">
+      <h2 class="text-subtitle text-fg">Quero passear também</h2>
+      <p class="text-body text-fg-muted">Crie seu perfil de passeador e passe a receber pedidos de outros tutores.</p>
+      <AppButton text="Quero passear também" variant="secondary" :icon="Footprints" @event="providerOpen = true" />
+    </UiCard>
+
+    <UiSheet v-model:open="providerOpen" title="Perfil de passeador">
+      <form class="flex flex-col gap-6" novalidate @submit.prevent="createProviderProfile">
+        <SignupStepProvider :form="providerForm" :form-errors="providerErrors" />
+        <AppButton text="Criar perfil de passeador" type="submit" variant="primary" :loading="providerSaving" />
+      </form>
+    </UiSheet>
 
     <UiCard padding="lg" class="flex flex-col gap-3">
       <h2 class="text-subtitle text-fg">Aparência</h2>
