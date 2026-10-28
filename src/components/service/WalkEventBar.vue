@@ -33,7 +33,6 @@ const buttonClass =
       :key="kind"
       type="button"
       :data-event-kind="kind"
-      :[`data-event-${kind}`]="''"
       :disabled="disabled"
       :class="buttonClass"
       @click="emit('mark', kind)"

@@ -106,10 +106,6 @@ function syncEventMarkers() {
   }
 }
 
-function markEvent(...args) {
-  store.addEvent(...args)
-}
-
 function applyMapStyle() {
   setStyle(dim.value ? 'dark' : resolved.value)
 }
@@ -213,7 +209,7 @@ onMounted(() => {
               <dd class="text-display tabular-nums text-fg">{{ store.formattedDistance }}</dd>
             </div>
           </dl>
-          <WalkEventBar v-if="isProvider" :disabled="store.eventSending" @mark="markEvent" />
+          <WalkEventBar v-if="isProvider" :disabled="store.eventSending" @mark="(...args) => store.addEvent(...args)" />
         </div>
       </template>
 

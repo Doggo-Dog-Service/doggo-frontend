@@ -10,7 +10,8 @@ const mapApi = {
   loaded: ref(true),
 }
 vi.mock('@/composables/useMap', () => ({ useMap: () => mapApi, getThemeColor: () => '#000' }))
-vi.mock('@/services/service', () => ({ getServiceEvents: vi.fn().mockResolvedValue([]) }))
+const serviceApi = vi.hoisted(() => ({ getServiceEvents: vi.fn() }))
+vi.mock('@/services/service', () => serviceApi)
 vi.mock('@/utils/notify', () => ({ default: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 
 import ServiceRouteMap from '../ServiceRouteMap.vue'
@@ -33,6 +34,7 @@ describe('ServiceRouteMap relatório', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
+    serviceApi.getServiceEvents.mockResolvedValue([])
   })
   afterEach(() => {
     document.body.innerHTML = ''
@@ -67,8 +69,26 @@ describe('ServiceRouteMap relatório', () => {
     expect(document.body.querySelector('[data-photo-large]').getAttribute('src')).toBe('http://x/a.jpg')
   })
 
-  it('loads events on mount', () => {
+  it('loads events on mount even when store already has a WS event, merging by id', async () => {
+    serviceApi.getServiceEvents.mockResolvedValue([ev(1, 'pee'), ev(2, 'poop')])
+    const store = useServiceWebSocketStore()
+    store.setService({ id: 1, status: 4, pets: [], provider_name: 'Bob' })
+    store.events.push(ev(2, 'poop'))
+    mount(ServiceRouteMap, {
+      props: { role: 'provider', isServiceRating: true },
+      attachTo: document.body,
+      global: { stubs: { SearchCard: true, ServicePetsList: true, InfoCard: true, ReviewModal: true } },
+    })
+    await flushPromises()
+    expect(serviceApi.getServiceEvents).toHaveBeenCalledWith(1)
+    expect(store.events.map((e) => e.id).sort()).toEqual([1, 2])
+  })
+
+  it('loads events on mount when store is empty', async () => {
+    serviceApi.getServiceEvents.mockResolvedValue([ev(5, 'water')])
     const { store } = setup()
-    expect(store.events).toEqual([])
+    await flushPromises()
+    expect(serviceApi.getServiceEvents).toHaveBeenCalledWith(1)
+    expect(store.events).toHaveLength(1)
   })
 })

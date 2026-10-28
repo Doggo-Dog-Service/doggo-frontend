@@ -36,11 +36,7 @@ async function send() {
   }
   await load()
   if (!ok) return
-  try {
-    await authStore.fetchUser()
-  } catch {
-    // os documentos já foram salvos; o status atualiza na próxima carga
-  }
+  await authStore.fetchUser()
   notify.success('Documentos enviados')
 }
 

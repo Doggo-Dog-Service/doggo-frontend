@@ -129,7 +129,7 @@ async function submitReview() {
 
 onMounted(() => {
   initializeMap()
-  if (serviceStore.events.length === 0) serviceStore.loadEvents()
+  serviceStore.loadEvents()
   if(!props.isServiceRating && props.role === 'client') {
     reviewOpen.value = true
   }
@@ -193,7 +193,7 @@ watch(loaded, (value) => {
       <InfoCard :icon="Clock" description="Duração" :info="durationLabel" />
       <InfoCard :icon="Banknote" description="Valor" :info="priceLabel" />
       <section class="col-span-2 flex flex-col gap-2" aria-label="Marcadores do passeio">
-        <h2 class="text-subtitle text-fg">Marcadores</h2>
+        <h2 class="text-subtitle text-fg">Marcadores do passeio</h2>
         <p data-event-counts class="text-body text-fg-muted">
           <template v-for="(item, index) in eventCounts" :key="item.kind">
             <span v-if="index > 0" aria-hidden="true"> · </span>{{ item.label }} {{ item.count }}

@@ -197,7 +197,7 @@ describe('ServiceActiveWalk', () => {
       const { store, wrapper } = setup('provider')
       const spy = vi.spyOn(store, 'addEvent').mockResolvedValue(null)
       for (const kind of ['pee', 'poop', 'water']) {
-        await wrapper.get(`[data-event-${kind}]`).trigger('click')
+        await wrapper.get(`[data-event-kind="${kind}"]`).trigger('click')
         expect(spy).toHaveBeenLastCalledWith(kind)
       }
       expect(wrapper.text()).toContain('Xixi')
@@ -220,7 +220,7 @@ describe('ServiceActiveWalk', () => {
 
     it('tutor: no action bar', () => {
       const { wrapper } = setup('client')
-      expect(wrapper.find('[data-event-pee]').exists()).toBe(false)
+      expect(wrapper.find('[data-event-kind="pee"]').exists()).toBe(false)
       expect(wrapper.find('[data-event-photo-input]').exists()).toBe(false)
     })
 
