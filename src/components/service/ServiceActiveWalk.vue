@@ -1,20 +1,28 @@
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import { Clock, Loader2, Map } from 'lucide-vue-next'
-import InfoCard from '@/components/cards/InfoCard.vue'
-import ServiceActions from '@/components/service/ServiceActions.vue'
+import { BatteryLow, Loader2, TriangleAlert } from 'lucide-vue-next'
+import AppButton from '@/components/buttons/AppButton.vue'
+import LiveWalkSheet from '@/components/service/LiveWalkSheet.vue'
+import LiveWalkSignal from '@/components/service/LiveWalkSignal.vue'
 import ServicePartyCard from '@/components/service/ServicePartyCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
+import WalkDimOverlay from '@/components/service/WalkDimOverlay.vue'
+import WhatsAppButton from '@/components/service/WhatsAppButton.vue'
+import UiSheet from '@/components/ui/UiSheet.vue'
 
 import { useMap } from '@/composables/useMap'
 import { useElapsedTime } from '@/composables/useElapsedTime'
+import { useTheme } from '@/composables/useTheme'
+import { useWakeLock } from '@/composables/useWakeLock'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatElapsed } from '@/utils/time'
 
+const DIM_KEY = 'doggo-walk-dim'
+
 const emit = defineEmits(['complete', 'cancel'])
 
-defineProps({
+const props = defineProps({
   role: {
     type: String,
     required: true,
@@ -22,18 +30,35 @@ defineProps({
 })
 
 const store = useServiceWebSocketStore()
+const { resolved } = useTheme()
 
-const { createMap, addMarker, flyTo, loaded } = useMap()
+const { createMap, addMarker, flyTo, setStyle, loaded } = useMap()
+const wakeLock = useWakeLock()
 const { elapsedSeconds } = useElapsedTime(
   () => store.startDatetime,
   () => store.inProgress,
 )
 
+const isProvider = computed(() => props.role === 'provider')
+
 const providerMarker = ref(null)
 const mapLoading = ref(true)
 const centered = ref(false)
+const sheetLevel = ref(0)
+const confirmOpen = ref(false)
+
+function readDim() {
+  try {
+    return sessionStorage.getItem(DIM_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+const dim = ref(isProvider.value && readDim())
 
 const elapsedLabel = computed(() => formatElapsed(elapsedSeconds.value))
+const contactPhone = computed(() => store.service?.contact_phone ?? null)
 
 function updateProviderMarker() {
   const location = store.currentLocation
@@ -57,13 +82,30 @@ function updateProviderMarker() {
   }
 }
 
+function applyMapStyle() {
+  setStyle(dim.value ? 'dark' : resolved.value)
+}
+
+function toggleDim() {
+  dim.value = !dim.value
+  try {
+    sessionStorage.setItem(DIM_KEY, dim.value ? '1' : '0')
+  } catch {
+    // armazenamento indisponível: o modo vale só enquanto a tela estiver aberta
+  }
+}
+
+function confirmComplete() {
+  confirmOpen.value = false
+  emit('complete')
+}
+
 async function initializeMap() {
-  const center = store.providerLocation
-    ? [store.providerLocation.longitude, store.providerLocation.latitude]
-    : [0, 0]
+  const known = store.providerLocation
+  const center = known ? [known.longitude, known.latitude] : [0, 0]
 
   await nextTick()
-  createMap('service-active-map', center, 15)
+  createMap('service-active-map', center, known ? 15 : 2)
 
   updateProviderMarker()
 }
@@ -71,18 +113,28 @@ async function initializeMap() {
 watch(() => store.currentLocation, updateProviderMarker)
 
 watch(loaded, (value) => {
-  if (value) mapLoading.value = false
+  if (!value) return
+  mapLoading.value = false
+  if (dim.value) applyMapStyle()
 })
 
-onMounted(initializeMap)
+watch(dim, () => {
+  if (loaded.value) applyMapStyle()
+})
+
+onBeforeUnmount(() => wakeLock.release())
+
+onMounted(() => {
+  if (isProvider.value) wakeLock.request()
+  initializeMap()
+})
 </script>
 
 <template>
-  <div class="relative flex flex-col w-full h-[calc(100vh-4.5rem)] md:flex-row md:overflow-hidden">
-    <div
-      id="service-active-map"
-      class="relative w-full h-[45vh] min-h-87.5 overflow-hidden md:h-full md:min-h-0 md:w-2/3 md:shrink-0"
-    >
+  <div
+    class="relative -mx-4 -my-5 h-[calc(100dvh-3.5rem-env(safe-area-inset-top))] overflow-hidden md:mx-0 md:my-0 md:h-[calc(100dvh-8rem)] md:rounded-card"
+  >
+    <div id="service-active-map" class="absolute inset-0 bg-surface-muted">
       <div
         v-if="mapLoading"
         class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-canvas"
@@ -93,21 +145,67 @@ onMounted(initializeMap)
       </div>
     </div>
 
-    <div class="w-full min-h-0 grid grid-cols-2 gap-2 p-4 pb-30 md:w-1/3 md:h-full md:overflow-y-auto md:pb-4">
-      <h1 class="col-span-2 w-full text-title text-fg">Passeio em andamento</h1>
-      <ServicePartyCard class="col-span-2" :role="role" />
-      <InfoCard :icon="Clock" description="Tempo" :info="elapsedLabel" />
-      <InfoCard :icon="Map" description="Distância" :info="store.formattedDistance" />
-      <ServicePetsList class="col-span-2" />
-      <ServiceActions
-        v-if="role === 'provider'"
-        class="col-span-2"
-        :role="role"
-        :status="3"
-        :busy="store.loading"
-        @complete="emit('complete')"
-        @cancel="emit('cancel')"
-      />
+    <div
+      v-if="isProvider"
+      class="absolute inset-x-3 top-3 z-10 flex items-center gap-2 rounded-control border border-line bg-warning-soft px-3 py-2 text-caption font-semibold text-warning shadow-card md:left-auto md:right-4 md:top-4 md:max-w-sm"
+      role="note"
+    >
+      <TriangleAlert :size="18" :stroke-width="2" class="shrink-0" aria-hidden="true" />
+      Mantenha o app aberto durante o passeio
     </div>
+
+    <LiveWalkSheet v-model:level="sheetLevel">
+      <template #summary>
+        <div class="flex flex-col gap-3">
+          <LiveWalkSignal v-if="!isProvider" :last-at="store.lastLocationAt" />
+          <h1 class="sr-only">Passeio em andamento</h1>
+          <dl class="grid grid-cols-2 gap-3">
+            <div>
+              <dt class="text-caption text-fg-muted">Tempo</dt>
+              <dd class="text-display tabular-nums text-fg">{{ elapsedLabel }}</dd>
+            </div>
+            <div>
+              <dt class="text-caption text-fg-muted">Distância</dt>
+              <dd class="text-display tabular-nums text-fg">{{ store.formattedDistance }}</dd>
+            </div>
+          </dl>
+        </div>
+      </template>
+
+      <ServicePartyCard :role="role" />
+      <WhatsAppButton :phone="contactPhone" />
+      <ServicePetsList />
+
+      <template v-if="isProvider">
+        <button
+          type="button"
+          data-dim-toggle
+          :aria-pressed="dim"
+          class="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-control border border-line bg-surface px-4 text-body font-semibold text-fg transition-colors hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-primary aria-pressed:border-primary aria-pressed:bg-primary-soft aria-pressed:text-primary"
+          @click="toggleDim"
+        >
+          <BatteryLow :size="20" :stroke-width="2" aria-hidden="true" />
+          Economizar bateria
+        </button>
+        <AppButton
+          data-complete-open
+          text="Concluir passeio"
+          :disabled="store.loading"
+          @event="confirmOpen = true"
+        />
+      </template>
+    </LiveWalkSheet>
+
+    <WalkDimOverlay v-if="dim" />
+
+    <UiSheet v-model:open="confirmOpen" title="Concluir passeio?">
+      <p class="text-body text-fg-muted">
+        O acompanhamento será encerrado e o tutor poderá avaliar o passeio.
+      </p>
+      <div class="flex flex-col gap-2">
+        <AppButton data-complete-confirm text="Sim, concluir" :disabled="store.loading" @event="confirmComplete" />
+        <AppButton text="Continuar passeio" mode="outline" @event="confirmOpen = false" />
+      </div>
+    </UiSheet>
   </div>
 </template>

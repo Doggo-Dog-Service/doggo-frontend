@@ -15,6 +15,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
 
   const currentLocation = ref(null)
   const currentDistance = ref(null)
+  const lastLocationAt = ref(null)
   const route = ref([])
 
   const routePoints = ref([])
@@ -209,6 +210,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   function updateLocation(location, distance) {
     currentLocation.value = location
     currentDistance.value = distance
+    lastLocationAt.value = Date.now()
     route.value.push(location)
   }
 
@@ -231,6 +233,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   function resetLocationState() {
     currentLocation.value = null
     currentDistance.value = null
+    lastLocationAt.value = null
     route.value = []
     routePoints.value = []
     totalDistance.value = null
@@ -272,6 +275,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     isRating,
     currentLocation,
     currentDistance,
+    lastLocationAt,
     route,
     routePoints,
     totalDistance,
