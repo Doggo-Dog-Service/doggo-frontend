@@ -235,6 +235,18 @@ describe('useSignupWizard', () => {
       expect(w.canEnter(3)).toBe(false)
     })
 
+    it('registro feito mas login falhou, sem usuario: reinicia na etapa 1', async () => {
+      fillAccount(w)
+      await w.next()
+      fillPersonal(w)
+      mocks.auth.login.mockResolvedValueOnce(false)
+      expect(await w.next()).toBe(false)
+      w.resetIfSessionLost()
+      expect(w.step.value).toBe(1)
+      expect(w.account.email).toBe('')
+      expect(w.canEnter(3)).toBe(false)
+    })
+
     it('com sessao ativa preserva o estado', async () => {
       fillAccount(w)
       await w.next()

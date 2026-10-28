@@ -96,7 +96,7 @@ export function useSignupWizard() {
 
   // Logout/troca de conta na mesma sessão deixa registered/loggedIn velhos no módulo.
   function resetIfSessionLost() {
-    if (state.loggedIn && !authStore.user) reset()
+    if (!authStore.user && (state.registered || state.loggedIn)) reset()
   }
 
   function advance() {
