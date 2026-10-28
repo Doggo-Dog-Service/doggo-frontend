@@ -25,15 +25,15 @@ export const useProviderStore = defineStore('providerStore', () => {
       const response = await providerService.fetchProviders(params)
       const fetchedProviders = response.results
       providers.value = fetchedProviders
-    } catch (error) {
-      error.value = error.message
-      notify.error(error.message)
+    } catch (e) {
+      error.value = e.message
+      notify.error(e.message)
     } finally {
       loading.value = false
     }
   }
 
-  const fetchProvider = async (id) => {
+  const fetchProvider =async (id) => {
     try {
       loading.value = true
       const response = await providerService.fetchProvider(id)
