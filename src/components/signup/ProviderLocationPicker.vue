@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Loader2 } from 'lucide-vue-next'
 import SearchBar from '@/components/inputs/SearchBar.vue'
 import LocationCard from '@/components/cards/LocationCard.vue'
@@ -11,9 +11,10 @@ import { useMap, getThemeColor } from '@/composables/useMap'
 const model = defineModel({ type: Object, default: () => ({ latitude: null, longitude: null }) })
 const emit = defineEmits(['error'])
 
+const HINT = 'Não foi possível obter sua localização. Busque o endereço ou toque no mapa.'
 const SAO_PAULO = [-46.633309, -23.55052]
 
-const { latitude, longitude, getCurrentPosition } = useGeolocation()
+const { latitude, longitude, error: geoError, getCurrentPosition } = useGeolocation()
 const { map, createMap, addMarker, flyTo } = useMap()
 const { searchedData, searchLocation, loading } = useLocation()
 
@@ -22,6 +23,7 @@ const searchText = ref('')
 const listOpen = ref(false)
 let marker = null
 let searchTimeout
+let active = true
 
 function selectPoint(lng, lat) {
   marker?.setLngLat([lng, lat])
@@ -36,6 +38,11 @@ function handleLocationSelect({ lng, lat }) {
   listOpen.value = false
 }
 
+onBeforeUnmount(() => {
+  active = false
+  clearTimeout(searchTimeout)
+})
+
 onMounted(async () => {
   const saved = model.value
   let center = SAO_PAULO
@@ -45,12 +52,16 @@ onMounted(async () => {
   } else {
     try {
       await getCurrentPosition()
-      if (latitude.value != null && longitude.value != null) {
+      if (!active) return
+      if (geoError.value) {
+        emit('error', HINT)
+      } else if (latitude.value != null && longitude.value != null) {
         center = [Number(longitude.value), Number(latitude.value)]
         located = true
       }
     } catch {
-      emit('error', 'Não foi possível obter sua localização. Busque o endereço ou toque no mapa.')
+      if (!active) return
+      emit('error', HINT)
     }
   }
 

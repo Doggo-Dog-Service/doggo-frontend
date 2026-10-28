@@ -434,7 +434,7 @@ describe('useSignupWizard', () => {
 
     it('guarda pendencia de passeador e limpa apos criar', async () => {
       await reachProvider({ withClient: true })
-      expect(JSON.parse(localStorage.getItem('doggo-signup-pending'))).toEqual({ provider: true })
+      expect(JSON.parse(localStorage.getItem('doggo-signup-pending'))).toEqual({ provider: true, userId: 7 })
       fillProvider()
       await w.next()
       expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
@@ -452,7 +452,7 @@ describe('useSignupWizard', () => {
     })
 
     it('retomada: tutor com pendencia abre a etapa 5', () => {
-      localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true }))
+      localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true, userId: 7 }))
       mocks.auth.user = { id: 7, client_profile: { id: 1 }, provider_profile: null }
       w.resumePending()
       expect(w.roles.client && w.roles.provider).toBe(true)

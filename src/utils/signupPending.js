@@ -10,9 +10,9 @@ export function readSignupPending() {
   }
 }
 
-export function setProviderPending() {
+export function setProviderPending(userId) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ provider: true }))
+    localStorage.setItem(KEY, JSON.stringify({ provider: true, userId }))
   } catch {
     // armazenamento bloqueado: segue sem persistir
   }
@@ -26,7 +26,7 @@ export function clearSignupPending() {
   }
 }
 
-// Tutor já criado que ainda precisa concluir o perfil de passeador.
+// Tutor já criado que ainda precisa concluir o perfil de passeador (a pendência é de um usuário só).
 export function hasPendingProvider(user) {
-  return !!(user?.client_profile && !user?.provider_profile && readSignupPending().provider === true)
+  return !!(user?.client_profile && !user?.provider_profile && readSignupPending().provider === true && readSignupPending().userId === user.id)
 }

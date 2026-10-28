@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import notify from '@/utils/notify'
 import * as authService from '@/services/authService'
 import { removeAccessToken } from '@/utils/token'
+import { clearSignupPending } from '@/utils/signupPending'
 
 const MODE_KEY = 'doggo-mode'
 const MODES = ['client', 'provider']
@@ -91,6 +92,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
   const logout = () => {
     authService.logout()
+    clearSignupPending()
     user.value = null
     notify.success('Logout realizado!')
   }

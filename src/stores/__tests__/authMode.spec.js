@@ -75,3 +75,12 @@ describe('auth mode', () => {
     expect(s.mode).toBe('provider')
   })
 })
+
+describe('auth logout', () => {
+  it('limpa a pendencia de cadastro', () => {
+    localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true, userId: 1 }))
+    setActivePinia(createPinia())
+    useAuthStore().logout()
+    expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+  })
+})

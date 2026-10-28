@@ -186,7 +186,7 @@ export function useSignupWizard() {
       state.errors.roles = 'Escolha ao menos uma opção para continuar.'
       return false
     }
-    if (state.roles.provider) setProviderPending()
+    if (state.roles.provider) setProviderPending(state.userId ?? authStore.user?.id)
     else clearSignupPending()
     if (state.roles.client && !state.clientCreated) {
       const ok = await clientStore.createClient()

@@ -69,7 +69,6 @@ export const useProviderStore = defineStore('providerStore', () => {
         return true
       }
     } catch (error) {
-      console.log(error)
       return false
     } finally {
       loading.value = false

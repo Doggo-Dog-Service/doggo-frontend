@@ -121,11 +121,11 @@ describe('router guard (retomada do cadastro)', () => {
 })
 
 describe('router guard (retomada de passeador pendente)', () => {
-  const dual = { mode: 'client', user: { client_profile: { id: 1 }, provider_profile: null } }
+  const dual = { mode: 'client', user: { id: 7, client_profile: { id: 1 }, provider_profile: null } }
   beforeEach(() => {
     getAccessToken.mockReturnValue('token')
     localStorage.clear()
-    localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true }))
+    localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true, userId: 7 }))
   })
 
   it('tutor com passeador pendente em rota protegida -> signup etapa 5', () => {
@@ -145,8 +145,14 @@ describe('router guard (retomada de passeador pendente)', () => {
     expect(createGuard(dual)(signupRoute('5'))).toEqual({ name: 'home-view' })
   })
 
+  it('pendencia de outro usuario no mesmo aparelho e ignorada', () => {
+    const other = { mode: 'client', user: { id: 8, client_profile: { id: 2 }, provider_profile: null } }
+    expect(createGuard(other)(routeOf('home-view'))).toBeUndefined()
+    expect(createGuard(other)(signupRoute('5'))).toEqual({ name: 'home-view' })
+  })
+
   it('usuario que ja tem perfil de passeador ignora a pendencia', () => {
-    const both = { mode: 'client', user: { client_profile: { id: 1 }, provider_profile: { id: 2 } } }
+    const both = { mode: 'client', user: { id: 7, client_profile: { id: 1 }, provider_profile: { id: 2 } } }
     expect(createGuard(both)(routeOf('home-view'))).toBeUndefined()
   })
 })
