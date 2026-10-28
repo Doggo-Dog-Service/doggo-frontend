@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { AlertCircle, Footprints, SearchX } from 'lucide-vue-next'
+import { AlertCircle, Footprints, SearchX, ShieldAlert } from 'lucide-vue-next'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
@@ -21,6 +21,13 @@ const routeFilter = computed(() => route.meta.filter ?? route.query.filtro ?? 't
 const hasRouteFilter = computed(() => ['ativos', 'pendentes'].includes(routeFilter.value))
 
 const selectedStatus = ref(0)
+
+// Passeador ainda não aprovado não aparece na busca: avisa em "Hoje".
+const verificationStatus = computed(() => {
+  if (routeFilter.value !== 'ativos' || authStore.mode !== 'provider') return null
+  const profile = authStore.user?.provider_profile
+  return ['pending', 'rejected'].includes(profile?.verification_status) ? profile.verification_status : null
+})
 
 const services = computed(() => filterServices(serviceStore.serivces, routeFilter.value))
 
@@ -85,6 +92,24 @@ watch(selectedStatus, load)
 <template>
   <section class="flex flex-col gap-5">
     <h1 class="hidden text-display text-fg md:block">{{ titleLabel }}</h1>
+
+    <div
+      v-if="verificationStatus"
+      role="status"
+      :class="[
+        'flex items-start gap-3 rounded-card border p-4 text-body',
+        verificationStatus === 'rejected' ? 'border-danger bg-danger-soft text-danger' : 'border-warning bg-warning-soft text-warning',
+      ]"
+    >
+      <ShieldAlert :size="20" class="mt-0.5 shrink-0" aria-hidden="true" />
+      <p v-if="verificationStatus === 'pending'">Seu perfil está em análise. Você ainda não aparece na busca.</p>
+      <p v-else>
+        Seu perfil foi recusado<template v-if="authStore.user.provider_profile.verification_note">: {{ authStore.user.provider_profile.verification_note }}</template>.
+        <RouterLink :to="{ name: 'profile-view' }" class="font-semibold underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-primary">
+          Ir para o Perfil
+        </RouterLink>
+      </p>
+    </div>
 
     <ul
       v-if="!hasRouteFilter"

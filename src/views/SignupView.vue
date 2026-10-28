@@ -8,6 +8,7 @@ import SignupStepPersonal from '@/components/signup/SignupStepPersonal.vue'
 import SignupStepRoles from '@/components/signup/SignupStepRoles.vue'
 import SignupStepPet from '@/components/signup/SignupStepPet.vue'
 import SignupStepProvider from '@/components/signup/SignupStepProvider.vue'
+import SignupStepDocuments from '@/components/signup/SignupStepDocuments.vue'
 import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useAuthStore } from '@/stores/auth'
 
@@ -23,10 +24,12 @@ const STEPS = {
   3: { title: 'Como você vai usar o DOGGO?', subtitle: null, component: SignupStepRoles },
   pet: { title: 'Seu primeiro pet', subtitle: null, component: SignupStepPet },
   provider: { title: 'Seu perfil de passeador', subtitle: null, component: SignupStepProvider },
+  documents: { title: 'Verificação do perfil', subtitle: null, component: SignupStepDocuments },
 }
 
 const current = computed(() => STEPS[stepKey.value] ?? STEPS[1])
-const canGoBack = computed(() => wizard.canEnter(step.value - 1))
+// O perfil de passeador já foi criado ao chegar nos documentos: voltar reenviaria o cadastro.
+const canGoBack = computed(() => stepKey.value !== 'documents' && wizard.canEnter(step.value - 1))
 // Tutor que também será passeador pode adiar o perfil de passeador (o de tutor já existe).
 const canDefer = computed(() => stepKey.value === 'provider' && wizard.roles.client)
 const heading = ref(null)
@@ -125,8 +128,8 @@ function onBack() {
         @event="onDefer"
       />
       <AppButton
-        v-if="stepKey === 'pet'"
-        text="Pular por agora"
+        v-if="stepKey === 'pet' || stepKey === 'documents'"
+        :text="stepKey === 'pet' ? 'Pular por agora' : 'Enviar depois'"
         variant="secondary"
         size="lg"
         :disabled="submitting"

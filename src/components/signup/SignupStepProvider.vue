@@ -4,7 +4,6 @@ import { Calendar, Clock } from 'lucide-vue-next'
 import AppInput from '@/components/inputs/AppInput.vue'
 import TextInput from '@/components/inputs/TextInput.vue'
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
-import UiBadge from '@/components/ui/UiBadge.vue'
 import ProviderLocationPicker from '@/components/signup/ProviderLocationPicker.vue'
 import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useServiceTypeStore } from '@/stores/serviceType'
@@ -74,10 +73,5 @@ onMounted(() => {
       label="Sobre você"
       placeholder="Conte sua experiência com cães (opcional)"
     />
-
-    <div class="flex items-center justify-between gap-3 rounded-card border border-line bg-surface-muted p-4 opacity-70">
-      <span class="text-body text-fg">Documentos</span>
-      <UiBadge>Em breve</UiBadge>
-    </div>
   </div>
 </template>

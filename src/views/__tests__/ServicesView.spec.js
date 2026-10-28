@@ -29,11 +29,11 @@ const mk = (id, status, offset, extra = {}) => ({
 
 let services
 
-function mountView(list) {
+function mountView(list, { mode = 'client', provider_profile } = {}) {
   setActivePinia(createPinia())
   const auth = useAuthStore()
-  auth.user = { client_profile: { id: 3 } }
-  auth.mode = 'client'
+  auth.user = mode === 'provider' ? { provider_profile } : { client_profile: { id: 3 } }
+  auth.mode = mode
   services = useServiceStore()
   services.getServices = vi.fn().mockResolvedValue()
   services.serivces = list
@@ -41,6 +41,41 @@ function mountView(list) {
     global: { plugins: [getActivePinia()], stubs: { RouterLink: RouterLinkStub } },
   })
 }
+
+describe('ServicesView aviso de verificação', () => {
+  beforeEach(() => {
+    route.meta = { filter: 'ativos' }
+    route.query = {}
+  })
+  const provider = (verification_status, verification_note = '') => ({ provider_profile: { id: 2, verification_status, verification_note } })
+
+  it('pendente avisa que não aparece na busca', async () => {
+    const w = mountView([], { mode: 'provider', ...provider('pending') })
+    await flushPromises()
+    expect(w.text()).toContain('Seu perfil está em análise. Você ainda não aparece na busca.')
+  })
+
+  it('recusado mostra o motivo e link para o Perfil', async () => {
+    const w = mountView([], { mode: 'provider', ...provider('rejected', 'Foto ilegível') })
+    await flushPromises()
+    expect(w.text()).toContain('Seu perfil foi recusado: Foto ilegível')
+    expect(w.find('a').attributes('href')).toBeTruthy()
+  })
+
+  it('aprovado não mostra aviso', async () => {
+    const w = mountView([], { mode: 'provider', ...provider('approved') })
+    await flushPromises()
+    expect(w.text()).not.toContain('Seu perfil')
+  })
+
+  it('modo tutor ou outras rotas não mostram aviso', async () => {
+    expect(mountView([]).text()).not.toContain('Seu perfil')
+    route.meta = {}
+    const w = mountView([], { mode: 'provider', ...provider('pending') })
+    await flushPromises()
+    expect(w.text()).not.toContain('Seu perfil')
+  })
+})
 
 describe('ServicesView agrupada', () => {
   beforeEach(() => {

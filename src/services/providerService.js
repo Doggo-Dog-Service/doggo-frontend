@@ -56,3 +56,27 @@ export const deleteProvider = async (id) => {
     }
   }
 }
+
+export const fetchMyDocuments = async () => {
+  try {
+    const { data } = await providerApi.getMyDocuments()
+    return data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail || 'Erro ao buscar os documentos',
+      status: error.response?.status,
+    }
+  }
+}
+
+export const saveMyDocument = async (payload) => {
+  try {
+    const { data } = await providerApi.saveMyDocument(payload)
+    return data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail || 'Erro ao salvar o documento',
+      status: error.response?.status,
+    }
+  }
+}

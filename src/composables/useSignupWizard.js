@@ -4,6 +4,7 @@ import { useClientStore } from '@/stores/clients'
 import { usePetStore } from '@/stores/pet'
 import { useProviderStore } from '@/stores/provider'
 import { useMedia } from '@/composables/useMedia'
+import { DOCUMENT_KINDS, useProviderDocuments } from '@/composables/useProviderDocuments'
 import { onlyDigits } from '@/utils/masks'
 import { parseDjangoErrors, parseFieldErrors } from '@/utils/errors'
 import { buildProviderPayload, mapProviderErrors, validateProviderForm } from '@/utils/providerForm'
@@ -22,6 +23,8 @@ const initialState = () => ({
   roles: { client: false, provider: false },
   pet: { name: '', breed: '', size: '', weight: '', photo: null },
   provider: { latitude: null, longitude: null, service_type: null, price_per_hour: '', price_per_day: '', description: '' },
+  documents: { doc_front: null, doc_back: null },
+  documentsSent: { doc_front: false, doc_back: false }, // já enviados (não reenvia se o outro falhar)
   errors: {},
   submitting: false,
   userId: null,
@@ -43,14 +46,15 @@ export function useSignupWizard() {
   const petStore = usePetStore()
   const providerStore = useProviderStore()
   const { postImage } = useMedia()
+  const { sendDocument } = useProviderDocuments()
 
-  // 1..3 fixos; depois 'pet' (tutor) e 'provider' (passeador).
+  // 1..3 fixos; depois 'pet' (tutor) e 'provider' + 'documents' (passeador).
   const stepOrder = computed(() => [
     1,
     2,
     3,
     ...(state.roles.client ? ['pet'] : []),
-    ...(state.roles.provider ? ['provider'] : []),
+    ...(state.roles.provider ? ['provider', 'documents'] : []),
   ])
   const totalSteps = computed(() => Math.max(4, stepOrder.value.length))
   const stepKey = computed(() => stepOrder.value[state.step - 1] ?? null)
@@ -71,11 +75,11 @@ export function useSignupWizard() {
 
   // Maior etapa permitida até a pedida (a URL pode apontar para uma etapa inalcançável).
   function resolveStep(requested) {
-    for (let n = Math.min(requested, 5); n >= 1; n--) {
+    for (let n = Math.min(requested, 6); n >= 1; n--) {
       if (canEnter(n)) return n
     }
     // Nada abaixo: a conta já existe e as etapas iniciais fecharam; vai para a primeira aberta.
-    for (let n = 1; n <= 5; n++) {
+    for (let n = 1; n <= 6; n++) {
       if (canEnter(n)) return n
     }
     return 1
@@ -252,9 +256,20 @@ export function useSignupWizard() {
     return advance()
   }
 
-  // "Pular por agora" só existe na etapa do pet.
+  // Documentos são opcionais no cadastro: sem arquivo escolhido, só avança.
+  async function submitDocuments() {
+    for (const { kind } of DOCUMENT_KINDS) {
+      const file = state.documents[kind]
+      if (!file || state.documentsSent[kind]) continue
+      if (!(await sendDocument(kind, file))) return false
+      state.documentsSent[kind] = true
+    }
+    return advance()
+  }
+
+  // "Pular por agora" (pet) e "Enviar depois" (documentos).
   function skip() {
-    if (stepKey.value !== 'pet') return false
+    if (stepKey.value !== 'pet' && stepKey.value !== 'documents') return false
     return advance()
   }
 
@@ -292,7 +307,9 @@ export function useSignupWizard() {
       if (state.step === 1) return submitAccount()
       if (state.step === 2) return await submitPersonal()
       if (state.step === 3) return await submitRoles()
-      return stepKey.value === 'pet' ? await submitPet() : await submitProvider()
+      if (stepKey.value === 'pet') return await submitPet()
+      if (stepKey.value === 'documents') return await submitDocuments()
+      return await submitProvider()
     } finally {
       state.submitting = false
     }
@@ -306,6 +323,7 @@ export function useSignupWizard() {
     roles: state.roles,
     pet: state.pet,
     provider: state.provider,
+    documents: state.documents,
     errors: state.errors,
     stepOrder,
     stepKey,

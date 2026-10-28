@@ -6,6 +6,10 @@ vi.mock('@/utils/notify', () => ({
   default: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('@/services/providerService', async (importOriginal) => ({
+  ...(await importOriginal()),
+  fetchMyDocuments: vi.fn().mockResolvedValue([]),
+}))
 
 import ProfileView from '../ProfileView.vue'
 import notify from '@/utils/notify'
@@ -45,6 +49,19 @@ const base = { id: 1, full_name: 'Ana', email: 'a@a.com' }
 const button = (w, text) => w.findAll('button').find((b) => b.text().includes(text))
 
 beforeEach(() => vi.clearAllMocks())
+
+describe('ProfileView - verificação', () => {
+  it('passeador vê o card Verificação com o status', async () => {
+    const w = setup({ ...base, provider_profile: { id: 2, verification_status: 'pending' } })
+    await flushPromises()
+    expect(w.text()).toContain('Verificação')
+    expect(w.text()).toContain('Em análise')
+  })
+
+  it('tutor sem perfil de passeador não vê o card', () => {
+    expect(setup({ ...base, client_profile: { id: 1 } }).text()).not.toContain('Verificação')
+  })
+})
 
 describe('ProfileView - quero passear também', () => {
   it('mostra o card só para tutor sem perfil de passeador', () => {

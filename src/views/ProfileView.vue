@@ -6,6 +6,7 @@ import UiAvatar from '@/components/ui/UiAvatar.vue'
 import UiCard from '@/components/ui/UiCard.vue'
 import UiSegmented from '@/components/ui/UiSegmented.vue'
 import UiSheet from '@/components/ui/UiSheet.vue'
+import ProviderVerificationCard from '@/components/profile/ProviderVerificationCard.vue'
 import SignupStepProvider from '@/components/signup/SignupStepProvider.vue'
 import ModeSwitch from '@/components/shell/ModeSwitch.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
@@ -168,6 +169,8 @@ function logout() {
       <p class="text-body text-fg-muted">Você é tutor e passeador. Escolha como quer usar o DOGGO agora.</p>
       <ModeSwitch />
     </UiCard>
+
+    <ProviderVerificationCard v-if="authStore.user?.provider_profile" />
 
     <UiCard v-if="canBecomeProvider" padding="lg" class="flex flex-col gap-3">
       <h2 class="text-subtitle text-fg">Quero passear também</h2>

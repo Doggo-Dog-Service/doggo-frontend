@@ -17,8 +17,20 @@ export function useMedia() {
     }
   }
 
+  const postDocument = async ({ file, description }) => {
+    try {
+      loading.value = true
+      return await mediaService.postDocument({ file, description })
+    } catch (error) {
+      notify.error(error?.response?.data?.detail || error?.message || 'Não foi possível enviar o documento.')
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
-    postImage
+    postImage,
+    postDocument
   }
 }

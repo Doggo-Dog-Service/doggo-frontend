@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   auth: { user: null, createUser: vi.fn(), login: vi.fn(), fetchUser: vi.fn(), updateUser: vi.fn() },
   clients: { createClient: vi.fn() },
   postImage: vi.fn(),
+  sendDocument: vi.fn(),
   pets: { createPet: vi.fn() },
   providers: { createProvider: vi.fn() },
   notify: { error: vi.fn(), success: vi.fn() },
@@ -15,6 +16,10 @@ vi.mock('@/stores/pet', () => ({ usePetStore: () => mocks.pets }))
 vi.mock('@/stores/provider', () => ({ useProviderStore: () => mocks.providers }))
 vi.mock('@/composables/useMedia', () => ({ useMedia: () => ({ postImage: mocks.postImage }) }))
 vi.mock('@/utils/notify', () => ({ default: mocks.notify }))
+vi.mock('@/composables/useProviderDocuments', () => ({
+  DOCUMENT_KINDS: [{ kind: 'doc_front' }, { kind: 'doc_back' }],
+  useProviderDocuments: () => ({ sendDocument: mocks.sendDocument }),
+}))
 
 import { useSignupWizard } from '../useSignupWizard'
 
@@ -40,6 +45,7 @@ describe('useSignupWizard', () => {
     mocks.auth.updateUser.mockResolvedValue({ id: 7 })
     mocks.clients.createClient.mockResolvedValue(true)
     mocks.postImage.mockResolvedValue({ attachment_key: 'abc' })
+    mocks.sendDocument.mockResolvedValue(true)
     w = useSignupWizard()
     w.reset()
   })
@@ -227,7 +233,7 @@ describe('useSignupWizard', () => {
       w.roles.client = true
       expect(w.totalSteps.value).toBe(4)
       w.roles.provider = true
-      expect(w.totalSteps.value).toBe(5)
+      expect(w.totalSteps.value).toBe(6)
     })
 
     it('stepKey: pet para tutor, provider para passeador', async () => {
@@ -497,6 +503,68 @@ describe('useSignupWizard', () => {
       expect(w.errors.price).toBe('Informe um número válido.')
       expect(w.errors.location).toBe('Invalid.')
       expect(mocks.notify.error).toHaveBeenCalled()
+    })
+
+    describe('documentos', () => {
+      const file = () => new File(['x'], 'doc.png')
+      async function reachDocuments() {
+        await reachProvider()
+        fillProvider()
+        await w.next()
+      }
+
+      it('vem depois do perfil de passeador e e a ultima etapa', async () => {
+        await reachDocuments()
+        expect(w.step.value).toBe(5)
+        expect(w.stepKey.value).toBe('documents')
+        expect(w.isLastStep.value).toBe(true)
+      })
+
+      it('passeador e tutor: documentos e a etapa 6', async () => {
+        await reachProvider({ withClient: true })
+        fillProvider()
+        await w.next()
+        expect(w.step.value).toBe(6)
+        expect(w.stepKey.value).toBe('documents')
+        expect(w.resolveStep(6)).toBe(6)
+      })
+
+      it('sem arquivos, continuar nao envia nada e conclui', async () => {
+        await reachDocuments()
+        expect(await w.next()).toBe(true)
+        expect(mocks.sendDocument).not.toHaveBeenCalled()
+      })
+
+      it('enviar depois pula a etapa', async () => {
+        await reachDocuments()
+        expect(w.skip()).toBe(true)
+        expect(mocks.sendDocument).not.toHaveBeenCalled()
+      })
+
+      it('envia frente e verso escolhidos', async () => {
+        await reachDocuments()
+        const front = file()
+        const back = file()
+        w.documents.doc_front = front
+        w.documents.doc_back = back
+        expect(await w.next()).toBe(true)
+        expect(mocks.sendDocument).toHaveBeenCalledWith('doc_front', front)
+        expect(mocks.sendDocument).toHaveBeenCalledWith('doc_back', back)
+      })
+
+      it('falha mantem a etapa e nao reenvia o que ja foi', async () => {
+        await reachDocuments()
+        w.documents.doc_front = file()
+        w.documents.doc_back = file()
+        mocks.sendDocument.mockImplementation(async (kind) => kind === 'doc_front')
+        expect(await w.next()).toBe(false)
+        expect(w.step.value).toBe(5)
+        mocks.sendDocument.mockClear()
+        mocks.sendDocument.mockResolvedValue(true)
+        expect(await w.next()).toBe(true)
+        expect(mocks.sendDocument).toHaveBeenCalledTimes(1)
+        expect(mocks.sendDocument).toHaveBeenCalledWith('doc_back', w.documents.doc_back)
+      })
     })
 
     it('ambos os papeis: pet, passeador e conclusao', async () => {
