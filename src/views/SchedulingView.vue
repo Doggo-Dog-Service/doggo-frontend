@@ -13,6 +13,7 @@ import SchedulingReview from '@/components/scheduling/SchedulingReview.vue'
 import SchedulingSuccess from '@/components/scheduling/SchedulingSuccess.vue'
 import PetModal from '@/components/pet/PetModal.vue'
 import { useScheduling } from '@/composables/useScheduling'
+import notify from '@/utils/notify'
 import { formatCurrency } from '@/utils/currency'
 import { estimatePrice } from '@/utils/price'
 
@@ -53,7 +54,7 @@ const hasSlot = computed(() => !!selectedDate.value && !!selectedTime.value)
 function canEnter(target) {
   if (target <= 1) return true
   if (target === 2) return hasPets.value
-  return hasPets.value && hasSlot.value
+  return hasPets.value && hasSlot.value && !!provider.value
 }
 
 // A etapa vem da URL, mas nunca passa de onde a seleção atual permite.
@@ -95,10 +96,17 @@ function goBack() {
 }
 
 async function onSubmit() {
+  if (submitting.value) return
+
   const result = await submit()
 
-  if (result === 'ok') sent.value = true
-  else if (result === 'conflict') goTo(2)
+  if (result === null) {
+    notify.error('Não foi possível identificar o tipo de serviço deste passeador.')
+  } else if (result === 'ok') {
+    sent.value = true
+  } else if (result === 'conflict') {
+    goTo(2)
+  }
 }
 
 async function closePetModal() {

@@ -28,7 +28,11 @@ const RouterLinkStub = { props: ['to'], template: '<a :data-to="JSON.stringify(t
 
 let router, pets, availability, getPetsCalls
 
-async function setup(url = '/scheduling/7', petList = [{ id: 1, name: 'Rex', breed: 'SRD' }]) {
+async function setup(
+  url = '/scheduling/7',
+  petList = [{ id: 1, name: 'Rex', breed: 'SRD' }],
+  { provider = undefined, typeList = [{ id: 5, name: 'Passeio', duration_minutes: 60 }] } = {},
+) {
   setActivePinia(createPinia())
   const auth = useAuthStore()
   auth.user = { client_profile: { id: 3 } }
@@ -39,16 +43,20 @@ async function setup(url = '/scheduling/7', petList = [{ id: 1, name: 'Rex', bre
     pets.pets = petList
   })
   const providers = useProviderStore()
-  providers.fetchProvider = vi.fn().mockResolvedValue({
-    id: 7,
-    full_name: 'Carlos',
-    service_type_name: 'Passeio',
-    price_per_hour: '40.00',
-    is_active: true,
-  })
+  providers.fetchProvider = vi.fn().mockResolvedValue(
+    provider === undefined
+      ? {
+          id: 7,
+          full_name: 'Carlos',
+          service_type_name: 'Passeio',
+          price_per_hour: '40.00',
+          is_active: true,
+        }
+      : provider,
+  )
   const types = useServiceTypeStore()
   types.getTypeServices = vi.fn(async () => {
-    types.typeServices = [{ id: 5, name: 'Passeio', duration_minutes: 60 }]
+    types.typeServices = typeList
   })
   availability = useAvailabilityStore()
   availability.getSlots = vi.fn(async () => {
@@ -181,5 +189,32 @@ describe('SchedulingView', () => {
     await flushPromises()
     expect(notify.error).toHaveBeenCalledWith('falhou')
     expect(w.text()).toContain('Revise e solicite')
+  })
+
+  it('provider não carregou: passo 3 não abre e mostra o erro', async () => {
+    const w = await setup('/scheduling/7', undefined, { provider: null })
+    expect(w.text()).toContain('Não foi possível carregar os dados deste profissional.')
+    await button(w, 'Rex').trigger('click')
+    await next(w).trigger('click')
+    await flushPromises()
+    await pickDay(w)
+    await pickTime(w)
+    expect(next(w).attributes('disabled')).toBeDefined()
+    await router.push({ query: { etapa: '3' } })
+    await flushPromises()
+    expect(w.text()).not.toContain('Revise e solicite')
+    expect(w.text()).toContain('Quando?')
+  })
+
+  it('sem tipo de serviço, enviar avisa em vez de ficar mudo', async () => {
+    const w = await setup('/scheduling/7', undefined, { typeList: [] })
+    await toStep3(w)
+    notify.error.mockClear()
+    await w.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
+    expect(createService).not.toHaveBeenCalled()
+    expect(notify.error).toHaveBeenCalledWith(
+      'Não foi possível identificar o tipo de serviço deste passeador.',
+    )
   })
 })

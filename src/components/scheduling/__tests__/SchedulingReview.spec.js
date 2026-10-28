@@ -32,6 +32,6 @@ describe('SchedulingReview', () => {
   })
 
   it('avisa que o pagamento é fora do app', () => {
-    expect(mountReview().text()).toContain('pagamento combinado fora do app')
+    expect(mountReview().text()).toContain('o pagamento é combinado fora do app')
   })
 })

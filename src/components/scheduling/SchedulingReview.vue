@@ -67,7 +67,7 @@ const price = computed(() => estimatePrice(props.provider, props.durationMinutes
 
     <p class="flex items-start gap-2 text-caption text-fg-muted">
       <UiIcon :icon="Info" :size="18" class="mt-0.5 shrink-0" />
-      O valor é uma estimativa e o pagamento combinado fora do app diretamente com o passeador.
+      O valor é uma estimativa e o pagamento é combinado fora do app diretamente com o passeador.
     </p>
   </div>
 </template>
