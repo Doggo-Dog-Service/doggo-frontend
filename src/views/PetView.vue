@@ -1,28 +1,37 @@
 <script setup>
-import { PawPrint, Plus } from 'lucide-vue-next'
+import { AlertTriangle, PawPrint, Plus } from 'lucide-vue-next'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
+import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import PetCard from '@/components/cards/PetCard.vue'
 import PetModal from '@/components/pet/PetModal.vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { usePetStore } from '@/stores/pet'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const petStore = usePetStore()
 
+const loaded = ref(false)
 const modalOpen = ref(false)
 const modalMode = ref('view')
 const modalPetId = ref(0)
 
+const showSkeleton = computed(
+  () => !loaded.value || (petStore.loading && petStore.pets.length === 0),
+)
+const showError = computed(() => !showSkeleton.value && !!petStore.error)
+
 const openModal = () => (modalOpen.value = true)
+
+function loadPets() {
+  return petStore.getPets({ owner: authStore.user.client_profile.id })
+}
+
 const closeModal = () => {
-  const ownerId = authStore.user.client_profile.id
-  petStore.getPets({
-    owner: ownerId,
-  })
+  loadPets()
   modalOpen.value = false
 }
 
@@ -45,10 +54,8 @@ function openAddPet() {
 onMounted(async () => {
   await authStore.fetchUser()
   if (authStore.isClient) {
-    const ownerId = authStore.user.client_profile.id
-    await petStore.getPets({
-      owner: ownerId,
-    })
+    await loadPets()
+    loaded.value = true
   } else {
     router.push('/')
   }
@@ -68,15 +75,38 @@ onMounted(async () => {
       Meus Pets <PawPrint :size="28" :stroke-width="2" class="text-primary" aria-hidden="true" />
     </h1>
     <ul
-      v-if="petStore.pets.length > 0"
-      class="grid w-full grid-cols-2 gap-4 pb-40 md:pb-20 lg:grid-cols-3 xl:grid-cols-5"
+      v-if="showSkeleton"
+      aria-busy="true"
+      aria-label="Carregando pets"
+      class="grid w-full grid-cols-2 gap-4 pb-40 md:pb-20 lg:grid-cols-3 xl:grid-cols-4"
+    >
+      <li v-for="n in 4" :key="n" class="flex flex-col gap-3">
+        <div class="aspect-square w-full animate-pulse rounded-card bg-surface-muted"></div>
+        <UiSkeleton :lines="2" />
+      </li>
+    </ul>
+    <UiEmptyState
+      v-else-if="showError"
+      :icon="AlertTriangle"
+      title="Não foi possível carregar seus pets"
+      description="Verifique sua conexão e tente novamente."
+    >
+      <template #action>
+        <AppButton text="Tentar novamente" variant="secondary" :block="false" @event="loadPets" />
+      </template>
+    </UiEmptyState>
+    <ul
+      v-else-if="petStore.pets.length > 0"
+      class="grid w-full grid-cols-2 gap-4 pb-40 md:pb-20 lg:grid-cols-3 xl:grid-cols-4"
     >
       <li v-for="pet in petStore.pets" :key="pet.id">
         <PetCard
           :name="pet.name"
           :breed="pet.breed"
-          @click="petDetail(pet.id)"
+          :size="pet.size"
+          :weight="pet.weight"
           :pet_picture="pet.pet_picture"
+          @click="petDetail(pet.id)"
         />
       </li>
     </ul>

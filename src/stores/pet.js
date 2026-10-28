@@ -13,6 +13,7 @@ export const usePetStore = defineStore('petStore', () => {
   const getPets = async (params = {}) => {
     try {
       loading.value = true
+      error.value = ''
       const data = await petService.getPets(params)
       pets.value = data.results
     } catch (err) {

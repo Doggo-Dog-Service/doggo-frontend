@@ -7,7 +7,7 @@ import { useReviewStore } from '@/stores/review.js'
 const reviewStore = useReviewStore()
 </script>
 <template>
-  <section class="flex h-120 flex-col gap-4 overflow-y-auto">
+  <section class="flex flex-col gap-3">
     <h2 class="text-title text-fg">Avaliações ({{ reviewStore.reviews.length }})</h2>
     <ReviewCard v-for="review in reviewStore.reviews" :key="review.id" :review="review" />
     <UiEmptyState
