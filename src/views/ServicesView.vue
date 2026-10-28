@@ -130,7 +130,12 @@ watch(selectedStatus, load)
       >
         <h2 :id="`group-title-${group.key}`" class="flex items-center gap-2 text-title text-fg">
           {{ group.title }}
-          <span data-testid="count" class="rounded-full bg-surface-muted px-2 text-caption font-semibold text-fg-muted">{{ group.items.length }}</span>
+          <span
+            data-testid="count"
+            class="rounded-full bg-surface-muted px-2 text-caption font-semibold text-fg-muted"
+          >
+            {{ group.items.length }}
+          </span>
         </h2>
         <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           <li v-for="service in group.items" :key="service.id">

@@ -15,6 +15,7 @@ const authStore = useAuthStore()
 const petStore = usePetStore()
 
 const loaded = ref(false)
+const loadFailed = ref(false)
 const modalOpen = ref(false)
 const modalMode = ref('view')
 const modalPetId = ref(0)
@@ -22,7 +23,7 @@ const modalPetId = ref(0)
 const showSkeleton = computed(
   () => !loaded.value || (petStore.loading && petStore.pets.length === 0),
 )
-const showError = computed(() => !showSkeleton.value && !!petStore.error)
+const showError = computed(() => !showSkeleton.value && (loadFailed.value || !!petStore.error))
 
 const openModal = () => (modalOpen.value = true)
 
@@ -51,15 +52,25 @@ function openAddPet() {
   openModal()
 }
 
-onMounted(async () => {
-  await authStore.fetchUser()
-  if (authStore.isClient) {
-    await loadPets()
+async function init() {
+  loadFailed.value = false
+  try {
+    await authStore.fetchUser()
+    if (authStore.isClient) {
+      await loadPets()
+      loaded.value = true
+    } else {
+      router.push('/')
+    }
+  } catch {
+    loadFailed.value = true
     loaded.value = true
-  } else {
-    router.push('/')
   }
-})
+}
+
+const retry = () => (loadFailed.value ? init() : loadPets())
+
+onMounted(init)
 </script>
 
 <template>
@@ -92,7 +103,7 @@ onMounted(async () => {
       description="Verifique sua conexão e tente novamente."
     >
       <template #action>
-        <AppButton text="Tentar novamente" variant="secondary" :block="false" @event="loadPets" />
+        <AppButton text="Tentar novamente" variant="secondary" :block="false" @event="retry" />
       </template>
     </UiEmptyState>
     <ul

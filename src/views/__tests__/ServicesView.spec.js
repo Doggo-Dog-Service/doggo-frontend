@@ -110,4 +110,25 @@ describe('ServicesView agrupada', () => {
     expect(text).toContain('Confirmado')
     expect(w.find('a').attributes('href')).toBe('/service/1')
   })
+
+  it('carregando mostra skeleton sem lista nem vazio', async () => {
+    const w = mountView([])
+    services.loading = true
+    await flushPromises()
+    expect(w.find('[role="status"][aria-label="Carregando serviços"]').exists()).toBe(true)
+    expect(w.text()).not.toContain('Nenhum serviço encontrado.')
+  })
+
+  it('erro mostra mensagem e tentar novamente recarrega', async () => {
+    const w = mountView([])
+    services.serviceError = 'Falhou'
+    await flushPromises()
+    expect(w.text()).toContain('Não foi possível carregar os passeios')
+    services.getServices.mockClear()
+    await w
+      .findAll('button')
+      .find((b) => b.text() === 'Tentar novamente')
+      .trigger('click')
+    expect(services.getServices).toHaveBeenCalledTimes(1)
+  })
 })

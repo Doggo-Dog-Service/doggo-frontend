@@ -17,11 +17,13 @@ const pet = (id, extra = {}) => ({
   ...extra,
 })
 
-function mountView({ pets = [], loading = false, error = '' } = {}) {
+function mountView({ pets = [], loading = false, error = '', fetchUserFails = false } = {}) {
   setActivePinia(createPinia())
   const auth = useAuthStore()
   auth.user = { client_profile: { id: 3 } }
-  auth.fetchUser = vi.fn().mockResolvedValue()
+  auth.fetchUser = fetchUserFails
+    ? vi.fn().mockRejectedValue(new Error('rede'))
+    : vi.fn().mockResolvedValue()
   const store = usePetStore()
   store.getPets = vi.fn().mockResolvedValue()
   store.pets = pets
@@ -81,5 +83,12 @@ describe('PetView', () => {
     const modal = w.findComponent({ name: 'PetModal' })
     expect(modal.exists()).toBe(true)
     expect(modal.props('mode')).toBe('add')
+  })
+
+  it('fetchUser falha: mostra erro e nao fica no skeleton', async () => {
+    const { w } = mountView({ fetchUserFails: true })
+    await flushPromises()
+    expect(w.find('[aria-busy="true"]').exists()).toBe(false)
+    expect(w.text()).toContain('Não foi possível carregar seus pets')
   })
 })

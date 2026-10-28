@@ -22,12 +22,14 @@ const isOwnProfile = computed(
 )
 const count = computed(() => props.provider.rating_count ?? 0)
 const ratingText = computed(() =>
-  count.value > 0
-    ? Number(props.provider.classification).toLocaleString('pt-BR', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      })
-    : null,
+  count.value === 0
+    ? null
+    : props.provider.classification == null
+      ? '—'
+      : Number(props.provider.classification).toLocaleString('pt-BR', {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        }),
 )
 const countText = computed(() =>
   count.value === 1 ? '1 avaliação' : `${count.value} avaliações`,

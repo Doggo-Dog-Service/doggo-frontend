@@ -25,7 +25,7 @@ const petNames = computed(() => props.pets.map((pet) => pet.name).join(', '))
     :to="link"
     class="flex w-full items-center gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition-colors hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-primary"
   >
-    <UiAvatar :src="props.participantPicture ?? ''" :name="props.participantName" size="lg" />
+    <UiAvatar :src="props.participantPicture" :name="props.participantName" size="lg" />
     <div class="min-w-0 flex-1">
       <p class="truncate text-subtitle text-fg">{{ props.participantName }}</p>
       <p v-if="petNames" class="flex items-center gap-1 truncate text-caption text-fg-muted">

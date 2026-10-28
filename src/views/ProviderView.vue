@@ -37,7 +37,11 @@ watch(
     }
 
     status.value = 'loading'
-    provider.value = (await providerStore.fetchProvider(id)) ?? null
+    try {
+      provider.value = (await providerStore.fetchProvider(id)) ?? null
+    } catch {
+      provider.value = null
+    }
     if (!provider.value) {
       status.value = 'error'
       return

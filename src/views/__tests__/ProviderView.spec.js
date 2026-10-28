@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, getActivePinia, setActivePinia } from 'pinia'
@@ -9,7 +10,7 @@ import { useReviewStore } from '@/stores/review'
 const route = vi.hoisted(() => ({ params: { id: '7' } }))
 vi.mock('vue-router', () => ({ useRoute: () => route }))
 vi.mock('@/composables/useLocation', () => ({
-  useLocation: () => ({ cityName: { value: 'Joinville - SC' }, setLocation: vi.fn() }),
+  useLocation: () => ({ cityName: ref('Joinville - SC'), setLocation: vi.fn() }),
 }))
 
 const RouterLinkStub = {
@@ -44,13 +45,16 @@ async function mountView({
   mode = 'client',
   user = { client_profile: { id: 3 } },
   data = provider,
+  fetchError = null,
 } = {}) {
   setActivePinia(createPinia())
   const auth = useAuthStore()
   auth.user = user
   auth.mode = mode
   const providers = useProviderStore()
-  providers.fetchProvider = vi.fn().mockResolvedValue(data)
+  providers.fetchProvider = fetchError
+    ? vi.fn().mockRejectedValue(fetchError)
+    : vi.fn().mockResolvedValue(data)
   const rev = useReviewStore()
   rev.getReviews = vi.fn().mockResolvedValue()
   rev.reviews = reviews
@@ -74,6 +78,7 @@ describe('ProviderView', () => {
     expect(text).toContain('12 avaliações')
     expect(text).toContain('35,00')
     expect(text).toContain('Dog Walking')
+    expect(text).toContain('Joinville - SC')
     expect(text).toContain('Amo cães.')
   })
 
@@ -131,5 +136,16 @@ describe('ProviderView', () => {
   it('erro ao carregar mostra estado de erro', async () => {
     const w = await mountView({ data: null })
     expect(w.text()).toContain('Não foi possível carregar este perfil')
+  })
+
+  it('fetch rejeitado mostra estado de erro', async () => {
+    const w = await mountView({ fetchError: new Error('rede') })
+    expect(w.text()).toContain('Não foi possível carregar este perfil')
+  })
+
+  it('com avaliacoes e nota nula mostra traco e nao 0,0', async () => {
+    const w = await mountView({ data: { ...provider, rating_count: 3, classification: null } })
+    expect(w.text()).not.toContain('0,0')
+    expect(w.text()).toContain('—')
   })
 })
