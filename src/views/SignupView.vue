@@ -11,11 +11,13 @@ import SignupStepProvider from '@/components/signup/SignupStepProvider.vue'
 import SignupStepDocuments from '@/components/signup/SignupStepDocuments.vue'
 import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useAuthStore } from '@/stores/auth'
+import { useDogMood } from '@/composables/useDogMood'
 
 const route = useRoute()
 const router = useRouter()
 const wizard = useSignupWizard()
 const authStore = useAuthStore()
+const dog = useDogMood()
 const { step, totalSteps, stepKey, isLastStep, submitting } = wizard
 
 const STEPS = {
@@ -62,6 +64,7 @@ function syncRoute() {
 }
 
 async function complete() {
+  await dog.react('happy')
   router.replace(await wizard.complete())
 }
 
@@ -69,6 +72,8 @@ async function onNext() {
   const wasLast = isLastStep.value
   const ok = await wizard.next()
   if (ok && wasLast) return complete()
+  if (ok) dog.flash('happy', 900)
+  else dog.flash('sad')
   syncRoute()
 }
 

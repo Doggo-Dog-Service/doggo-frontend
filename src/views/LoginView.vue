@@ -7,9 +7,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useRoute, useRouter } from 'vue-router'
 import { safeRedirect } from '@/utils/safeRedirect'
 import { homeRouteFor } from '@/router/navigation'
+import { useDogMood } from '@/composables/useDogMood'
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const dog = useDogMood()
 
 const data = reactive({
   email: '',
@@ -18,7 +20,9 @@ const data = reactive({
 
 const handleLogin = async () => {
   const ok = await authStore.login(data)
-  if (ok) router.push(safeRedirect(route.query.redirect) ?? homeRouteFor(authStore.mode))
+  if (!ok) return dog.flash('sad')
+  await dog.react('happy')
+  router.push(safeRedirect(route.query.redirect) ?? homeRouteFor(authStore.mode))
 }
 </script>
 

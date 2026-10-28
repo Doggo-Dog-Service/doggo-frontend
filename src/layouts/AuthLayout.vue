@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useTheme } from '@/composables/useTheme.js'
+import AuthDog from '@/components/auth/AuthDog.vue'
 
 const { preference } = useTheme()
 const isLight = computed(() => preference === 'light')
@@ -23,7 +24,9 @@ const widthClass = computed(() => {
       <RouterLink to="/" class="self-center rounded-control focus-visible:ring-2 focus-visible:ring-primary">
         <img class="h-10 w-auto" :src="isLight ? '/logo.png' : '/logo-dark-mode.png'" alt="Doggo" />
       </RouterLink>
-      <main class="overflow-hidden rounded-card border border-line bg-surface p-6 shadow-card md:p-8">
+      <!-- O cachorro "senta" na borda do cartão: o cartão cobre a base da sombra. -->
+      <AuthDog :compact="route.name === 'signup-view'" class="-mb-7" />
+      <main class="relative z-10 overflow-hidden rounded-card border border-line bg-surface p-6 shadow-card md:p-8">
         <RouterView v-slot="{ Component }">
           <Transition
             mode="out-in"
