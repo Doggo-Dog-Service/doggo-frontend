@@ -1,4 +1,7 @@
 <script setup>
+import { Star } from 'lucide-vue-next'
+import UiAvatar from '@/components/ui/UiAvatar.vue'
+
 const props = defineProps({
   review: {
     type: Object,
@@ -7,38 +10,27 @@ const props = defineProps({
 })
 </script>
 <template>
-  <div class="bg-white border border-doggo-gray px-6 py-6 rounded-2xl">
-    <div class="flex gap-4 items-start">
-      <img
-        v-if="props.review.client_picture"
-        :src="props.review.client_picture"
-        alt="profile-picture"
-        class="w-12 h-12 rounded-full object-cover"
-      />
-      <div
-        v-else
-        class="flex items-center justify-center w-12 h-12 rounded-xl bg-doggo-light-green text-white font-semibold text-lg shrink-0"
-      >
-        {{ props.review.client_name.charAt(0) }}
-      </div>
-      <div class="flex-1 min-w-0">
-        <h3 class="font-semibold">
+  <div class="rounded-card border border-line bg-surface p-5 shadow-card">
+    <div class="flex items-start gap-3">
+      <UiAvatar :src="props.review.client_picture" :name="props.review.client_name" />
+      <div class="min-w-0 flex-1">
+        <h3 class="text-subtitle text-fg">
           {{ props.review.client_name }}
         </h3>
-        <div class="flex mt-1">
-          <span
+        <div class="mt-1 flex" role="img" :aria-label="`Nota ${props.review.rating} de 5`">
+          <Star
             v-for="star in 5"
             :key="star"
-            :class="
-              star <= props.review.rating
-                ? 'mdi mdi-star text-amber-500'
-                : 'mdi mdi-star-outline text-gray-300'
-            "
+            :size="16"
+            :stroke-width="2"
+            :fill="star <= props.review.rating ? 'currentColor' : 'none'"
+            :class="star <= props.review.rating ? 'text-warning' : 'text-fg-subtle'"
+            aria-hidden="true"
           />
         </div>
       </div>
     </div>
-    <p class="mt-4 wrap-break-word whitespace-pre-wrap">
+    <p class="mt-3 text-body text-fg wrap-break-word whitespace-pre-wrap">
       {{ props.review.comment }}
     </p>
   </div>

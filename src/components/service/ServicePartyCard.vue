@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
 
+import UiAvatar from '@/components/ui/UiAvatar.vue'
+import UiBadge from '@/components/ui/UiBadge.vue'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 
 const store = useServiceWebSocketStore()
@@ -27,60 +29,25 @@ const party = computed(() => {
     link: `/provider/${store.providerId}`,
   }
 })
-
-const initial = computed(() => party.value.name?.charAt(0)?.toUpperCase() ?? '')
 </script>
 
 <template>
-  <RouterLink
-    v-if="party.link"
-    :to="party.link"
-    class="relative w-full flex items-start justify-between bg-white border border-doggo-gray rounded-xl p-3 transition-all duration-200 hover:scale-99"
+  <component
+    :is="party.link ? 'RouterLink' : 'div'"
+    :to="party.link ?? undefined"
+    :class="[
+      'flex w-full items-center justify-between gap-3 rounded-card border border-line bg-surface p-3 shadow-card',
+      party.link &&
+        'transition-colors hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-primary',
+    ]"
   >
-    <div class="flex items-center gap-4">
-      <img
-        v-if="party.picture"
-        class="h-10 w-10 rounded-lg object-cover md:h-12 md:w-12"
-        :src="party.picture"
-        :alt="`${party.name}-photo`"
-      />
-      <div
-        v-else
-        class="flex flex-col items-center justify-center h-10 w-10 rounded-lg bg-doggo-light-green text-doggo-green md:h-12 md:w-12"
-      >
-        <p class="text-base font-semibold">{{ initial }}</p>
-      </div>
-      <div class="flex flex-col min-w-0">
-        <p class="truncate max-w-40">{{ party.name }}</p>
-        <p class="text-doggo-black/50 text-sm truncate max-w-40">{{ store.serviceType }}</p>
+    <div class="flex min-w-0 items-center gap-3">
+      <UiAvatar :src="party.picture" :name="party.name ?? ''" size="md" />
+      <div class="flex min-w-0 flex-col">
+        <p class="truncate text-body font-semibold text-fg">{{ party.name }}</p>
+        <p class="truncate text-caption text-fg-muted">{{ store.serviceType }}</p>
       </div>
     </div>
-    <span class="bg-doggo-light-green text-doggo-green text-sm border rounded-full px-2 truncate max-w-28">
-      {{ store.serviceType }}
-    </span>
-  </RouterLink>
-
-  <div v-else class="relative w-full flex items-start justify-between bg-white border border-doggo-gray rounded-xl p-3">
-    <div class="flex items-center gap-4">
-      <img
-        v-if="party.picture"
-        class="h-10 w-10 rounded-lg object-cover md:h-12 md:w-12"
-        :src="party.picture"
-        :alt="`${party.name}-photo`"
-      />
-      <div
-        v-else
-        class="flex flex-col items-center justify-center h-10 w-10 rounded-lg bg-doggo-light-green text-doggo-green md:h-12 md:w-12"
-      >
-        <p class="text-base font-semibold">{{ initial }}</p>
-      </div>
-      <div class="flex flex-col min-w-0">
-        <p class="truncate max-w-40">{{ party.name }}</p>
-        <p class="text-doggo-black/50 text-sm truncate max-w-40">{{ store.serviceType }}</p>
-      </div>
-    </div>
-    <span class="bg-doggo-light-green text-doggo-green text-sm border rounded-full px-2 truncate max-w-28">
-      {{ store.serviceType }}
-    </span>
-  </div>
+    <UiBadge tone="brand" class="max-w-28 shrink-0 truncate">{{ store.serviceType }}</UiBadge>
+  </component>
 </template>

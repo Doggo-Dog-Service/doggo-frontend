@@ -52,3 +52,20 @@ export const groupSlotsByPeriod = (slots = []) => {
     }),
   })).filter((period) => period.slots.length > 0)
 }
+
+/** Duração prevista entre dois ISO: "45 min", "1h", "1h30". Vazio se inválida. */
+export const formatPlannedDuration = (startIso, endIso) => {
+  if (!startIso || !endIso) return ''
+
+  const diff = new Date(endIso) - new Date(startIso)
+
+  if (!Number.isFinite(diff) || diff <= 0) return ''
+
+  const total = Math.round(diff / 60000)
+  const hours = Math.floor(total / 60)
+  const minutes = total % 60
+
+  if (hours === 0) return `${minutes} min`
+
+  return minutes === 0 ? `${hours}h` : `${hours}h${String(minutes).padStart(2, '0')}`
+}

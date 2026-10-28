@@ -1,7 +1,7 @@
 import { computed, shallowRef, toValue, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toast-notification'
+import notify from '@/utils/notify'
 
 import { useAuthStore } from '@/stores/auth'
 import { useAvailabilityStore } from '@/stores/availability'
@@ -10,12 +10,6 @@ import { useProviderStore } from '@/stores/provider'
 import { useServiceTypeStore } from '@/stores/serviceType'
 import { createService } from '@/services/service'
 import { fromDateAndTime, toLocalIsoString } from '@/utils/date'
-
-const TOAST_OPTIONS = {
-  type: 'error',
-  duration: 4000,
-  position: 'top-right',
-}
 
 /**
  * Orquestra a tela de agendamento: carrega os dados necessários,
@@ -28,8 +22,6 @@ const TOAST_OPTIONS = {
  */
 export function useScheduling(options = {}) {
   const { providerId: providerIdInput } = options
-
-  const $toast = useToast()
   const router = useRouter()
 
   const authStore = useAuthStore()
@@ -65,6 +57,12 @@ export function useScheduling(options = {}) {
     if (!name) return null
 
     return typeServices.value.find((type) => type.name === name)?.id ?? null
+  })
+
+  const durationMinutes = computed(() => {
+    const name = provider.value?.service_type_name
+
+    return typeServices.value.find((type) => type.name === name)?.duration_minutes ?? 60
   })
 
   const isReadyToSubmit = computed(
@@ -107,7 +105,7 @@ export function useScheduling(options = {}) {
     }
 
     if (!serviceTypeId.value) {
-      $toast.error('Não foi possível identificar o tipo de serviço do profissional.', TOAST_OPTIONS)
+      notify.error('Não foi possível identificar o tipo de serviço do profissional.')
     }
   }
 
@@ -122,12 +120,23 @@ export function useScheduling(options = {}) {
     await availabilityStore.getSlots(providerId.value, selectedDate.value)
   }
 
+  async function reloadPets() {
+    if (!clientId.value) return
+
+    petStore.error = ''
+    await petStore.getPets({ owner_id: clientId.value })
+  }
+
+  /**
+   * Envia a solicitação. Retorna 'ok', 'conflict' (horário ocupado),
+   * 'error' ou null quando não há o que enviar (ou já está enviando).
+   */
   async function submit() {
-    if (!isReadyToSubmit.value) return
+    if (!isReadyToSubmit.value) return null
 
     const startDatetime = fromDateAndTime(selectedDate.value, selectedTime.value)
 
-    if (!startDatetime) return
+    if (!startDatetime) return null
 
     submitting.value = true
     submitError.value = ''
@@ -140,21 +149,19 @@ export function useScheduling(options = {}) {
         start_datetime: toLocalIsoString(startDatetime),
       })
 
-      $toast.success('Solicitação enviada! Aguarde a resposta do profissional.', {
-        ...TOAST_OPTIONS,
-        type: 'success',
-        duration: 3000,
-      })
-
-      await router.push({ name: 'services-view' })
+      return 'ok'
     } catch (error) {
+      if (error?.status === 409) {
+        submitError.value = 'Esse horário acabou de ser ocupado. Escolha outro.'
+        notify.error(submitError.value)
+        await refreshSlots()
+        return 'conflict'
+      }
+
       submitError.value =
         error?.message || 'Não foi possível enviar a solicitação. Tente novamente.'
-      $toast.error(submitError.value, TOAST_OPTIONS)
-
-      if (error?.status === 409) {
-        await refreshSlots()
-      }
+      notify.error(submitError.value)
+      return 'error'
     } finally {
       submitting.value = false
     }
@@ -187,8 +194,12 @@ export function useScheduling(options = {}) {
     selectedPets,
     submitError,
     submitting,
+    durationMinutes,
+    serviceTypeId,
     isReadyToSubmit,
     reload: load,
+    reloadPets,
+    refreshSlots,
     submit,
   }
 }

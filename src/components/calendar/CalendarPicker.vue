@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps({
   maxMonthsAhead: {
@@ -105,40 +106,40 @@ function selectDay(day) {
       <button
         type="button"
         :class="[
-          'text-lg border border-doggo-gray rounded-xl px-1.5 py-0.5 transition-all duration-200',
+          'flex size-11 items-center justify-center rounded-full border border-line transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary',
           canGoToPrevMonth
-            ? 'text-doggo-green cursor-pointer hover:bg-doggo-green/5 active:scale-95'
-            : 'text-gray-300 cursor-not-allowed',
+            ? 'cursor-pointer text-primary hover:bg-surface-muted active:scale-95'
+            : 'cursor-not-allowed text-fg-subtle',
         ]"
         :disabled="!canGoToPrevMonth"
         aria-label="Mês anterior"
         @click="goToPrevMonth"
       >
-        <span class="mdi mdi-chevron-left"></span>
+        <ChevronLeft :size="20" :stroke-width="2" aria-hidden="true" />
       </button>
-      <h3 class="text-base font-bold text-doggo-green capitalize">
+      <h3 class="text-subtitle text-fg capitalize">
         {{ monthName }} {{ displayYear }}
       </h3>
       <button
         type="button"
         :class="[
-          'text-lg border border-doggo-gray rounded-xl px-1.5 py-0.5 transition-all duration-200',
+          'flex size-11 items-center justify-center rounded-full border border-line transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary',
           canGoToNextMonth
-            ? 'text-doggo-green cursor-pointer hover:bg-doggo-green/5 active:scale-95'
-            : 'text-gray-300 cursor-not-allowed',
+            ? 'cursor-pointer text-primary hover:bg-surface-muted active:scale-95'
+            : 'cursor-not-allowed text-fg-subtle',
         ]"
         :disabled="!canGoToNextMonth"
         aria-label="Próximo mês"
         @click="goToNextMonth"
       >
-        <span class="mdi mdi-chevron-right"></span>
+        <ChevronRight :size="20" :stroke-width="2" aria-hidden="true" />
       </button>
     </div>
     <div class="grid grid-cols-7 gap-1">
       <div
         v-for="header in dayHeaders"
         :key="header"
-        class="text-center text-xs text-gray-400 font-semibold py-1"
+        class="py-1 text-center text-caption font-semibold text-fg-muted"
       >
         {{ header }}
       </div>
@@ -149,23 +150,19 @@ function selectDay(day) {
           v-if="day"
           type="button"
           :class="[
-            'h-9 w-9 rounded-full text-sm transition-all duration-200 cursor-pointer',
-            isSelected(day) && 'bg-doggo-green text-white font-bold scale-105',
-            !isSelected(day) &&
-              isToday(day) &&
-              'bg-doggo-light-green/50 text-doggo-green font-semibold',
-            !isSelected(day) &&
-              !isToday(day) &&
-              !isPast(day) &&
-              'text-doggo-black hover:bg-doggo-green/10',
-            isPast(day) && 'text-gray-300 cursor-not-allowed',
+            'size-10 cursor-pointer rounded-full text-body transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary',
+            isSelected(day) && 'bg-primary font-bold text-primary-fg',
+            !isSelected(day) && isToday(day) && 'bg-primary-soft font-semibold text-primary',
+            !isSelected(day) && !isToday(day) && !isPast(day) && 'text-fg hover:bg-surface-muted',
+            isPast(day) && 'cursor-not-allowed text-fg-subtle',
           ]"
           :disabled="isPast(day)"
+          :aria-pressed="isSelected(day)"
           @click="selectDay(day)"
         >
           {{ day }}
         </button>
-        <div v-else class="h-9 w-9"></div>
+        <div v-else class="size-10"></div>
       </div>
     </div>
   </div>

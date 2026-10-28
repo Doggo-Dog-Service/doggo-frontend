@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { CameraIcon } from '@heroicons/vue/24/outline'
+import { Camera } from 'lucide-vue-next'
 
 const model = defineModel()
 
@@ -10,9 +10,9 @@ const props = defineProps({
     required: false,
   },
   edit: {
-    type:Boolean,
-    default: false
-  }
+    type: Boolean,
+    default: false,
+  },
 })
 
 const preview = ref(null)
@@ -32,29 +32,27 @@ function handleFileChange(event) {
 
 <template>
   <div class="flex flex-col items-center gap-2">
-    <input class="hidden" id="image" type="file" accept="image/*" @change="handleFileChange" />
+    <input class="sr-only" id="image" type="file" accept="image/*" @change="handleFileChange" />
     <label
       for="image"
-      class="group relative flex h-32 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-4xl border-2 border-dashed transition-all duration-200 border-doggo-green bg-doggo-green/10  hover:border-green-900 hover:bg-doggo-green/20"
+      class="group relative flex size-32 cursor-pointer items-center justify-center overflow-hidden rounded-card border-2 border-dashed border-primary bg-primary-soft transition-colors duration-200 hover:bg-surface-muted has-focus-visible:ring-2 has-focus-visible:ring-primary has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-canvas"
     >
-      <img v-if="preview" :src="preview" alt="Foto de perfil" class="h-full w-full object-cover" />
+      <img v-if="preview" :src="preview" alt="Foto selecionada" class="size-full object-cover" />
 
-      <template v-else>
-        <div class="flex flex-col items-center gap-2 text-doggo-green">
-          <CameraIcon class="h-8 w-8" />
-          <span class="text-xs font-medium">{{ props.edit ? 'Alterar foto' : 'Adicionar foto'}}</span>
-        </div>
-      </template>
+      <div v-else class="flex flex-col items-center gap-2 text-primary">
+        <Camera :size="32" :stroke-width="2" aria-hidden="true" />
+        <span class="text-caption font-semibold">{{ props.edit ? 'Alterar foto' : 'Adicionar foto' }}</span>
+      </div>
 
       <div
-        class="absolute inset-0 hidden items-center justify-center bg-black/40 text-white group-hover:flex"
         v-if="preview"
+        class="absolute inset-0 hidden items-center justify-center bg-neutral-950/40 text-white group-hover:flex"
       >
-        <CameraIcon class="h-8 w-8" />
+        <Camera :size="32" :stroke-width="2" aria-hidden="true" />
       </div>
     </label>
 
-    <p v-if="label" class="text-sm font-semibold text-zinc-600">
+    <p v-if="label" class="text-caption font-semibold text-fg-muted">
       {{ props.label }}
     </p>
   </div>

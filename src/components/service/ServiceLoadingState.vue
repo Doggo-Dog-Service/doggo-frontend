@@ -1,6 +1,10 @@
+<script setup>
+import { Loader2 } from 'lucide-vue-next'
+</script>
+
 <template>
-  <div class="w-full h-full flex flex-col items-center justify-center gap-4 p-8">
-    <div class="w-12 h-12 rounded-full border-l-2 border-doggo-green animate-spin"></div>
-    <p class="text-doggo-black/50 font-semibold">Carregando serviço...</p>
+  <div class="flex h-full w-full flex-col items-center justify-center gap-4 p-8" role="status">
+    <Loader2 :size="40" :stroke-width="2" class="animate-spin text-primary" aria-hidden="true" />
+    <p class="text-body text-fg-muted">Carregando serviço...</p>
   </div>
 </template>

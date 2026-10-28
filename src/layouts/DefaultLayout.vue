@@ -1,36 +1,68 @@
 <script setup>
-import AppHeader from '@/components/layouts/AppHeader.vue'
-import AltHeader from '@/components/layouts/AltHeader.vue'
-import MobileNavBar from '@/components/layouts/MobileNavBar.vue'
-import SideBar from '@/components/layouts/SideBar.vue'
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import AppSidebar from '@/components/shell/AppSidebar.vue'
+import AppTopBar from '@/components/shell/AppTopBar.vue'
+import AppBottomNav from '@/components/shell/AppBottomNav.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useServiceStore } from '@/stores/services'
+
 const route = useRoute()
+const authStore = useAuthStore()
+const serviceStore = useServiceStore()
+
+const showNav = computed(() => !route.meta.hideNav)
+// Telas com mapa (meta.fullBleed) ocupam a largura toda; cada uma cuida do próprio espaçamento.
+const fullBleed = computed(() => !!route.meta.fullBleed)
+
+// Contador de pedidos pendentes: carrega ao entrar no modo passeador e ao abrir Pedidos.
+// Depois de confirmar/recusar/cancelar, quem o atualiza é a store serviceWebSocket (tela de serviço).
+watch(
+  () => authStore.mode,
+  (mode) => {
+    if (mode === 'provider') serviceStore.fetchPendingCount()
+  },
+  { immediate: true },
+)
+watch(
+  () => route.name,
+  (name) => {
+    if (name === 'provider-requests-view' && authStore.mode === 'provider') serviceStore.fetchPendingCount()
+  },
+)
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row">
-    <SideBar class="hidden md:block" />
-    <div class="w-full md:ml-72">
-      <AppHeader v-if="route.name === 'home-view'" class="md:hidden"/>
-      <AltHeader v-else/>
-      <main>
+  <div class="min-h-dvh bg-canvas text-fg">
+    <AppSidebar />
+    <div class="md:pl-68">
+      <AppTopBar />
+      <main
+        :class="
+          fullBleed
+            ? 'w-full'
+            : [
+                'mx-auto w-full max-w-5xl px-4 py-5 md:px-8 md:py-8',
+                showNav && 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-8',
+              ]
+        "
+      >
         <RouterView v-slot="{ Component }">
           <Transition
             mode="out-in"
-            enter-active-class="transition duration-300 ease-out"
-            leave-active-class="transition duration-200 ease-in"
+            enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
+            leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
             enter-from-class="opacity-0"
             enter-to-class="opacity-100"
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
           >
-            <component :is="Component" :key="$route.fullPath" />
+            <!-- path (não fullPath): mudar só a query, como ?etapa= do agendamento, não pode recriar a tela e perder a seleção. -->
+            <component :is="Component" :key="$route.path" />
           </Transition>
         </RouterView>
       </main>
     </div>
-    <MobileNavBar
-     v-if="route.name !== 'provider-view'"
-     class="block md:hidden" />
+    <AppBottomNav v-if="showNav" />
   </div>
 </template>

@@ -19,3 +19,11 @@ export const updateProvider = (id, data) => {
 export const deleteProvider = (id)  => {
     return api.delete(`/providers/${id}/`);
 }
+
+export const getMyDocuments = () => {
+    return api.get('/providers/me/documents/');
+}
+
+export const saveMyDocument = (data) => {
+    return api.post('/providers/me/documents/', data);
+}

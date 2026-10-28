@@ -1,4 +1,5 @@
 import * as serviceApi from '../api/services'
+import { parseDjangoErrors } from '../utils/errors'
 
 export const getServices = async (params) => {
   try {
@@ -39,18 +40,6 @@ export const createService = async (payload) => {
 export const updateService = async (id, payload) => {
   try {
     const response = await serviceApi.updateService(id, payload)
-    return response.data
-  } catch (error) {
-    throw {
-      message: error.response?.data?.detail,
-      status: error.response?.status,
-    }
-  }
-}
-
-export const deleteService = async (id) => {
-  try {
-    const response = await serviceApi.deleteService(id)
     return response.data
   } catch (error) {
     throw {
@@ -125,9 +114,9 @@ export const cancelService = async (id) => {
   }
 }
 
-export const rateService = async (id) => {
+export const rateService = async (id, payload) => {
   try {
-    const response = await serviceApi.rateService(id)
+    const response = await serviceApi.rateService(id, payload)
 
     return response.data
   } catch (error) {
@@ -146,6 +135,45 @@ export const getServiceRoute = async (id) => {
   } catch (error) {
     throw {
       message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const getServiceEvents = async (id) => {
+  try {
+    const response = await serviceApi.getServiceEvents(id)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: error.response?.data?.detail,
+      status: error.response?.status,
+    }
+  }
+}
+
+export const postServiceEvent = async (id, payload) => {
+  try {
+    const response = await serviceApi.postServiceEvent(id, payload)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: parseDjangoErrors(error),
+      status: error.response?.status,
+    }
+  }
+}
+
+export const patchServiceNote = async (id, payload) => {
+  try {
+    const response = await serviceApi.patchServiceNote(id, payload)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: parseDjangoErrors(error),
       status: error.response?.status,
     }
   }
