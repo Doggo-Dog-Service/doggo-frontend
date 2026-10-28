@@ -31,7 +31,11 @@ let router, pets, availability, getPetsCalls
 async function setup(
   url = '/scheduling/7',
   petList = [{ id: 1, name: 'Rex', breed: 'SRD' }],
-  { provider = undefined, typeList = [{ id: 5, name: 'Passeio', duration_minutes: 60 }] } = {},
+  {
+    provider = undefined,
+    typeList = [{ id: 5, name: 'Passeio', duration_minutes: 60 }],
+    attach = false,
+  } = {},
 ) {
   setActivePinia(createPinia())
   const auth = useAuthStore()
@@ -74,6 +78,7 @@ async function setup(
   router.push(url)
   await router.isReady()
   const wrapper = mount(SchedulingView, {
+    attachTo: attach ? document.body : undefined,
     global: {
       plugins: [router],
       stubs: { PetModal: PetModalStub, RouterLink: RouterLinkStub },
@@ -216,5 +221,32 @@ describe('SchedulingView', () => {
     expect(notify.error).toHaveBeenCalledWith(
       'Não foi possível identificar o tipo de serviço deste passeador.',
     )
+  })
+
+  it('horário inválido (sem faltar tipo de serviço) mostra mensagem genérica', async () => {
+    const w = await setup()
+    await button(w, 'Rex').trigger('click')
+    await next(w).trigger('click')
+    await flushPromises()
+    await pickDay(w)
+    w.findComponent(SchedulingSlots).vm.$emit('update:modelValue', 'xx:yy')
+    await flushPromises()
+    await next(w).trigger('click')
+    await flushPromises()
+    notify.error.mockClear()
+    await w.find('[data-test="submit"]').trigger('click')
+    await flushPromises()
+    expect(createService).not.toHaveBeenCalled()
+    expect(notify.error).toHaveBeenCalledWith('Não foi possível solicitar o passeio. Tente novamente.')
+  })
+
+  it('mudar de passo move o foco para o título', async () => {
+    const w = await setup('/scheduling/7', undefined, { attach: true })
+    await button(w, 'Rex').trigger('click')
+    await next(w).trigger('click')
+    await flushPromises()
+    expect(w.find('h1').text()).toBe('Quando?')
+    expect(document.activeElement).toBe(w.find('h1').element)
+    w.unmount()
   })
 })

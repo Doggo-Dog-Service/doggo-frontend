@@ -29,6 +29,7 @@ const initialState = () => ({
   photoDone: false,
   clientCreated: false,
   petCreated: false,
+  petUpload: { file: null, key: null }, // foto do pet já enviada (reaproveitada se createPet falhar)
   done: {}, // etapas concluídas: { 1: true, ... }
 })
 
@@ -103,8 +104,11 @@ export function useSignupWizard() {
   }
 
   // Logout/troca de conta na mesma sessão deixa registered/loggedIn velhos no módulo.
+  // Sessão de outro usuário (id diferente do cadastro em andamento) também invalida o estado.
   function resetIfSessionLost() {
-    if (!authStore.user && (state.registered || state.loggedIn)) reset()
+    const lost = !authStore.user && (state.registered || state.loggedIn)
+    const otherUser = !!state.userId && !!authStore.user && state.userId !== authStore.user.id
+    if (lost || otherUser) reset()
   }
 
   function advance() {
@@ -132,6 +136,9 @@ export function useSignupWizard() {
       return
     }
     for (const field of known) state.errors[field] = fields[field]
+    // Campos que o formulário não mostra ainda precisam chegar ao usuário.
+    const unknown = Object.keys(fields).filter((field) => !REGISTER_FIELDS.includes(field))
+    if (unknown.length) notify.error(unknown.map((field) => fields[field]).join(' '))
     if (known.some((field) => ACCOUNT_FIELDS.includes(field))) state.step = 1
   }
 
@@ -200,15 +207,24 @@ export function useSignupWizard() {
     const { name, breed, size, weight, photo } = state.pet
     if (!name.trim()) state.errors.name = 'Informe o nome do seu pet.'
     if (!size) state.errors.size = 'Escolha o porte.'
+    const hasWeight = String(weight ?? '').trim() !== ''
+    const weightValue = Number(weight)
+    if (hasWeight && !(Number.isFinite(weightValue) && weightValue > 0 && Number(weightValue.toFixed(3)) < 100)) {
+      state.errors.weight = 'Informe um peso entre 0 e 100 kg.'
+    }
     if (Object.keys(state.errors).length) return false
 
     if (!state.petCreated) {
       const payload = { name: name.trim(), breed: breed.trim(), size }
-      if (String(weight).trim() !== '') payload.weight = Number(weight)
+      if (hasWeight) payload.weight = Number(weightValue.toFixed(3))
       if (photo) {
-        const image = await postImage({ file: photo, description: name.trim() })
-        if (!image?.attachment_key) return false
-        payload.pet_picture = image.attachment_key
+        if (state.petUpload.file !== photo) {
+          const image = await postImage({ file: photo, description: name.trim() })
+          if (!image?.attachment_key) return false
+          state.petUpload.file = photo
+          state.petUpload.key = image.attachment_key
+        }
+        payload.pet_picture = state.petUpload.key
       }
       const created = await petStore.createPet(payload)
       if (!created) return false
@@ -239,6 +255,8 @@ export function useSignupWizard() {
     if (!filled(price_per_hour) && !filled(price_per_day)) {
       state.errors.price = 'Informe o preço por hora ou por dia.'
     }
+    const invalidPrice = [price_per_hour, price_per_day].some((v) => filled(v) && !(Number(v) > 0))
+    if (invalidPrice) state.errors.price = 'O preço precisa ser maior que zero.'
     if (Object.keys(state.errors).length) return false
 
     const payload = {
@@ -271,6 +289,12 @@ export function useSignupWizard() {
     state.done[1] = state.done[2] = state.done[3] = true
     state.step = 5
     return true
+  }
+
+  // "Concluir depois": tutor que também seria passeador adia o perfil e segue para a home.
+  async function skipProvider() {
+    clearSignupPending()
+    return complete()
   }
 
   // Só aqui o perfil é carregado: antes disso mode fica null e o guard mantém o usuário no cadastro.
@@ -315,6 +339,7 @@ export function useSignupWizard() {
     next,
     skip,
     complete,
+    skipProvider,
     resumePending,
     back,
     reset,

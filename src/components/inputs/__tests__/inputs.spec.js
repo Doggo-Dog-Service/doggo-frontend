@@ -34,3 +34,17 @@ describe.each([
     expect(w.props('modelValue')).toBe('abc')
   })
 })
+
+describe('AppInput number', () => {
+  it('repassa min, max e step ao input', () => {
+    const w = mount(AppInput, { props: { type: 'number', min: '0.1', max: '99.999', step: '0.001' } })
+    const el = w.find('input')
+    expect(el.attributes('min')).toBe('0.1')
+    expect(el.attributes('max')).toBe('99.999')
+    expect(el.attributes('step')).toBe('0.001')
+  })
+  it('mantem step 0.01 por padrao em number', () => {
+    const w = mount(AppInput, { props: { type: 'number' } })
+    expect(w.find('input').attributes('step')).toBe('0.01')
+  })
+})

@@ -21,6 +21,9 @@ const props = defineProps({
   },
   hint: String,
   error: String,
+  min: [String, Number],
+  max: [String, Number],
+  step: [String, Number],
 })
 
 const uid = useId()
@@ -52,7 +55,9 @@ const describedBy = computed(() => (props.error ? errorId : props.hint ? hintId 
         :placeholder="props.placeholder"
         :autocomplete="props.autocomplete"
         :required="props.required"
-        :step="props.type === 'number' ? '0.01' : ''"
+        :min="props.min"
+        :max="props.max"
+        :step="props.step ?? (props.type === 'number' ? '0.01' : '')"
         :aria-invalid="props.error ? 'true' : undefined"
         :aria-describedby="describedBy"
         v-model="model"

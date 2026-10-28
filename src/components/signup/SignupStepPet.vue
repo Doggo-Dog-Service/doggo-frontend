@@ -15,7 +15,16 @@ const { pet, errors } = useSignupWizard()
     <AppInput v-model="pet.name" label="Nome" placeholder="Nome do seu pet" :error="errors.name" required />
     <div class="grid grid-cols-2 gap-4">
       <AppInput v-model="pet.breed" label="Raça" placeholder="Raça do seu pet" />
-      <AppInput v-model="pet.weight" label="Peso (kg)" placeholder="0" type="number" />
+      <AppInput
+        v-model="pet.weight"
+        label="Peso (kg)"
+        placeholder="0"
+        type="number"
+        min="0.1"
+        max="99.999"
+        step="0.001"
+        :error="errors.weight"
+      />
     </div>
     <fieldset class="flex flex-col gap-2">
       <legend class="mb-2 text-caption font-semibold text-fg">

@@ -112,6 +112,20 @@ describe('HomeView', () => {
     expect(w.findAll('[data-testid="nearby-provider"]').length).toBe(8)
   })
 
+  it('nao lista o proprio perfil de passeador entre os proximos', async () => {
+    auth.user = { full_name: 'Maria', client_profile: { id: 3 }, provider_profile: { id: 2 } }
+    providers.fetchProviders = vi.fn(async () => {
+      providers.providers = [
+        { id: 1, full_name: 'Outro', price_per_hour: '30' },
+        { id: 2, full_name: 'Eu mesma', price_per_hour: '30' },
+      ]
+    })
+    const w = mountWithPinia()
+    await flushPromises()
+    expect(w.findAll('[data-testid="nearby-provider"]').length).toBe(1)
+    expect(w.text()).not.toContain('Eu mesma')
+  })
+
   it('geolocalizacao que nunca responde: busca sem lat/lon apos timeout', async () => {
     vi.useFakeTimers()
     geo.impl = () => new Promise(() => {})

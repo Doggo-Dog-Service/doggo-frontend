@@ -54,8 +54,8 @@ onMounted(() => {
     <section class="flex flex-col gap-2" aria-labelledby="provider-prices">
       <h2 id="provider-prices" class="text-subtitle text-fg">Preços</h2>
       <div class="grid grid-cols-2 gap-4">
-        <AppInput v-model="provider.price_per_hour" :icon="Clock" label="Por hora" placeholder="R$ 0,00" type="number" />
-        <AppInput v-model="provider.price_per_day" :icon="Calendar" label="Por dia" placeholder="R$ 0,00" type="number" />
+        <AppInput v-model="provider.price_per_hour" :icon="Clock" label="Por hora" placeholder="R$ 0,00" type="number" min="0" step="0.01" />
+        <AppInput v-model="provider.price_per_day" :icon="Calendar" label="Por dia" placeholder="R$ 0,00" type="number" min="0" step="0.01" />
       </div>
       <p v-if="errors.price" role="alert" class="text-caption text-danger">{{ errors.price }}</p>
     </section>

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, shallowRef, watch } from 'vue'
+import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import AppButton from '@/components/buttons/AppButton.vue'
@@ -37,6 +37,7 @@ const {
   selectedPets,
   submitting,
   durationMinutes,
+  serviceTypeId,
   reload,
   reloadPets,
   submit,
@@ -77,6 +78,13 @@ watch(
   { immediate: true },
 )
 
+// Leitores de tela e teclado seguem para o conteúdo do novo passo.
+const heading = useTemplateRef('heading')
+watch(step, async () => {
+  await nextTick()
+  heading.value?.focus()
+})
+
 function goTo(target) {
   router.push({ query: { ...route.query, etapa: String(target) } })
 }
@@ -101,7 +109,11 @@ async function onSubmit() {
   const result = await submit()
 
   if (result === null) {
-    notify.error('Não foi possível identificar o tipo de serviço deste passeador.')
+    notify.error(
+      serviceTypeId.value
+        ? 'Não foi possível solicitar o passeio. Tente novamente.'
+        : 'Não foi possível identificar o tipo de serviço deste passeador.',
+    )
   } else if (result === 'ok') {
     sent.value = true
   } else if (result === 'conflict') {
@@ -130,7 +142,7 @@ async function closePetModal() {
         <UiSteps :current="step" :total="TOTAL_STEPS" aria-label="Progresso do agendamento" />
       </div>
 
-      <h1 class="text-title text-fg">{{ TITLES[step] }}</h1>
+      <h1 ref="heading" tabindex="-1" class="text-title text-fg focus:outline-none">{{ TITLES[step] }}</h1>
 
       <SchedulingPetCardSelector
         v-if="step === 1"

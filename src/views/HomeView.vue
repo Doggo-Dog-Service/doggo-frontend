@@ -13,6 +13,7 @@ import { useProviderStore } from '@/stores/provider'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { buildServiceParams } from '@/utils/serviceFilters'
 import { pickHomeHighlight } from '@/utils/homeHighlight'
+import { withTimeout } from '@/utils/withTimeout'
 
 const MAX_PROVIDERS = 8
 const GEO_TIMEOUT_MS = 5000
@@ -30,7 +31,11 @@ const today = new Intl.DateTimeFormat('pt-BR', {
 }).format(new Date())
 
 const highlight = computed(() => pickHomeHighlight(serviceStore.serivces))
-const nearby = computed(() => (providerStore.providers ?? []).slice(0, MAX_PROVIDERS))
+// Quem também é passeador não aparece na própria lista de sugestões.
+const nearby = computed(() => {
+  const ownId = authStore.user?.provider_profile?.id
+  return (providerStore.providers ?? []).filter((p) => ownId == null || p.id !== ownId).slice(0, MAX_PROVIDERS)
+})
 
 const servicesLoaded = ref(false)
 const providersLoaded = ref(false)
@@ -40,21 +45,13 @@ async function loadServices() {
   servicesLoaded.value = true
 }
 
-// Permissão ignorada não pode travar a lista: desiste da localização após o timeout.
-function locate() {
-  let timer
-  const timeout = new Promise((_, reject) => {
-    timer = setTimeout(() => reject(new Error('timeout')), GEO_TIMEOUT_MS)
-  })
-  return Promise.race([getCurrentPosition(), timeout]).finally(() => clearTimeout(timer))
-}
-
 const isCoord = (v) => v != null && v !== '' && Number.isFinite(Number(v))
 
 async function loadProviders() {
   const params = {}
   try {
-    await locate()
+    // Permissão ignorada não pode travar a lista: desiste da localização após o timeout.
+    await withTimeout(getCurrentPosition(), GEO_TIMEOUT_MS)
     if (isCoord(latitude.value) && isCoord(longitude.value)) {
       params.lat = latitude.value
       params.lon = longitude.value

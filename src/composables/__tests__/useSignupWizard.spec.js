@@ -149,6 +149,16 @@ describe('useSignupWizard', () => {
       expect(mocks.notify.error).toHaveBeenCalledWith('Servidor fora do ar.')
     })
 
+    it('campos desconhecidos junto de conhecidos tambem viram toast', async () => {
+      mocks.auth.createUser.mockImplementation(async (_, { onError }) => {
+        onError({ message: 'x', fields: { cpf: ['CPF inválido.'], address: ['Endereço inválido.'] } })
+        return null
+      })
+      expect(await w.next()).toBe(false)
+      expect(w.errors.cpf).toBe('CPF inválido.')
+      expect(mocks.notify.error).toHaveBeenCalledWith('Endereço inválido.')
+    })
+
     it('valida nome e cpf antes de chamar a API', async () => {
       w.personal.cpf = '123'
       w.personal.full_name = ''
@@ -265,6 +275,17 @@ describe('useSignupWizard', () => {
       expect(w.step.value).toBe(3)
     })
 
+    it('estado de outro usuario (id diferente da sessao) e descartado', async () => {
+      fillAccount(w)
+      await w.next()
+      fillPersonal(w)
+      await w.next()
+      mocks.auth.user = { id: 99 }
+      w.resetIfSessionLost()
+      expect(w.step.value).toBe(1)
+      expect(w.account.email).toBe('')
+    })
+
     it('visitante no meio da etapa 1 nao perde o que digitou', () => {
       fillAccount(w)
       w.resetIfSessionLost()
@@ -371,6 +392,44 @@ describe('useSignupWizard', () => {
       expect(mocks.pets.createPet).toHaveBeenCalledWith({ name: 'Rex', breed: '', size: 'p', pet_picture: 'pk' })
     })
 
+    it.each(['0', '-1', '100', '150', 'abc'])('pet: peso %s e rejeitado', async (weight) => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p', weight })
+      expect(await w.next()).toBe(false)
+      expect(w.errors.weight).toBeTruthy()
+      expect(mocks.pets.createPet).not.toHaveBeenCalled()
+    })
+
+    it('pet: peso arredonda para 3 casas', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p', weight: '12.34567' })
+      expect(await w.next()).toBe(true)
+      expect(mocks.pets.createPet).toHaveBeenCalledWith({ name: 'Rex', breed: '', size: 'p', weight: 12.346 })
+    })
+
+    it('pet: repetir apos falha do createPet nao reenvia a foto', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p', photo: new File(['x'], 'p.png') })
+      mocks.postImage.mockResolvedValue({ attachment_key: 'pk' })
+      mocks.pets.createPet.mockResolvedValueOnce(null)
+      expect(await w.next()).toBe(false)
+      expect(await w.next()).toBe(true)
+      expect(mocks.postImage).toHaveBeenCalledTimes(1)
+      expect(mocks.pets.createPet).toHaveBeenLastCalledWith({ name: 'Rex', breed: '', size: 'p', pet_picture: 'pk' })
+    })
+
+    it('pet: trocar a foto depois da falha envia a nova', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p', photo: new File(['x'], 'p.png') })
+      mocks.postImage.mockResolvedValueOnce({ attachment_key: 'k1' }).mockResolvedValueOnce({ attachment_key: 'k2' })
+      mocks.pets.createPet.mockResolvedValueOnce(null)
+      await w.next()
+      w.pet.photo = new File(['y'], 'q.png')
+      await w.next()
+      expect(mocks.postImage).toHaveBeenCalledTimes(2)
+      expect(mocks.pets.createPet).toHaveBeenLastCalledWith({ name: 'Rex', breed: '', size: 'p', pet_picture: 'k2' })
+    })
+
     it('pet: falha na store mantem a etapa e permite repetir', async () => {
       await reachPet()
       Object.assign(w.pet, { name: 'Rex', size: 'p' })
@@ -387,6 +446,21 @@ describe('useSignupWizard', () => {
       expect(w.errors.location).toBeTruthy()
       expect(w.errors.service_type).toBeTruthy()
       expect(w.errors.price).toBeTruthy()
+      expect(mocks.providers.createProvider).not.toHaveBeenCalled()
+    })
+
+    it.each([
+      ['0', ''],
+      ['-5', ''],
+      ['abc', ''],
+      ['25', '0'],
+      ['', '-1'],
+    ])('passeador: preco hora=%s dia=%s e rejeitado', async (hour, day) => {
+      await reachProvider()
+      fillProvider()
+      Object.assign(w.provider, { price_per_hour: hour, price_per_day: day })
+      expect(await w.next()).toBe(false)
+      expect(w.errors.price).toBe('O preço precisa ser maior que zero.')
       expect(mocks.providers.createProvider).not.toHaveBeenCalled()
     })
 
@@ -452,6 +526,16 @@ describe('useSignupWizard', () => {
       fillProvider()
       await w.next()
       expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+    })
+
+    it('concluir depois: limpa a pendencia e devolve a home sem criar o perfil', async () => {
+      localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true, userId: 7 }))
+      mocks.auth.user = { id: 7, client_profile: { id: 1 }, provider_profile: null }
+      w.resumePending()
+      const to = await w.skipProvider()
+      expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+      expect(mocks.providers.createProvider).not.toHaveBeenCalled()
+      expect(to).toEqual({ name: 'home-view' })
     })
 
     it('reset limpa a pendencia', async () => {

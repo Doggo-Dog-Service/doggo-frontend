@@ -195,6 +195,7 @@ export function useScheduling(options = {}) {
     submitError,
     submitting,
     durationMinutes,
+    serviceTypeId,
     isReadyToSubmit,
     reload: load,
     reloadPets,

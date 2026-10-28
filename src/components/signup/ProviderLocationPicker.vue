@@ -6,6 +6,7 @@ import LocationCard from '@/components/cards/LocationCard.vue'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useLocation } from '@/composables/useLocation'
 import { useMap, getThemeColor } from '@/composables/useMap'
+import { withTimeout } from '@/utils/withTimeout'
 
 // v-model: { latitude, longitude } como números com 6 casas decimais.
 const model = defineModel({ type: Object, default: () => ({ latitude: null, longitude: null }) })
@@ -13,6 +14,7 @@ const emit = defineEmits(['error'])
 
 const HINT = 'Não foi possível obter sua localização. Busque o endereço ou toque no mapa.'
 const SAO_PAULO = [-46.633309, -23.55052]
+const GEO_TIMEOUT_MS = 5000
 
 const { latitude, longitude, error: geoError, getCurrentPosition } = useGeolocation()
 const { map, createMap, addMarker, flyTo } = useMap()
@@ -25,8 +27,19 @@ let marker = null
 let searchTimeout
 let active = true
 
+// O marcador só existe depois de uma localização ou escolha: o centro padrão não é um local escolhido.
+function ensureMarker(lng, lat) {
+  if (marker) return
+  marker = addMarker(lng, lat, { color: getThemeColor('--primary', '#2E7D6B'), draggable: true })
+  marker.on('dragend', () => {
+    const point = marker.getLngLat()
+    selectPoint(point.lng, point.lat)
+  })
+}
+
 function selectPoint(lng, lat) {
-  marker?.setLngLat([lng, lat])
+  if (marker) marker.setLngLat([lng, lat])
+  else ensureMarker(lng, lat)
   model.value = { latitude: Number(lat.toFixed(6)), longitude: Number(lng.toFixed(6)) }
 }
 
@@ -47,11 +60,13 @@ onMounted(async () => {
   const saved = model.value
   let center = SAO_PAULO
   let located = false
+  let hasSaved = false
   if (saved?.latitude != null && saved?.longitude != null) {
     center = [Number(saved.longitude), Number(saved.latitude)]
+    hasSaved = true
   } else {
     try {
-      await getCurrentPosition()
+      await withTimeout(getCurrentPosition(), GEO_TIMEOUT_MS)
       if (!active) return
       if (geoError.value) {
         emit('error', HINT)
@@ -66,15 +81,11 @@ onMounted(async () => {
   }
 
   createMap(container.value, center, 15)
-  marker = addMarker(center[0], center[1], { color: getThemeColor('--primary', '#2E7D6B'), draggable: true })
 
   map.value.on('click', (e) => selectPoint(e.lngLat.lng, e.lngLat.lat))
-  marker.on('dragend', () => {
-    const { lng, lat } = marker.getLngLat()
-    selectPoint(lng, lat)
-  })
 
-  if (located) selectPoint(center[0], center[1])
+  if (hasSaved) ensureMarker(center[0], center[1])
+  else if (located) selectPoint(center[0], center[1])
 })
 
 watch(searchText, (text) => {
@@ -91,7 +102,13 @@ defineExpose({ selectPoint })
 
 <template>
   <div class="flex flex-col gap-3">
-    <SearchBar v-model="searchText" placeholder="Busque seu endereço" @focus="listOpen = true" @out="listOpen = false">
+    <SearchBar
+      v-model="searchText"
+      placeholder="Busque seu endereço"
+      @keydown.enter.prevent
+      @focus="listOpen = true"
+      @out="listOpen = false"
+    >
       <template #list>
         <div
           v-if="listOpen && (loading || searchedData.length > 0)"
