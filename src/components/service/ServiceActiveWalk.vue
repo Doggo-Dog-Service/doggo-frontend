@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
+import { Clock, Loader2, Map } from 'lucide-vue-next'
 import InfoCard from '@/components/cards/InfoCard.vue'
 import ServiceActions from '@/components/service/ServiceActions.vue'
 import ServicePartyCard from '@/components/service/ServicePartyCard.vue'
@@ -84,18 +85,19 @@ onMounted(initializeMap)
     >
       <div
         v-if="mapLoading"
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background-light"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-canvas"
+        role="status"
       >
-        <div class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"></div>
-        <p class="text-sm text-doggo-black/50 font-semibold">Carregando mapa...</p>
+        <Loader2 :size="32" :stroke-width="2" class="animate-spin text-primary" aria-hidden="true" />
+        <p class="text-body text-fg-muted">Carregando mapa...</p>
       </div>
     </div>
 
     <div class="w-full min-h-0 grid grid-cols-2 gap-2 p-4 pb-30 md:w-1/3 md:h-full md:overflow-y-auto md:pb-4">
-      <h1 class="w-full col-span-2 font-semibold">Passeio em andamento</h1>
+      <h1 class="col-span-2 w-full text-title text-fg">Passeio em andamento</h1>
       <ServicePartyCard class="col-span-2" :role="role" />
-      <InfoCard icon="mdi mdi-clock-outline" description="Tempo" :info="elapsedLabel" />
-      <InfoCard icon="mdi mdi-map-outline" description="Distância" :info="store.formattedDistance" />
+      <InfoCard :icon="Clock" description="Tempo" :info="elapsedLabel" />
+      <InfoCard :icon="Map" description="Distância" :info="store.formattedDistance" />
       <ServicePetsList class="col-span-2" />
       <ServiceActions
         v-if="role === 'provider'"

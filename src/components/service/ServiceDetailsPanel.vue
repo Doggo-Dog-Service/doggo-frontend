@@ -1,4 +1,5 @@
 <script setup>
+import { Banknote, CalendarClock, Clock } from 'lucide-vue-next'
 import InfoCard from '@/components/cards/InfoCard.vue'
 import ServicePartyCard from '@/components/service/ServicePartyCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
@@ -26,9 +27,9 @@ const endLabel = computed(() => formatDateTime(store.endDatetime))
   <div class="w-full flex flex-col gap-2">
     <ServicePartyCard :role="role" />
     <div class="grid grid-cols-2 gap-2">
-      <InfoCard icon="mdi mdi-cash" description="Preço" :info="priceLabel" />
-      <InfoCard icon="mdi mdi-calendar-clock" description="Início" :info="startLabel" />
-      <InfoCard v-if="store.endDatetime" icon="mdi mdi-clock-outline" description="Fim" :info="endLabel" />
+      <InfoCard :icon="Banknote" description="Preço" :info="priceLabel" />
+      <InfoCard :icon="CalendarClock" description="Início" :info="startLabel" />
+      <InfoCard v-if="store.endDatetime" :icon="Clock" description="Fim" :info="endLabel" />
     </div>
     <ServicePetsList />
   </div>

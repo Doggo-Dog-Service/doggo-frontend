@@ -2,12 +2,13 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { getRouteCenter } from '@/utils/distance'
 
+import { Banknote, Clock, Loader2, MapPinOff, Route } from 'lucide-vue-next'
 import InfoCard from '@/components/cards/InfoCard.vue'
 import SearchCard from '../cards/SearchCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
 import ReviewModal from '../modals/ReviewModal.vue'
 
-import { useMap } from '@/composables/useMap'
+import { useMap, getThemeColor } from '@/composables/useMap'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatMeters } from '@/utils/distance'
 import { formatCurrency } from '@/utils/currency'
@@ -66,11 +67,11 @@ function renderRouteOnMap() {
   const end = coordinates[coordinates.length - 1]
 
   if (start) {
-    addMarker(start[0], start[1], { color: '#2E7D6B' })
+    addMarker(start[0], start[1], { color: getThemeColor('--primary', '#2E7D6B') })
   }
 
   if (end && end !== start) {
-    addMarker(end[0], end[1], { color: '#EF4444' })
+    addMarker(end[0], end[1], { color: getThemeColor('--danger', '#DC2626') })
   }
 }
 
@@ -119,17 +120,18 @@ watch(loaded, (value) => {
     >
       <div
         v-if="mapLoading || (serviceStore.routeLoading && serviceStore.routePoints.length === 0)"
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background-light"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-canvas"
+        role="status"
       >
-        <div class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"></div>
-        <p class="text-sm text-doggo-black/50 font-semibold">Carregando mapa...</p>
+        <Loader2 :size="32" :stroke-width="2" class="animate-spin text-primary" aria-hidden="true" />
+        <p class="text-body text-fg-muted">Carregando mapa...</p>
       </div>
       <div
         v-else-if="serviceStore.routePoints.length === 0"
-        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background-light text-center p-6"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-canvas p-6 text-center"
       >
-        <span class="mdi mdi-map-marker-off text-4xl text-doggo-green"></span>
-        <p class="text-sm text-doggo-black/50 font-semibold">
+        <MapPinOff :size="32" :stroke-width="2" class="text-primary" aria-hidden="true" />
+        <p class="text-body text-fg-muted">
           Não há pontos de localização registrados para este passeio.
         </p>
       </div>
@@ -138,7 +140,7 @@ watch(loaded, (value) => {
     <div
       class="w-full min-h-0 grid grid-cols-2 gap-2 p-4 pb-30 md:w-1/3 md:h-full md:overflow-y-auto md:pb-4"
     >
-      <h1 class="w-full col-span-2 text-center font-semibold">Passeio concluído</h1>
+      <h1 class="col-span-2 w-full text-center text-title text-fg">Passeio concluído</h1>
       <SearchCard
         class="col-span-2"
         link="/provider/"
@@ -147,9 +149,9 @@ watch(loaded, (value) => {
         :profile_photo="serviceStore.providerPicture"
         :service="serviceStore.serviceType"
       />
-      <InfoCard icon="mdi mdi-map-marker-distance" description="Distância" :info="distanceLabel" />
-      <InfoCard icon="mdi mdi-clock-outline" description="Duração" :info="durationLabel" />
-      <InfoCard icon="mdi mdi-cash" description="Valor" :info="priceLabel" />
+      <InfoCard :icon="Route" description="Distância" :info="distanceLabel" />
+      <InfoCard :icon="Clock" description="Duração" :info="durationLabel" />
+      <InfoCard :icon="Banknote" description="Valor" :info="priceLabel" />
       <ServicePetsList class="col-span-2" />
     </div>
   </div>

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { ShieldOff } from 'lucide-vue-next'
 import AppButton from '@/components/buttons/AppButton.vue'
 import ServiceActions from '@/components/service/ServiceActions.vue'
 import ServiceActiveWalk from '@/components/service/ServiceActiveWalk.vue'
@@ -166,8 +167,8 @@ load()
       v-else-if="!isParticipant"
       class="w-full h-[calc(100vh-4.5rem)] flex flex-col items-center justify-center gap-4 p-8 text-center"
     >
-      <span class="mdi mdi-shield-off-outline text-5xl text-doggo-green"></span>
-      <p class="text-doggo-black/70 font-semibold">Você não tem acesso a este serviço.</p>
+      <ShieldOff :size="48" :stroke-width="1.75" class="text-primary" aria-hidden="true" />
+      <p class="text-body text-fg-muted">Você não tem acesso a este serviço.</p>
       <AppButton text="Voltar à página inicial" mode="outline" @event="router.push('/')" />
     </div>
 
@@ -187,9 +188,9 @@ load()
     <div v-else class="w-full flex flex-col items-center gap-4 p-4 pb-30 md:p-8 md:pb-4">
       <div class="w-full max-w-160 flex flex-col gap-4">
         <header class="flex flex-col items-center gap-2 text-center">
-          <h1 class="text-2xl font-bold">{{ statusInfo.title }}</h1>
+          <h1 class="text-display text-fg">{{ statusInfo.title }}</h1>
           <ServiceStatusBadge :status="serviceWebSocketStore.status" />
-          <p class="text-doggo-black/50 font-semibold">{{ statusInfo.subtitle }}</p>
+          <p class="text-body text-fg-muted">{{ statusInfo.subtitle }}</p>
         </header>
 
         <ServiceDetailsPanel :role="role" />

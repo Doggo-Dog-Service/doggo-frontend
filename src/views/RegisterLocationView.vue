@@ -10,7 +10,7 @@ import { useProviderStore } from '@/stores/provider'
 import { useRouter } from 'vue-router'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useLocation } from '@/composables/useLocation'
-import { useMap } from '@/composables/useMap'
+import { useMap, getThemeColor } from '@/composables/useMap'
 
 const authStore = useAuthStore()
 const providerStore = useProviderStore()
@@ -56,8 +56,8 @@ Object.assign(userElement.style, {
   height: '30px',
   borderRadius: '50%',
   objectFit: 'cover',
-  border: 'solid 2px #2E7D6B',
-  backgroundColor: '#A7F3D0',
+  border: `solid 2px ${getThemeColor('--primary', '#2E7D6B')}`,
+  backgroundColor: getThemeColor('--primary-soft', '#ECF7F3'),
 })
 
 onMounted(async () => {
@@ -76,12 +76,12 @@ onMounted(async () => {
   }
 
   userMarker.value = addMarker(longitude.value, latitude.value, {
-    color: '#3b82f6',
+    color: getThemeColor('--info', '#0284C7'),
     element: userElement,
   })
 
   fixedMarker.value = addMarker(longitude.value, latitude.value, {
-    color: '#2E7D6B',
+    color: getThemeColor('--primary', '#2E7D6B'),
     draggable: true,
   })
 

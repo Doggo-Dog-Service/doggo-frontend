@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { Briefcase, Dog } from 'lucide-vue-next'
 import { formatDateTime } from '@/utils/time'
 
 const props = defineProps({
@@ -59,55 +60,50 @@ const props = defineProps({
 })
 
 const link = computed(() => `/service/${props.id}`)
-const isYellow = computed(() => props.color === 'yellow')
-const isBlue = computed(() => props.color === 'blue')
-const isGreen = computed(() => props.color === 'green')
-const isRed = computed(() => props.color === 'red')
+
+const ACCENTS = {
+  yellow: { bar: 'border-l-warning lg:border-t-warning', text: 'text-warning' },
+  blue: { bar: 'border-l-info lg:border-t-info', text: 'text-info' },
+  green: { bar: 'border-l-success lg:border-t-success', text: 'text-success' },
+  red: { bar: 'border-l-danger lg:border-t-danger', text: 'text-danger' },
+}
+const accent = computed(() => ACCENTS[props.color])
 </script>
 
 <template>
   <RouterLink
     :to="link"
     :class="[
-      'grid grid-rows-2 w-full h-50 rounded-xl p-4 bg-white border-l-4 border border-doggo-gray lg:border-l lg:border-l-doggo-gray lg:border-t-4 transition-transform hover:scale-98 active:scale-99',
-      isYellow && 'border-l-yellow-400 lg:border-t-yellow-400',
-      isBlue && 'border-l-blue-400 lg:border-t-blue-400',
-      isGreen && 'border-l-doggo-green lg:border-t-doggo-green',
-      isRed && 'border-l-red-400 lg:border-t-red-400',
+      'grid h-50 w-full grid-rows-2 rounded-card border border-l-4 border-line bg-surface p-4 shadow-card transition-transform hover:scale-98 active:scale-99 focus-visible:ring-2 focus-visible:ring-primary lg:border-l lg:border-t-4',
+      accent.bar,
     ]"
   >
-    <div class="flex justify-between row-span-1">
-      <h2 class="text-xl font-semibold">
-        <span
-          :class="[
-            'mdi mdi-briefcase-variant',
-            isYellow && 'text-yellow-400',
-            isBlue && 'text-blue-400',
-            isGreen && 'text-doggo-green',
-            isRed && 'text-red-400',
-          ]"
-        ></span>
-        {{ props.serviceType }}
+    <div class="row-span-1 flex justify-between gap-2">
+      <h2 class="flex min-w-0 items-start gap-2 text-subtitle text-fg">
+        <Briefcase :size="20" :stroke-width="2" :class="['mt-0.5 shrink-0', accent.text]" aria-hidden="true" />
+        <span class="truncate">{{ props.serviceType }}</span>
       </h2>
-      <ul class="flex">
+      <ul class="flex shrink-0">
         <li v-for="(pet, index) in props.pets" :key="pet.id" :class="[index > 0 && '-ml-6']">
           <img
             v-if="pet.pet_picture"
             :src="pet.pet_picture"
             :alt="pet.name"
-            class="rounded-full w-10 h-10 object-cover"
+            class="size-10 rounded-full border-2 border-surface object-cover"
           />
           <div
-            class="grid justify-center items-center h-10 w-10 bg-doggo-light-green text-doggo-green rounded-full"
             v-else
+            class="grid size-10 items-center justify-center rounded-full border-2 border-surface bg-primary-soft text-primary"
+            role="img"
+            :aria-label="pet.name"
           >
-            <span class="mdi mdi-dog text-xl"></span>
+            <Dog :size="20" :stroke-width="2" aria-hidden="true" />
           </div>
         </li>
       </ul>
     </div>
-    <div class="w-full flex items-end gap-2 min-w-0">
-      <ul class="w-full min-w-0">
+    <div class="flex w-full min-w-0 items-end gap-2">
+      <ul class="w-full min-w-0 text-caption text-fg-muted">
         <li class="w-full truncate">Profissional: {{ props.providerName }}</li>
         <li class="w-full truncate">Cliente: {{ props.clientName }}</li>
         <li class="w-full truncate">Início: {{ formatDateTime(props.startDateTime) }}</li>
@@ -115,22 +111,13 @@ const isRed = computed(() => props.color === 'red')
           Fim: {{ formatDateTime(props.endDateTime) }}
         </li>
       </ul>
-      <ul class="grid justify-end">
-        <li class="flex gap-1 text-xl">
+      <ul class="grid justify-end text-right">
+        <li class="flex gap-1 text-title text-fg">
           <span>R$</span>
           <p>{{ props.price }}</p>
         </li>
         <li>
-          <span
-            :class="[
-              'font-semibold text-nowrap',
-              isYellow && 'text-yellow-400',
-              isBlue && 'text-blue-400',
-              isGreen && 'text-doggo-green',
-              isRed && 'text-red-400',
-            ]"
-            >{{ props.status }}</span
-          >
+          <span :class="['text-caption font-semibold text-nowrap', accent.text]">{{ props.status }}</span>
         </li>
       </ul>
     </div>
