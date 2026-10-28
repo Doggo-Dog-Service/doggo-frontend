@@ -4,9 +4,9 @@ import UiIcon from '@/components/ui/UiIcon.vue'
 
 const emits = defineEmits(['event'])
 const props = defineProps({
-  // Componente Lucide; string (classe MDI) segue aceita até as telas migrarem.
+  // Componente Lucide.
   icon: {
-    type: [Object, Function, String],
+    type: [Object, Function],
     required: true,
   },
   label: {
@@ -46,7 +46,7 @@ const VARIANTS = {
 const accessibleLabel = computed(() => props.label ?? props.tooltip)
 // Chamadores legados (sem `variant`) mantêm o visual preenchido atual.
 const resolvedVariant = computed(
-  () => props.variant ?? (props.mode === 'red' ? 'danger' : typeof props.icon === 'string' ? 'primary' : 'ghost'),
+  () => props.variant ?? (props.mode === 'red' ? 'danger' : 'ghost'),
 )
 </script>
 
@@ -61,6 +61,6 @@ const resolvedVariant = computed(
     :title="accessibleLabel"
     @click="emits('event')"
   >
-    <UiIcon :icon="props.icon" :size="22" :class="typeof props.icon === 'string' && 'text-2xl'" />
+    <UiIcon :icon="props.icon" :size="22" />
   </button>
 </template>

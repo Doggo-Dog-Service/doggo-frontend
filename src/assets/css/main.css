@@ -48,14 +48,6 @@
     --radius-card: 20px;
     --radius-control: 14px;
 
-    /* Tokens antigos: removidos na Task 10 */
-    --color-doggo-black: #111827;
-    --color-doggo-green: #2E7D6B;
-    --color-doggo-gray: #E8EAED;
-    --color-doggo-light-green: #A7F3D0;
-    --color-doggo-yellow: #FDE68A;
-    --color-doggo-yellow-text: #E6B64E;
-    --color-background-light: #F7F8FA;
 }
 
 :root {

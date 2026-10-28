@@ -11,7 +11,7 @@ const props = defineProps({
   },
   placeholder: String,
   icon: {
-    type: [Object, Function, String],
+    type: [Object, Function],
     default: null,
   },
   required: {

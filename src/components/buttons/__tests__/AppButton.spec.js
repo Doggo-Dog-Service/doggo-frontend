@@ -43,10 +43,10 @@ describe('IconButton', () => {
     const w = mount(IconButton, { props: { icon: PawPrint, label: 'Editar' } })
     expect(w.attributes('aria-label')).toBe('Editar')
   })
-  it('legacy string icon and tooltip still work', () => {
-    const w = mount(IconButton, { props: { icon: 'mdi mdi-delete', tooltip: 'Deletar pet' } })
+  it('tooltip legado serve de rótulo', () => {
+    const w = mount(IconButton, { props: { icon: PawPrint, tooltip: 'Deletar pet' } })
     expect(w.attributes('aria-label')).toBe('Deletar pet')
-    expect(w.find('span.mdi').exists()).toBe(true)
+    expect(w.find('svg').exists()).toBe(true)
   })
   it('emits event', async () => {
     const w = mount(IconButton, { props: { icon: PawPrint, label: 'x' } })

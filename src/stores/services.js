@@ -13,6 +13,7 @@ export const useServiceStore = defineStore('serviceStore', () => {
   async function getServices(params) {
     try {
       loading.value = true
+      serviceError.value = ''
       const data  = await serviceService.getServices(params)
       serivces.value = data.results ?? []
     } catch (error) {
@@ -62,6 +63,7 @@ export const useServiceStore = defineStore('serviceStore', () => {
   return {
     loading,
     serivces,
+    serviceError,
     pendingCount,
     getServices,
     fetchPendingCount,

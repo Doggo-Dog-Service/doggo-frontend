@@ -2,7 +2,7 @@
 import UiIcon from './UiIcon.vue'
 
 defineProps({
-  icon: { type: [Object, Function, String], default: null },
+  icon: { type: [Object, Function], default: null },
   title: { type: String, required: true },
   description: { type: String, default: '' },
 })

@@ -1,8 +1,9 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Footprints, SearchX } from 'lucide-vue-next'
+import { AlertCircle, Footprints, SearchX } from 'lucide-vue-next'
 import UiEmptyState from '@/components/ui/UiEmptyState.vue'
+import AppButton from '@/components/buttons/AppButton.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import ServiceCard from '@/components/cards/ServiceCard.vue'
 import { serviceStatus } from '@/utils/serviceStatus'
@@ -85,6 +86,15 @@ watch(selectedStatus, load)
     <div v-if="serviceStore.loading" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Carregando serviços">
       <UiSkeleton v-for="n in 3" :key="n" shape="rect" />
     </div>
+    <UiEmptyState
+      v-else-if="serviceStore.serviceError"
+      :icon="AlertCircle"
+      title="Não foi possível carregar os passeios"
+    >
+      <template #action>
+        <AppButton text="Tentar novamente" @event="load" />
+      </template>
+    </UiEmptyState>
     <ul v-else-if="services.length > 0" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       <li v-for="service in services" :key="service.id">
         <ServiceCard

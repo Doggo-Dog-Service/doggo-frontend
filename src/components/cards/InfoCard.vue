@@ -2,9 +2,9 @@
 import UiIcon from '@/components/ui/UiIcon.vue'
 
 const props = defineProps({
-  // Componente Lucide; string (classe MDI) segue aceita até as demais telas migrarem.
+  // Componente Lucide.
   icon: {
-    type: [Object, Function, String],
+    type: [Object, Function],
     default: null,
   },
   info: {

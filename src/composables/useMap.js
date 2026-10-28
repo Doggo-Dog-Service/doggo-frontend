@@ -7,6 +7,7 @@ const styles = {
   dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
 }
 
+// Atenção: tokens como --danger/--info resolvem para oklch, que o parser de estilo do maplibre (line-color) rejeita; use só para Marker/CSS.
 // Lê um token de cor do tema em tempo de execução (ex.: '--primary'); fallback se indisponível.
 export function getThemeColor(name, fallback) {
   try {

@@ -38,7 +38,7 @@ const props = defineProps({
     validator: (value) => ['sm', 'md', 'lg'].includes(value),
   },
   icon: {
-    type: [Object, Function, String],
+    type: [Object, Function],
     default: null,
   },
   loading: {

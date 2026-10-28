@@ -1,4 +1,3 @@
-import '@mdi/font/css/materialdesignicons.css'
 import '@/assets/css/main.css'
 import 'vue3-toastify/dist/index.css'
 import { createApp, watch } from 'vue'

@@ -8,7 +8,7 @@ const props = defineProps({
     default: 'neutral',
     validator: (v) => ['neutral', 'brand', 'success', 'warning', 'danger', 'info'].includes(v),
   },
-  icon: { type: [Object, Function, String], default: null },
+  icon: { type: [Object, Function], default: null },
 })
 
 const TONES = {
