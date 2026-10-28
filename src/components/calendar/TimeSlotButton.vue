@@ -18,13 +18,17 @@ const props = defineProps({
 
 <template>
   <button
+    type="button"
     :class="[
-      'px-4 py-3 rounded-xl border transition-all duration-200 cursor-pointer text-sm font-semibold min-w-20',
-      props.disabled && 'bg-gray-100 border-gray-100 text-gray-300 cursor-not-allowed',
-      !props.disabled && props.selected && 'bg-doggo-green border-doggo-green text-white shadow-sm',
-      !props.disabled && !props.selected && 'bg-white border-doggo-gray text-doggo-black hover:border-doggo-green hover:text-doggo-green active:scale-98',
+      'min-h-11 min-w-20 rounded-control border px-4 py-2 text-body font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+      props.disabled && 'cursor-not-allowed border-line bg-surface-muted text-fg-subtle',
+      !props.disabled && props.selected && 'cursor-pointer border-primary bg-primary text-primary-fg',
+      !props.disabled &&
+        !props.selected &&
+        'cursor-pointer border-line bg-surface text-fg hover:bg-surface-muted active:scale-98',
     ]"
     :disabled="props.disabled"
+    :aria-pressed="props.selected"
     @click="emit('select')"
   >
     {{ props.time }}

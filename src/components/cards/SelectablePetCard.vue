@@ -1,4 +1,6 @@
 <script setup>
+import { CheckCircle2, Dog, PawPrint } from 'lucide-vue-next'
+
 const emits = defineEmits(['click'])
 
 const props = defineProps({
@@ -24,42 +26,36 @@ const props = defineProps({
 <template>
   <button
     :class="[
-      'relative w-full flex flex-col rounded-xl bg-white border-b-2 border-doggo-gray text-justify cursor-pointer transition-all duration-200 hover:scale-98 active:scale-98 active:opacity-70',
-      props.selected && 'opacity-70',
+      'relative flex w-full cursor-pointer flex-col overflow-hidden rounded-card border bg-surface text-left shadow-card transition-colors duration-200 active:scale-98 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+      props.selected ? 'border-primary ring-2 ring-primary' : 'border-line hover:bg-surface-muted',
     ]"
     type="button"
+    :aria-pressed="props.selected"
     @click="emits('click')"
   >
     <div class="relative">
       <img
         v-if="props.pet_picture"
         :src="props.pet_picture"
-        alt="pet-picture"
-        class="w-full aspect-[4/3] object-cover rounded-t-xl"
+        :alt="`Foto de ${props.name}`"
+        class="aspect-[4/3] w-full object-cover"
       />
-      <div
-        v-else
-        class="aspect-[4/3] grid justify-center items-center bg-doggo-green/20 rounded-t-xl"
-      >
-        <span class="mdi mdi-dog text-doggo-green text-4xl md:text-5xl"></span>
+      <div v-else class="flex aspect-[4/3] items-center justify-center bg-primary-soft text-primary">
+        <Dog :size="40" :stroke-width="2" aria-hidden="true" />
       </div>
       <span
         v-if="props.selected"
-        class="absolute inset-0 flex items-center justify-center pointer-events-none"
+        class="pointer-events-none absolute right-2 top-2 flex size-8 items-center justify-center rounded-full bg-primary text-primary-fg"
       >
-        <span
-          class="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-full bg-white/70"
-        >
-          <span
-            class="mdi mdi-check-circle text-doggo-green text-4xl md:text-5xl leading-none"
-          ></span>
-        </span>
+        <CheckCircle2 :size="20" :stroke-width="2" aria-hidden="true" />
       </span>
     </div>
-    <div class="p-3 md:p-4">
-      <p class="text-base md:text-xl font-semibold">{{ props.name }}</p>
-      <p class="text-sm md:text-base text-gray-500 font-semibold">
-        <span class="mdi mdi-paw"></span> {{ props.breed }}
+    <div class="flex flex-col gap-1 p-3 md:p-4">
+      <p class="text-subtitle text-fg">{{ props.name }}</p>
+      <p class="flex items-center gap-1.5 text-caption text-fg-muted">
+        <PawPrint :size="14" :stroke-width="2" aria-hidden="true" />
+        {{ props.breed }}
+        <span v-if="props.selected" class="sr-only">(selecionado)</span>
       </p>
     </div>
   </button>

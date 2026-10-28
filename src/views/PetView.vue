@@ -1,4 +1,6 @@
 <script setup>
+import { PawPrint, Plus } from 'lucide-vue-next'
+import UiEmptyState from '@/components/ui/UiEmptyState.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import PetCard from '@/components/cards/PetCard.vue'
 import PetModal from '@/components/pet/PetModal.vue'
@@ -54,7 +56,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="relative flex flex-col gap-4 p-6">
+  <div class="relative flex flex-col gap-4 p-4 md:p-6">
     <PetModal
       v-if="modalOpen"
       :mode="modalMode"
@@ -62,12 +64,12 @@ onMounted(async () => {
       @close="closeModal"
       @change-mode="changeModalMode"
     />
-    <h1 class="text-3xl md:text-4xl font-bold text-doggo-black">
-      Meus Pets <span class="mdi mdi-paw text-doggo-green"></span>
+    <h1 class="flex items-center gap-2 text-display text-fg">
+      Meus Pets <PawPrint :size="28" :stroke-width="2" class="text-primary" aria-hidden="true" />
     </h1>
     <ul
       v-if="petStore.pets.length > 0"
-      class="w-full grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 pb-40 md:pb-20"
+      class="grid w-full grid-cols-2 gap-4 pb-40 md:pb-20 lg:grid-cols-3 xl:grid-cols-5"
     >
       <li v-for="pet in petStore.pets" :key="pet.id">
         <PetCard
@@ -78,11 +80,16 @@ onMounted(async () => {
         />
       </li>
     </ul>
-    <div v-else class="w-full text-center text-xl text-doggo-green font-semibold mt-20">
-      Você ainda não possui nenhum pet cadastrado
-    </div>
-    <div class="fixed w-full bottom-22 right-0 px-4 md:w-50 md:bottom-6">
-      <AppButton text="+ Adicionar pet" mode="outline" @event="openAddPet" />
+    <UiEmptyState
+      v-else
+      :icon="PawPrint"
+      title="Você ainda não possui nenhum pet cadastrado"
+      description="Cadastre seu pet para agendar passeios e outros serviços."
+    />
+    <div
+      class="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:inset-x-auto md:right-6 md:bottom-6 md:w-56"
+    >
+      <AppButton text="Adicionar pet" variant="primary" :icon="Plus" @event="openAddPet" />
     </div>
   </div>
 </template>

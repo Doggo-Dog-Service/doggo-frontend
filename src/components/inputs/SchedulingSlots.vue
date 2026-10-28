@@ -30,27 +30,27 @@ const periods = computed(() => groupSlotsByPeriod(props.slots))
 
 <template>
   <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-bold">Horários disponíveis</h2>
+    <h2 class="text-subtitle text-fg">Horários disponíveis</h2>
 
-    <p v-if="!props.hasDate" class="text-doggo-black/50 text-sm">
+    <p v-if="!props.hasDate" class="text-caption text-fg-muted">
       Selecione uma data para ver os horários disponíveis
     </p>
 
-    <div v-else-if="props.loading" class="flex justify-center py-6">
-      <div class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"></div>
+    <div v-else-if="props.loading" role="status" aria-label="Carregando" class="flex flex-wrap gap-2">
+      <div v-for="n in 6" :key="n" class="h-11 w-20 animate-pulse rounded-control bg-surface-muted"></div>
     </div>
 
-    <p v-else-if="props.error" class="text-red-700 text-sm font-semibold">
+    <p v-else-if="props.error" role="alert" class="text-caption font-semibold text-danger">
       {{ props.error }}
     </p>
 
-    <p v-else-if="periods.length === 0" class="text-doggo-black/50 text-sm">
+    <p v-else-if="periods.length === 0" class="text-caption text-fg-muted">
       Não há horários disponíveis para este dia. Escolha outra data.
     </p>
 
     <div v-else class="flex flex-col gap-4">
       <div v-for="period in periods" :key="period.label" class="flex flex-col gap-2">
-        <p class="text-sm text-doggo-black/50 font-semibold">{{ period.label }}</p>
+        <p class="text-caption font-semibold text-fg-muted">{{ period.label }}</p>
         <div class="flex flex-wrap gap-2 justify-center md:justify-start">
           <TimeSlotButton
             v-for="slot in period.slots"

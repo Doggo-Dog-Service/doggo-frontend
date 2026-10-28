@@ -25,13 +25,13 @@ const emit = defineEmits(['submit'])
 
 <template>
   <div
-    class="fixed bottom-22 left-0 right-0 px-6 pb-[env(safe-area-inset-bottom)] md:relative md:bottom-auto md:left-auto md:right-auto md:px-0 md:pb-0 md:mt-2"
+    class="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:static md:inset-auto md:mt-2"
   >
-    <p v-if="props.error" class="text-red-700 text-sm font-semibold mb-2">{{ props.error }}</p>
+    <p v-if="props.error" role="alert" class="mb-2 rounded-control bg-danger-soft px-3 py-2 text-caption font-semibold text-danger">{{ props.error }}</p>
     <AppButton
       :disabled="props.disabled"
       :text="props.loading ? 'Enviando...' : props.text"
-      mode="outline"
+      variant="primary"
       @event="emit('submit')"
     />
   </div>

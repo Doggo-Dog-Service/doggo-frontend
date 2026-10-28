@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+import UiCard from '@/components/ui/UiCard.vue'
 import CalendarPicker from '@/components/calendar/CalendarPicker.vue'
 import SchedulingPetCardSelector from '@/components/inputs/SchedulingPetCardSelector.vue'
 import SchedulingProviderSummary from '@/components/cards/SchedulingProviderSummary.vue'
@@ -35,7 +36,7 @@ const {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-4 md:p-6 mb-19 text-doggo-black pb-22">
+  <div class="flex flex-col gap-6 p-4 pb-44 text-fg md:p-6 md:pb-6">
     <SchedulingProviderSummary
       :provider="provider"
       :loading="providerLoading"
@@ -44,10 +45,10 @@ const {
     />
 
     <section class="flex flex-col gap-3">
-      <h2 class="text-lg font-bold">Selecione o dia</h2>
-      <div class="bg-white border border-doggo-gray rounded-xl p-4">
+      <h2 class="text-subtitle text-fg">Selecione o dia</h2>
+      <UiCard>
         <CalendarPicker v-model="selectedDate" />
-      </div>
+      </UiCard>
     </section>
 
     <SchedulingSlots

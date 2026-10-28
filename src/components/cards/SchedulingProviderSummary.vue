@@ -1,6 +1,7 @@
 <script setup>
 import UserCard from '@/components/cards/UserCard.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
+import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 
 defineEmits(['retry'])
 
@@ -33,17 +34,15 @@ defineProps({
   />
 
   <section v-else class="flex flex-col gap-3">
-    <h1 class="text-xl font-bold">Agendamento</h1>
+    <h1 class="text-title text-fg">Agendamento</h1>
 
-    <div v-if="loading" class="flex justify-center py-6">
-      <div class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"></div>
-    </div>
+    <UiSkeleton v-if="loading" class="h-24 w-full" />
 
     <div v-else class="flex flex-col items-start gap-3">
-      <p class="text-red-700 text-sm font-semibold">
+      <p role="alert" class="text-caption font-semibold text-danger">
         {{ error || 'Não foi possível carregar os dados deste profissional.' }}
       </p>
-      <AppButton text="Tentar novamente" mode="outline" @event="$emit('retry')" />
+      <AppButton text="Tentar novamente" variant="primary" :block="false" @event="$emit('retry')" />
     </div>
   </section>
 </template>
