@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import notify from '@/utils/notify'
+import { useMedia } from '@/composables/useMedia'
 
 import * as serviceService from '@/services/service'
 import { useAuthStore } from '@/stores/auth'
@@ -20,6 +21,9 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
 
   const routePoints = ref([])
   const totalDistance = ref(null)
+
+  const events = ref([])
+  const eventSending = ref(false)
 
   const routeLoading = ref(false)
   const error = ref(null)
@@ -142,6 +146,80 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
+  function pushEvent(event) {
+    if (!event || events.value.some((item) => item.id === event.id)) {
+      return
+    }
+
+    events.value.push(event)
+  }
+
+  function handleWalkEvent(message) {
+    if (!service.value || message?.service_id !== service.value.id) {
+      return
+    }
+
+    pushEvent(message.event)
+  }
+
+  async function loadEvents() {
+    if (!service.value) {
+      return
+    }
+
+    const serviceId = service.value.id
+
+    try {
+      const data = await serviceService.getServiceEvents(serviceId)
+
+      // Eventos do WS que chegaram antes do GET ficam; o dedupe é por id.
+      if (service.value?.id === serviceId) {
+        data.forEach(pushEvent)
+      }
+    } catch (err) {
+      error.value = err.message || 'Não foi possível carregar os marcadores.'
+    }
+  }
+
+  async function addEvent(kind, file = null) {
+    if (!service.value || eventSending.value) {
+      return null
+    }
+
+    eventSending.value = true
+
+    try {
+      const payload = { kind }
+
+      if (currentLocation.value) {
+        payload.latitude = currentLocation.value.latitude
+        payload.longitude = currentLocation.value.longitude
+      }
+
+      if (file) {
+        const uploaded = await useMedia().postImage({ file, description: 'Foto do passeio' })
+
+        if (!uploaded?.attachment_key) {
+          return null
+        }
+
+        payload.image_attachment_key = uploaded.attachment_key
+      }
+
+      const event = await serviceService.postServiceEvent(service.value.id, payload)
+
+      pushEvent(event)
+
+      return event
+    } catch (err) {
+      notify.error(err.message || 'Não foi possível salvar o marcador.')
+
+      return null
+    } finally {
+      eventSending.value = false
+    }
+  }
+
   async function runServiceAction(action, successMessage, { refreshPending = false } = {}) {
     if (!service.value) {
       return null
@@ -235,6 +313,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     currentDistance.value = null
     lastLocationAt.value = null
     route.value = []
+    events.value = []
     routePoints.value = []
     totalDistance.value = null
     connected.value = false
@@ -279,6 +358,8 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     route,
     routePoints,
     totalDistance,
+    events,
+    eventSending,
     routeLoading,
     error,
     loading,
@@ -287,6 +368,9 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     walkDuration,
     getService,
     getRoute,
+    loadEvents,
+    addEvent,
+    handleWalkEvent,
     startService,
     confirmService,
     rejectService,

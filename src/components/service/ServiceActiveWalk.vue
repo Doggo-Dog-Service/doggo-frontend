@@ -7,6 +7,8 @@ import LiveWalkSheet from '@/components/service/LiveWalkSheet.vue'
 import LiveWalkSignal from '@/components/service/LiveWalkSignal.vue'
 import ServicePartyCard from '@/components/service/ServicePartyCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
+import WalkEventBar from '@/components/service/WalkEventBar.vue'
+import WalkEventList from '@/components/service/WalkEventList.vue'
 import WalkDimOverlay from '@/components/service/WalkDimOverlay.vue'
 import WhatsAppButton from '@/components/service/WhatsAppButton.vue'
 import UiSheet from '@/components/ui/UiSheet.vue'
@@ -17,6 +19,7 @@ import { useTheme } from '@/composables/useTheme'
 import { useWakeLock } from '@/composables/useWakeLock'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatElapsed } from '@/utils/time'
+import { createWalkEventPin } from '@/utils/walkEvents'
 
 const DIM_KEY = 'doggo-walk-dim'
 
@@ -42,6 +45,7 @@ const { elapsedSeconds } = useElapsedTime(
 const isProvider = computed(() => props.role === 'provider')
 
 const providerMarker = ref(null)
+const eventMarkerIds = new Set()
 const mapLoading = ref(true)
 const centered = ref(false)
 const sheetLevel = ref(0)
@@ -82,6 +86,27 @@ function updateProviderMarker() {
   }
 }
 
+function syncEventMarkers() {
+  for (const event of store.events) {
+    if (eventMarkerIds.has(event.id)) continue
+
+    const lat = Number(event.latitude)
+    const lng = Number(event.longitude)
+
+    // Evento salvo sem GPS aparece só na lista.
+    if (event.latitude == null || event.longitude == null || Number.isNaN(lat) || Number.isNaN(lng)) continue
+
+    const marker = addMarker(lng, lat, { element: createWalkEventPin(event.kind) })
+
+    // Sem mapa ainda: tenta de novo quando ele existir.
+    if (marker) eventMarkerIds.add(event.id)
+  }
+}
+
+function markEvent(...args) {
+  store.addEvent(...args)
+}
+
 function applyMapStyle() {
   setStyle(dim.value ? 'dark' : resolved.value)
 }
@@ -108,9 +133,11 @@ async function initializeMap() {
   createMap('service-active-map', center, known ? 15 : 2)
 
   updateProviderMarker()
+  syncEventMarkers()
 }
 
 watch(() => store.currentLocation, updateProviderMarker)
+watch(() => store.events.length, syncEventMarkers)
 
 watch(loaded, (value) => {
   if (!value) return
@@ -127,6 +154,7 @@ onBeforeUnmount(() => wakeLock.release())
 onMounted(() => {
   if (isProvider.value) wakeLock.request()
   initializeMap()
+  store.loadEvents()
 })
 </script>
 
@@ -170,11 +198,13 @@ onMounted(() => {
               <dd class="text-display tabular-nums text-fg">{{ store.formattedDistance }}</dd>
             </div>
           </dl>
+          <WalkEventBar v-if="isProvider" :disabled="store.eventSending" @mark="markEvent" />
         </div>
       </template>
 
       <ServicePartyCard :role="role" />
       <WhatsAppButton :phone="contactPhone" />
+      <WalkEventList :events="store.events" />
       <ServicePetsList />
 
       <template v-if="isProvider">

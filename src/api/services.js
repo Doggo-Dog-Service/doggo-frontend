@@ -43,3 +43,11 @@ export const getServiceRoute = (id) => {
 export const rateService = (id, payload) => {
     return api.post(`/services/${id}/rate/`, payload)
 }
+
+export const getServiceEvents = (id) => {
+    return api.get(`/services/${id}/events/`)
+}
+
+export const postServiceEvent = (id, payload) => {
+    return api.post(`/services/${id}/events/`, payload)
+}

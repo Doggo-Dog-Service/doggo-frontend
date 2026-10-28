@@ -14,7 +14,7 @@ const mapApi = {
   loaded: ref(false),
 }
 vi.mock('@/composables/useMap', () => ({ useMap: () => mapApi }))
-vi.mock('@/services/service', () => ({}))
+vi.mock('@/services/service', () => ({ getServiceEvents: vi.fn().mockResolvedValue([]) }))
 vi.mock('@/utils/notify', () => ({ default: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 
 import ServiceActiveWalk from '../ServiceActiveWalk.vue'
@@ -151,5 +151,61 @@ describe('ServiceActiveWalk', () => {
   it('tutor has no complete button', () => {
     const { wrapper } = setup('client')
     expect(wrapper.find('[data-complete-open]').exists()).toBe(false)
+  })
+
+  describe('marcadores', () => {
+    const ev = (id, kind = 'pee', extra = {}) => ({ id, kind, latitude: -26.3, longitude: -48.8, image_url: null, created_at: '2026-10-28T12:00:00Z', ...extra })
+
+    it('provider: action bar calls addEvent per kind', async () => {
+      const { store, wrapper } = setup('provider')
+      const spy = vi.spyOn(store, 'addEvent').mockResolvedValue(null)
+      for (const kind of ['pee', 'poop', 'water']) {
+        await wrapper.get(`[data-event-${kind}]`).trigger('click')
+        expect(spy).toHaveBeenLastCalledWith(kind)
+      }
+      expect(wrapper.text()).toContain('Xixi')
+      expect(wrapper.text()).toContain('Cocô')
+      expect(wrapper.text()).toContain('Água')
+      expect(wrapper.text()).toContain('Foto')
+    })
+
+    it('provider: photo input opens camera and uploads chosen file', async () => {
+      const { store, wrapper } = setup('provider')
+      const spy = vi.spyOn(store, 'addEvent').mockResolvedValue(null)
+      const input = wrapper.get('[data-event-photo-input]')
+      expect(input.attributes('accept')).toBe('image/*')
+      expect(input.attributes('capture')).toBe('environment')
+      const file = new File(['a'], 'a.jpg', { type: 'image/jpeg' })
+      Object.defineProperty(input.element, 'files', { value: [file] })
+      await input.trigger('change')
+      expect(spy).toHaveBeenCalledWith('photo', file)
+    })
+
+    it('tutor: no action bar', () => {
+      const { wrapper } = setup('client')
+      expect(wrapper.find('[data-event-pee]').exists()).toBe(false)
+      expect(wrapper.find('[data-event-photo-input]').exists()).toBe(false)
+    })
+
+    it('tutor: WS event adds one map marker and one list item, no duplicate', async () => {
+      const { store, wrapper } = setup('client')
+      await flushPromises()
+      mapApi.addMarker.mockClear()
+      store.handleWalkEvent({ service_id: 1, event: ev(1) })
+      store.handleWalkEvent({ service_id: 1, event: ev(1) })
+      await flushPromises()
+      expect(mapApi.addMarker).toHaveBeenCalledTimes(1)
+      expect(wrapper.findAll('[data-event-item]')).toHaveLength(1)
+    })
+
+    it('event without position is listed but not on the map', async () => {
+      const { store, wrapper } = setup('client')
+      await flushPromises()
+      mapApi.addMarker.mockClear()
+      store.handleWalkEvent({ service_id: 1, event: ev(2, 'water', { latitude: null, longitude: null }) })
+      await flushPromises()
+      expect(mapApi.addMarker).not.toHaveBeenCalled()
+      expect(wrapper.findAll('[data-event-item]')).toHaveLength(1)
+    })
   })
 })

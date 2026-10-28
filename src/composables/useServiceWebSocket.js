@@ -100,6 +100,10 @@ export const useServiceWebSocket = (serviceId, handlers = {}) => {
         handleWalkCancelled(message)
         break
 
+      case 'walk_event':
+        serviceWebSocketStore.handleWalkEvent(message)
+        break
+
       case 'error':
         handleServerError(message)
         break
