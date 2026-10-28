@@ -110,6 +110,15 @@ describe('ServiceActiveWalk', () => {
     expect(wrapper.emitted('complete')).toHaveLength(1)
   })
 
+  // .maplibregl-map (CSS fora de @layer) força position:relative e anula `absolute inset-0`:
+  // o container precisa de altura própria ou o mapa fica com 0px.
+  it('map container has its own size, not absolute positioning', () => {
+    const { wrapper } = setup('client')
+    const map = wrapper.find('#service-active-map')
+    expect(map.classes()).toEqual(expect.arrayContaining(['h-full', 'w-full']))
+    expect(map.classes()).not.toContain('absolute')
+  })
+
   it('tutor has no complete button', () => {
     const { wrapper } = setup('client')
     expect(wrapper.find('[data-complete-open]').exists()).toBe(false)

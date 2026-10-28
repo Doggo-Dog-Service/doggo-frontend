@@ -134,7 +134,8 @@ onMounted(() => {
   <div
     class="relative -mx-4 -my-5 h-[calc(100dvh-3.5rem-env(safe-area-inset-top))] overflow-hidden md:mx-0 md:my-0 md:h-[calc(100dvh-8rem)] md:rounded-card"
   >
-    <div id="service-active-map" class="absolute inset-0 bg-surface-muted">
+    <!-- h-full/w-full e não absolute: .maplibregl-map força position:relative e anularia o inset-0. -->
+    <div id="service-active-map" class="h-full w-full bg-surface-muted">
       <div
         v-if="mapLoading"
         class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-canvas"
