@@ -68,7 +68,8 @@ async function save() {
 const canBecomeProvider = computed(() => !!authStore.user?.client_profile && !authStore.user?.provider_profile)
 const providerOpen = ref(false)
 const providerSaving = ref(false)
-const providerForm = reactive({ latitude: null, longitude: null, service_type: null, price_per_hour: '', price_per_day: '', description: '' })
+const emptyProviderForm = () => ({ latitude: null, longitude: null, service_type: null, price_per_hour: '', price_per_day: '', description: '' })
+const providerForm = reactive(emptyProviderForm())
 const providerErrors = reactive({})
 
 function setProviderErrors(errs) {
@@ -76,23 +77,55 @@ function setProviderErrors(errs) {
   Object.assign(providerErrors, errs)
 }
 
+// Fechar a folha descarta o rascunho e os erros.
+watch(providerOpen, (open) => {
+  if (open) return
+  Object.assign(providerForm, emptyProviderForm())
+  setProviderErrors({})
+})
+
+// Editar um campo limpa o erro dele.
+const ERROR_FIELDS = {
+  location: ['latitude', 'longitude'],
+  service_type: ['service_type'],
+  price: ['price_per_hour', 'price_per_day'],
+  description: ['description'],
+}
+for (const [errorKey, fields] of Object.entries(ERROR_FIELDS)) {
+  watch(
+    () => fields.map((field) => providerForm[field]),
+    () => {
+      delete providerErrors[errorKey]
+    },
+  )
+}
+
 async function createProviderProfile() {
   const invalid = validateProviderForm(providerForm)
   setProviderErrors(invalid)
   if (Object.keys(invalid).length) return
   providerSaving.value = true
-  const ok = await providerStore.createProvider(buildProviderPayload(providerForm), {
-    onError: (error) => {
-      setProviderErrors(mapProviderErrors(error?.response?.data))
-      notify.error(parseDjangoErrors(error))
-    },
-  })
-  if (ok) {
-    await authStore.fetchUser()
-    notify.success('Perfil de passeador criado')
-    providerOpen.value = false
+  try {
+    const ok = await providerStore.createProvider(buildProviderPayload(providerForm), {
+      onError: (error) => {
+        setProviderErrors(mapProviderErrors(error?.response?.data))
+        notify.error(parseDjangoErrors(error))
+      },
+    })
+    if (ok) {
+      try {
+        await authStore.fetchUser()
+      } catch {
+        // o perfil já foi criado; o usuário é recarregado na próxima navegação
+      }
+      notify.success('Perfil de passeador criado')
+      providerOpen.value = false
+    }
+  } catch (error) {
+    notify.error(parseDjangoErrors(error))
+  } finally {
+    providerSaving.value = false
   }
-  providerSaving.value = false
 }
 
 function logout() {

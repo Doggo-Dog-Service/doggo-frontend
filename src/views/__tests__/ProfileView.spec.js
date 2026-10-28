@@ -92,4 +92,52 @@ describe('ProfileView - quero passear também', () => {
     expect(w.text()).toContain('Texto inválido')
     expect(auth.fetchUser).not.toHaveBeenCalled()
   })
+
+  async function fillAndSubmit(w) {
+    await button(w, 'Quero passear também').trigger('click')
+    await w.find('[data-test="pick"]').trigger('click')
+    await w.findAll('button').find((b) => b.text() === 'Passeio').trigger('click')
+    await w.find('input[type="number"]').setValue('30')
+    await button(w, 'Criar perfil de passeador').trigger('click')
+    await flushPromises()
+  }
+
+  it('fetchUser falhando após criar ainda fecha a folha e avisa sucesso', async () => {
+    const w = setup({ ...base, client_profile: { id: 1 } })
+    vi.spyOn(providers, 'createProvider').mockResolvedValue(true)
+    auth.fetchUser = vi.fn().mockRejectedValue(new Error('rede'))
+    await fillAndSubmit(w)
+    expect(notify.success).toHaveBeenCalledWith('Perfil de passeador criado')
+    expect(w.find('[data-test="sheet"]').exists()).toBe(false)
+  })
+
+  it('createProvider lançando limpa o loading', async () => {
+    const w = setup({ ...base, client_profile: { id: 1 } })
+    vi.spyOn(providers, 'createProvider').mockRejectedValue(new Error('boom'))
+    await fillAndSubmit(w).catch(() => {})
+    await flushPromises()
+    expect(button(w, 'Criar perfil de passeador').attributes('disabled')).toBeUndefined()
+  })
+
+  it('reseta formulário e erros ao fechar a folha', async () => {
+    const w = setup({ ...base, client_profile: { id: 1 } })
+    await button(w, 'Quero passear também').trigger('click')
+    await w.find('input[type="number"]').setValue('30')
+    await button(w, 'Criar perfil de passeador').trigger('click')
+    expect(w.text()).toContain('Marque no mapa onde você atende.')
+    w.findComponent(SheetStub).vm.$emit('update:open', false)
+    await w.vm.$nextTick()
+    await button(w, 'Quero passear também').trigger('click')
+    expect(w.text()).not.toContain('Marque no mapa onde você atende.')
+    expect(w.find('input[type="number"]').element.value).toBe('')
+  })
+
+  it('limpa o erro do campo quando ele muda', async () => {
+    const w = setup({ ...base, client_profile: { id: 1 } })
+    await button(w, 'Quero passear também').trigger('click')
+    await button(w, 'Criar perfil de passeador').trigger('click')
+    expect(w.text()).toContain('Marque no mapa onde você atende.')
+    await w.find('[data-test="pick"]').trigger('click')
+    expect(w.text()).not.toContain('Marque no mapa onde você atende.')
+  })
 })

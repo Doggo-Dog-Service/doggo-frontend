@@ -15,6 +15,7 @@ const props = defineProps({
   formErrors: { type: Object, default: null },
 })
 const wizard = useSignupWizard()
+// `form` é lido uma única vez: quem chama passa objetos estáveis (reactive).
 const provider = props.form ?? wizard.provider
 const errors = props.formErrors ?? wizard.errors
 const serviceTypeStore = useServiceTypeStore()

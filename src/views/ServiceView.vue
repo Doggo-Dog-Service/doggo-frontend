@@ -175,7 +175,6 @@ load()
       v-else-if="serviceWebSocketStore.inProgress"
       :role="role"
       @complete="serviceWebSocketStore.completeService"
-      @cancel="serviceWebSocketStore.cancelService"
     />
 
     <ServiceRouteMap

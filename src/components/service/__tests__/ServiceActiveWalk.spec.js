@@ -18,6 +18,7 @@ vi.mock('@/services/service', () => ({}))
 vi.mock('@/utils/notify', () => ({ default: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 
 import ServiceActiveWalk from '../ServiceActiveWalk.vue'
+import { useTheme } from '@/composables/useTheme'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 
 function setup(role, service = {}) {
@@ -91,6 +92,34 @@ describe('ServiceActiveWalk', () => {
     expect(mapApi.setStyle).toHaveBeenCalledWith('dark')
     await btn.trigger('click')
     expect(sessionStorage.getItem('doggo-walk-dim')).toBe('0')
+  })
+
+  it('restyles map when app theme changes mid-walk, unless dim forces dark', async () => {
+    const { setPreference } = useTheme()
+    setPreference('light')
+    mapApi.loaded.value = true
+    const { wrapper } = setup('client')
+    mapApi.setStyle.mockClear()
+    setPreference('dark')
+    await flushPromises()
+    expect(mapApi.setStyle).toHaveBeenCalledWith('dark')
+    setPreference('light')
+    await flushPromises()
+    expect(mapApi.setStyle).toHaveBeenLastCalledWith('light')
+    wrapper.unmount()
+
+    sessionStorage.setItem('doggo-walk-dim', '1')
+    setup('provider')
+    mapApi.setStyle.mockClear()
+    setPreference('dark')
+    setPreference('light')
+    await flushPromises()
+    expect(mapApi.setStyle).not.toHaveBeenCalledWith('light')
+  })
+
+  it('does not declare a cancel emit', () => {
+    const { wrapper } = setup('provider')
+    expect(wrapper.vm.$options.emits).toEqual(['complete'])
   })
 
   it('restores dim from sessionStorage', () => {

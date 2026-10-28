@@ -20,7 +20,7 @@ import { formatElapsed } from '@/utils/time'
 
 const DIM_KEY = 'doggo-walk-dim'
 
-const emit = defineEmits(['complete', 'cancel'])
+const emit = defineEmits(['complete'])
 
 const props = defineProps({
   role: {
@@ -118,7 +118,7 @@ watch(loaded, (value) => {
   if (dim.value) applyMapStyle()
 })
 
-watch(dim, () => {
+watch([dim, resolved], () => {
   if (loaded.value) applyMapStyle()
 })
 
