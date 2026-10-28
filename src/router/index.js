@@ -141,7 +141,8 @@ router.beforeEach((to) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     return {
-      name: 'login-view'
+      name: 'login-view',
+      query: { redirect: to.fullPath },
     }
   }
 

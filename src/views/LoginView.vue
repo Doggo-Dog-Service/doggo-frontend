@@ -4,9 +4,11 @@ import AppInput from '@/components/inputs/AppInput.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import { onMounted, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { safeRedirect } from '@/utils/safeRedirect'
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const data = reactive({
   email: '',
@@ -15,7 +17,7 @@ const data = reactive({
 
 const handleLogin = async () => {
   const ok = await authStore.login(data)
-  if (ok) router.push('/')
+  if (ok) router.push(safeRedirect(route.query.redirect) ?? '/')
 }
 
 onMounted(() => {

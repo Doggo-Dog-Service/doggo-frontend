@@ -48,6 +48,10 @@ export const useAuthStore = defineStore('authStore', () => {
     notify.success('Logout realizado!')
   }
 
+  const clearSession = () => {
+    user.value = null
+  }
+
   const createUser = async (data) => {
     try {
       loading.value = true
@@ -101,6 +105,7 @@ export const useAuthStore = defineStore('authStore', () => {
     createUser,
     updateUser,
     logout,
+    clearSession,
     deleteUser,
     inicialize,
   }
