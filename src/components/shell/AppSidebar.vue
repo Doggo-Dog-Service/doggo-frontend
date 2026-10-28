@@ -6,10 +6,15 @@ import ModeSwitch from './ModeSwitch.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceStore } from '@/stores/services'
 import { navItemsFor, activeTabName, homeRouteFor } from '@/router/navigation'
+import { useTheme } from '@/composables/useTheme.js'
+
+const { preference } = useTheme()
+const isLight = computed(() => preference === 'light')
 
 const route = useRoute()
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
+
 
 const items = computed(() => navItemsFor(authStore.mode))
 const activeName = computed(() => activeTabName(route, authStore.mode))
@@ -21,7 +26,7 @@ const activeName = computed(() => activeTabName(route, authStore.mode))
       :to="homeRouteFor(authStore.mode)"
       class="rounded-control px-2 pt-1 focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <img class="h-9 w-auto" src="/logo.png" alt="Doggo" />
+      <img class="h-9 w-auto" :src="isLight ? '/logo.png' : '/logo-dark-mode.png'" alt="Doggo" />
     </RouterLink>
 
     <ModeSwitch />

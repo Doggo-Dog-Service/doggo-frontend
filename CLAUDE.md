@@ -46,11 +46,11 @@ porque deixaram de ser prioridade.
 -   Pinia.
 -   Axios.
 -   Tailwind CSS v4 (já em uso, com configuração CSS-first).
--   `lucide-vue-next` para os ícones (alvo; hoje o código usa `@mdi/font`
-    e `@heroicons/vue`, e a migração é do sub-projeto 2 do roadmap).
+-   `lucide-vue-next` para os ícones (em uso; `@mdi/font` e
+    `@heroicons/vue` foram removidos).
 -   GSAP conforme já configurado no projeto.
--   `vue3-toastify` para notificações (alvo; hoje o código usa
-    `vue-toast-notification`, e a migração é do sub-projeto 2).
+-   `vue3-toastify` para notificações (em uso, via `src/utils/notify.js`;
+    `vue-toast-notification` foi removido).
 -   PWA conforme a implementação existente.
 
 Confirme `package.json` e os arquivos de configuração antes de usar
@@ -90,6 +90,14 @@ corresponder a este padrão, utilize:
   Views/páginas           `src/views/`            `XView.vue`
 
   Componentes de domínio  `src/components/`       PascalCase
+
+  Componentes base        `src/components/ui/`    `UiX.vue` (UiIcon,
+                                                  UiBadge, UiCard,
+                                                  UiSheet, etc.)
+
+  Casca de navegação      `src/components/shell/` AppSidebar, AppTopBar,
+                                                  AppBottomNav,
+                                                  ModeSwitch
 
   Layouts                 `src/layouts/`          `XLayout.vue`
 
@@ -135,8 +143,8 @@ código.
     existentes. A validação no frontend melhora a experiência, mas não
     substitui a validação no backend.
 -   Não usar `alert()` como mecanismo de notificação; utilizar os
-    padrões existentes de notificação (hoje `vue-toast-notification`;
-    `vue3-toastify` é o alvo do sub-projeto 2).
+    `notify` (`src/utils/notify.js`, sobre `vue3-toastify`):
+    `notify.success`, `notify.error`, `notify.info`.
 -   Não deixar `console.log` como tratamento de erro ou depuração
     permanente.
 
@@ -180,7 +188,13 @@ específica e testada. Investigue exceções antes de alterar.
 
 -   Usar Tailwind CSS v4.
 -   Utilizar a skill tailwind-design-system
--   Reutilizar os tokens e variáveis CSS existentes.
+-   Reutilizar os tokens semânticos de `src/assets/css/main.css`
+    (`bg-canvas`, `bg-surface`, `text-fg`, `text-fg-muted`,
+    `border-line`, `bg-primary`, `text-primary-fg`, `text-danger`...),
+    que já trocam entre tema claro e escuro. Não usar cores cruas
+    (`bg-white`, `text-gray-*`) nem os tokens antigos `doggo-*`.
+-   Ícones: sempre componentes de `lucide-vue-next`, renderizados com
+    `UiIcon`.
 -   Evitar repetir valores de cores, espaçamentos e tipografia em vários
     arquivos.
 -   Manter consistência visual com a identidade atual do DOGGO.

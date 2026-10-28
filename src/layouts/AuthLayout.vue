@@ -2,6 +2,10 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSignupWizard } from '@/composables/useSignupWizard'
+import { useTheme } from '@/composables/useTheme.js'
+
+const { preference } = useTheme()
+const isLight = computed(() => preference === 'light')
 
 const route = useRoute()
 const wizard = useSignupWizard()
@@ -17,7 +21,7 @@ const widthClass = computed(() => {
   <div class="min-h-dvh bg-canvas text-fg">
     <div :class="['mx-auto flex w-full flex-col gap-6 px-4 py-8 md:py-12', widthClass]">
       <RouterLink to="/" class="self-center rounded-control focus-visible:ring-2 focus-visible:ring-primary">
-        <img class="h-10 w-auto" src="/logo.png" alt="Doggo" />
+        <img class="h-10 w-auto" :src="isLight ? '/logo.png' : '/logo-dark-mode.png'" alt="Doggo" />
       </RouterLink>
       <main class="overflow-hidden rounded-card border border-line bg-surface p-6 shadow-card md:p-8">
         <RouterView v-slot="{ Component }">

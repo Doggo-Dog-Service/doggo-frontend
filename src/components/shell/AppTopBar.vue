@@ -4,6 +4,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { homeRouteFor, isTabRoute } from '@/router/navigation'
+import { useTheme } from '@/composables/useTheme.js'
+
+const { preference } = useTheme()
+const isLight = computed(() => preference === 'light')
 
 const route = useRoute()
 const router = useRouter()
@@ -38,7 +42,7 @@ function goBack() {
       :to="homeRouteFor(authStore.mode)"
       class="shrink-0 rounded-control focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <img class="h-7 w-auto" src="/logo.png" alt="Doggo" />
+      <img class="h-7 w-auto" :src="isLight ? '/logo.png' : '/logo-dark-mode.png'" alt="Doggo" />
     </RouterLink>
     <h1 class="flex-1 truncate text-subtitle text-fg">{{ route.meta.title }}</h1>
     <slot name="actions" />
