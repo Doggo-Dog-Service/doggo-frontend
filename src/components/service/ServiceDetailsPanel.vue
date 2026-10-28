@@ -1,5 +1,5 @@
 <script setup>
-import { Banknote, CalendarClock, Clock } from 'lucide-vue-next'
+import { Banknote, CalendarClock, Clock, Timer } from 'lucide-vue-next'
 import InfoCard from '@/components/cards/InfoCard.vue'
 import ServicePartyCard from '@/components/service/ServicePartyCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
@@ -21,6 +21,7 @@ defineProps({
 const priceLabel = computed(() => formatCurrency(store.price))
 const startLabel = computed(() => formatDateTime(store.startDatetime))
 const endLabel = computed(() => formatDateTime(store.endDatetime))
+const durationLabel = computed(() => store.walkDuration)
 </script>
 
 <template>
@@ -30,6 +31,7 @@ const endLabel = computed(() => formatDateTime(store.endDatetime))
       <InfoCard :icon="Banknote" description="Preço" :info="priceLabel" />
       <InfoCard :icon="CalendarClock" description="Início" :info="startLabel" />
       <InfoCard v-if="store.endDatetime" :icon="Clock" description="Fim" :info="endLabel" />
+      <InfoCard v-if="durationLabel" :icon="Timer" description="Duração" :info="durationLabel" />
     </div>
     <ServicePetsList />
   </div>

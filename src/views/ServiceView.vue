@@ -6,11 +6,10 @@ import { ShieldOff } from 'lucide-vue-next'
 import AppButton from '@/components/buttons/AppButton.vue'
 import ServiceActions from '@/components/service/ServiceActions.vue'
 import ServiceActiveWalk from '@/components/service/ServiceActiveWalk.vue'
-import ServiceDetailsPanel from '@/components/service/ServiceDetailsPanel.vue'
+import ServiceSummaryCard from '@/components/service/ServiceSummaryCard.vue'
 import ServiceErrorState from '@/components/service/ServiceErrorState.vue'
 import ServiceLoadingState from '@/components/service/ServiceLoadingState.vue'
 import ServiceRouteMap from '@/components/service/ServiceRouteMap.vue'
-import ServiceStatusBadge from '@/components/service/ServiceStatusBadge.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
@@ -186,25 +185,20 @@ load()
     />
 
     <div v-else class="w-full flex flex-col items-center gap-4 p-4 pb-30 md:p-8 md:pb-4">
-      <div class="w-full max-w-160 flex flex-col gap-4">
-        <header class="flex flex-col items-center gap-2 text-center">
-          <h1 class="text-display text-fg">{{ statusInfo.title }}</h1>
-          <ServiceStatusBadge :status="serviceWebSocketStore.status" />
-          <p class="text-body text-fg-muted">{{ statusInfo.subtitle }}</p>
-        </header>
-
-        <ServiceDetailsPanel :role="role" />
-
-        <ServiceActions
-          v-if="showActions"
-          :role="role"
-          :status="serviceWebSocketStore.status"
-          :busy="serviceWebSocketStore.loading"
-          @confirm="serviceWebSocketStore.confirmService"
-          @reject="serviceWebSocketStore.rejectService"
-          @start="serviceWebSocketStore.startService"
-          @cancel="serviceWebSocketStore.cancelService"
-        />
+      <div class="w-full max-w-160">
+        <ServiceSummaryCard :role="role" :title="statusInfo.title" :subtitle="statusInfo.subtitle">
+          <div v-if="showActions" data-actions class="w-full">
+            <ServiceActions
+              :role="role"
+              :status="serviceWebSocketStore.status"
+              :busy="serviceWebSocketStore.loading"
+              @confirm="serviceWebSocketStore.confirmService"
+              @reject="serviceWebSocketStore.rejectService"
+              @start="serviceWebSocketStore.startService"
+              @cancel="serviceWebSocketStore.cancelService"
+            />
+          </div>
+        </ServiceSummaryCard>
       </div>
     </div>
   </div>
