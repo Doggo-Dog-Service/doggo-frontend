@@ -17,6 +17,7 @@ vi.mock('@/composables/useMap', () => ({ useMap: () => mapApi }))
 vi.mock('@/services/service', () => ({ getServiceEvents: vi.fn().mockResolvedValue([]) }))
 vi.mock('@/utils/notify', () => ({ default: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 
+import notify from '@/utils/notify'
 import ServiceActiveWalk from '../ServiceActiveWalk.vue'
 import { useTheme } from '@/composables/useTheme'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
@@ -136,6 +137,42 @@ describe('ServiceActiveWalk', () => {
     expect(confirm).not.toBeNull()
     confirm.click()
     await flushPromises()
+    expect(wrapper.emitted('complete')).toHaveLength(1)
+  })
+
+  async function confirmWithNote(wrapper, text) {
+    await wrapper.get('[data-complete-open]').trigger('click')
+    const area = document.body.querySelector('[data-complete-note]')
+    expect(area.getAttribute('maxlength')).toBe('1000')
+    if (text) {
+      area.value = text
+      area.dispatchEvent(new Event('input'))
+    }
+    document.body.querySelector('[data-complete-confirm]').click()
+    await flushPromises()
+  }
+
+  it('concluir with note saves it first, then emits complete', async () => {
+    const { store, wrapper } = setup('provider')
+    const save = vi.spyOn(store, 'saveNote').mockResolvedValue({})
+    await confirmWithNote(wrapper, 'Ótimo passeio')
+    expect(save).toHaveBeenCalledWith('Ótimo passeio')
+    expect(wrapper.emitted('complete')).toHaveLength(1)
+  })
+
+  it('concluir without note skips saveNote', async () => {
+    const { store, wrapper } = setup('provider')
+    const save = vi.spyOn(store, 'saveNote').mockResolvedValue({})
+    await confirmWithNote(wrapper, '')
+    expect(save).not.toHaveBeenCalled()
+    expect(wrapper.emitted('complete')).toHaveLength(1)
+  })
+
+  it('note failure toasts but still completes', async () => {
+    const { store, wrapper } = setup('provider')
+    vi.spyOn(store, 'saveNote').mockRejectedValue({ message: 'falhou' })
+    await confirmWithNote(wrapper, 'n')
+    expect(notify.error).toHaveBeenCalled()
     expect(wrapper.emitted('complete')).toHaveLength(1)
   })
 

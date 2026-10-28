@@ -40,6 +40,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
   const isRejected = computed(() => status.value === 6)
   const isTerminal = computed(() => isFinished.value || isCancelled.value || isRejected.value)
 
+  const providerNote = computed(() => service.value?.provider_note ?? '')
   const providerId = computed(() => service.value?.provider_id ?? null)
   const providerName = computed(() => service.value?.provider_name ?? null)
   const providerPicture = computed(() => service.value?.provider_picture ?? null)
@@ -220,6 +221,18 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     }
   }
 
+  async function saveNote(note) {
+    if (!service.value) {
+      return null
+    }
+
+    const data = await serviceService.patchServiceNote(service.value.id, { provider_note: note })
+
+    service.value = data
+
+    return data
+  }
+
   async function runServiceAction(action, successMessage, { refreshPending = false } = {}) {
     if (!service.value) {
       return null
@@ -340,6 +353,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     isRejected,
     isTerminal,
     providerId,
+    providerNote,
     providerName,
     providerPicture,
     providerLocation,
@@ -370,6 +384,7 @@ export const useServiceWebSocketStore = defineStore('serviceWebSocket', () => {
     getRoute,
     loadEvents,
     addEvent,
+    saveNote,
     handleWalkEvent,
     startService,
     confirmService,

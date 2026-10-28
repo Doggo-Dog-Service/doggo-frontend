@@ -7,11 +7,13 @@ import InfoCard from '@/components/cards/InfoCard.vue'
 import SearchCard from '../cards/SearchCard.vue'
 import ServicePetsList from '@/components/service/ServicePetsList.vue'
 import ReviewModal from '../modals/ReviewModal.vue'
+import UiSheet from '@/components/ui/UiSheet.vue'
 
 import { useMap, getThemeColor } from '@/composables/useMap'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatMeters } from '@/utils/distance'
 import { formatCurrency } from '@/utils/currency'
+import { createWalkEventPin, walkEventMeta } from '@/utils/walkEvents'
 
 const props = defineProps({
   role: {
@@ -32,6 +34,41 @@ const mapLoading = ref(true)
 const reviewOpen = ref(false)
 const reviewComment = ref('')
 const reviewRating = ref(0)
+const photoOpen = ref(false)
+const photoSelected = ref(null)
+const eventMarkerIds = new Set()
+
+const COUNT_KINDS = ['pee', 'poop', 'water']
+
+const eventCounts = computed(() =>
+  COUNT_KINDS.map((kind) => ({
+    kind,
+    label: walkEventMeta(kind).label,
+    count: serviceStore.events.filter((event) => event.kind === kind).length,
+  })),
+)
+const photos = computed(() => serviceStore.events.filter((event) => event.image_url))
+const providerNote = computed(() => serviceStore.providerNote.trim())
+
+function openPhoto(event) {
+  photoSelected.value = event
+  photoOpen.value = true
+}
+
+function syncEventMarkers() {
+  if (!loaded.value) return
+
+  for (const event of serviceStore.events) {
+    if (eventMarkerIds.has(event.id)) continue
+
+    const lat = Number(event.latitude)
+    const lng = Number(event.longitude)
+
+    if (event.latitude == null || event.longitude == null || Number.isNaN(lat) || Number.isNaN(lng)) continue
+
+    if (addMarker(lng, lat, { element: createWalkEventPin(event.kind) })) eventMarkerIds.add(event.id)
+  }
+}
 
 const distanceLabel = computed(() => formatMeters(serviceStore.totalDistance))
 const durationLabel = computed(() => serviceStore.walkDuration)
@@ -52,6 +89,7 @@ async function initializeMap() {
   createMap('service-route-map', center, 15)
 
   renderRouteOnMap()
+  syncEventMarkers()
 }
 
 function renderRouteOnMap() {
@@ -91,12 +129,14 @@ async function submitReview() {
 
 onMounted(() => {
   initializeMap()
+  if (serviceStore.events.length === 0) serviceStore.loadEvents()
   if(!props.isServiceRating && props.role === 'client') {
     reviewOpen.value = true
   }
 })
 
 watch([loaded, () => serviceStore.routePoints.length], renderRouteOnMap)
+watch([loaded, () => serviceStore.events.length], syncEventMarkers)
 
 watch(loaded, (value) => {
   if (value) mapLoading.value = false
@@ -152,7 +192,49 @@ watch(loaded, (value) => {
       <InfoCard :icon="Route" description="Distância" :info="distanceLabel" />
       <InfoCard :icon="Clock" description="Duração" :info="durationLabel" />
       <InfoCard :icon="Banknote" description="Valor" :info="priceLabel" />
+      <section class="col-span-2 flex flex-col gap-2" aria-label="Marcadores do passeio">
+        <h2 class="text-subtitle text-fg">Marcadores</h2>
+        <p data-event-counts class="text-body text-fg-muted">
+          <template v-for="(item, index) in eventCounts" :key="item.kind">
+            <span v-if="index > 0" aria-hidden="true"> · </span>{{ item.label }} {{ item.count }}
+          </template>
+        </p>
+      </section>
+      <section v-if="photos.length > 0" class="col-span-2 flex flex-col gap-2" aria-label="Fotos do passeio">
+        <h2 class="text-subtitle text-fg">Fotos</h2>
+        <ul class="grid grid-cols-3 gap-2">
+          <li v-for="photo in photos" :key="photo.id">
+            <button
+              type="button"
+              data-photo-thumb
+              class="block aspect-square w-full cursor-pointer overflow-hidden rounded-control focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label="Ampliar foto do passeio"
+              @click="openPhoto(photo)"
+            >
+              <img :src="photo.image_url" alt="Foto do passeio" class="size-full object-cover" loading="lazy" />
+            </button>
+          </li>
+        </ul>
+      </section>
+      <section
+        v-if="providerNote"
+        data-provider-note
+        class="col-span-2 flex flex-col gap-1 rounded-control border border-line bg-surface p-3"
+      >
+        <h2 class="text-subtitle text-fg">Nota do passeador</h2>
+        <p class="whitespace-pre-line text-body text-fg-muted">{{ providerNote }}</p>
+      </section>
       <ServicePetsList class="col-span-2" />
     </div>
   </div>
+
+  <UiSheet v-model:open="photoOpen" title="Foto do passeio">
+    <img
+      v-if="photoSelected"
+      data-photo-large
+      :src="photoSelected.image_url"
+      alt="Foto do passeio ampliada"
+      class="max-h-[70dvh] w-full rounded-control object-contain"
+    />
+  </UiSheet>
 </template>

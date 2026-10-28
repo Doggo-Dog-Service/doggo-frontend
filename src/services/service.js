@@ -165,3 +165,16 @@ export const postServiceEvent = async (id, payload) => {
     }
   }
 }
+
+export const patchServiceNote = async (id, payload) => {
+  try {
+    const response = await serviceApi.patchServiceNote(id, payload)
+
+    return response.data
+  } catch (error) {
+    throw {
+      message: parseDjangoErrors(error),
+      status: error.response?.status,
+    }
+  }
+}

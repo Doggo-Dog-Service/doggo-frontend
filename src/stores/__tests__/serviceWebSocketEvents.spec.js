@@ -84,3 +84,15 @@ describe('serviceWebSocket events', () => {
     expect(store.events).toEqual([])
   })
 })
+
+describe('serviceWebSocket saveNote', () => {
+  it('patches provider_note and updates the service', async () => {
+    setActivePinia(createPinia())
+    svc.patchServiceNote = vi.fn().mockResolvedValue({ id: 7, status: 3, provider_note: 'Tudo bem' })
+    const store = useServiceWebSocketStore()
+    store.setService({ id: 7, status: 3 })
+    await store.saveNote('Tudo bem')
+    expect(svc.patchServiceNote).toHaveBeenCalledWith(7, { provider_note: 'Tudo bem' })
+    expect(store.providerNote).toBe('Tudo bem')
+  })
+})

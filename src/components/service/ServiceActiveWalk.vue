@@ -20,6 +20,7 @@ import { useWakeLock } from '@/composables/useWakeLock'
 import { useServiceWebSocketStore } from '@/stores/serviceWebSocket'
 import { formatElapsed } from '@/utils/time'
 import { createWalkEventPin } from '@/utils/walkEvents'
+import notify from '@/utils/notify'
 
 const DIM_KEY = 'doggo-walk-dim'
 
@@ -50,6 +51,8 @@ const mapLoading = ref(true)
 const centered = ref(false)
 const sheetLevel = ref(0)
 const confirmOpen = ref(false)
+const note = ref('')
+const NOTE_MAX = 1000
 
 function readDim() {
   try {
@@ -120,8 +123,20 @@ function toggleDim() {
   }
 }
 
-function confirmComplete() {
+async function confirmComplete() {
+  const text = note.value.trim()
+
   confirmOpen.value = false
+
+  // A nota é opcional: se falhar, avisa e conclui o passeio mesmo assim.
+  if (text) {
+    try {
+      await store.saveNote(text)
+    } catch (err) {
+      notify.error(err?.message || 'Não foi possível salvar a nota. O passeio será concluído.')
+    }
+  }
+
   emit('complete')
 }
 
@@ -233,6 +248,19 @@ onMounted(() => {
       <p class="text-body text-fg-muted">
         O acompanhamento será encerrado e o tutor poderá avaliar o passeio.
       </p>
+      <div class="flex flex-col gap-1">
+        <label for="complete-note" class="text-caption font-semibold text-fg">Nota para o tutor (opcional)</label>
+        <textarea
+          id="complete-note"
+          v-model="note"
+          data-complete-note
+          :maxlength="NOTE_MAX"
+          rows="3"
+          class="w-full resize-none rounded-control border border-line bg-surface p-3 text-body text-fg focus-visible:ring-2 focus-visible:ring-primary"
+          placeholder="Ex.: Caramelo bebeu água e brincou bastante."
+        />
+        <span class="self-end text-caption tabular-nums text-fg-muted">{{ note.length }}/{{ NOTE_MAX }}</span>
+      </div>
       <div class="flex flex-col gap-2">
         <AppButton data-complete-confirm text="Sim, concluir" :disabled="store.loading" @event="confirmComplete" />
         <AppButton text="Continuar passeio" mode="outline" @event="confirmOpen = false" />

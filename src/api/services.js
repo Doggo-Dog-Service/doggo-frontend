@@ -51,3 +51,7 @@ export const getServiceEvents = (id) => {
 export const postServiceEvent = (id, payload) => {
     return api.post(`/services/${id}/events/`, payload)
 }
+
+export const patchServiceNote = (id, payload) => {
+    return api.patch(`/services/${id}/note/`, payload)
+}
