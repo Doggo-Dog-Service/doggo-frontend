@@ -39,8 +39,12 @@ export const usePetStore = defineStore('petStore', () => {
       loading.value = true
       const data = await petService.createPet(payload)
       notify.success(`${data.name} adicionado!`)
+      return data
     } catch(error) {
       notify.error(error?.message)
+      return null
+    } finally {
+      loading.value = false
     }
   }
 

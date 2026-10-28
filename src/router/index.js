@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken } from '@/utils/token'
 import { useAuthStore } from '@/stores/auth'
 import { homeRouteFor } from './navigation'
+import { hasPendingProvider } from '@/utils/signupPending'
+
+// Etapa do passeador para quem é tutor e passeador (1-3 fixas, 4 pet, 5 passeador).
+const PROVIDER_STEP = 5
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -120,10 +124,20 @@ export function createGuard(authStore) {
 
     const mode = authStore.mode
 
+    // Tutor criado que escolheu também ser passeador, mas ainda não criou esse perfil.
+    const pendingProvider = isAuthenticated && !!mode && hasPendingProvider(authStore.user)
+
     if (to.name === 'signup-view') {
       if (!isAuthenticated && signupStep(to) >= 3) return { name: 'signup-view', query: { etapa: '1' } }
+      if (pendingProvider) {
+        return signupStep(to) === PROVIDER_STEP ? undefined : { name: 'signup-view', query: { etapa: String(PROVIDER_STEP) } }
+      }
       if (isAuthenticated && mode) return homeRouteFor(mode)
       return
+    }
+
+    if (pendingProvider && to.meta.requiresAuth) {
+      return { name: 'signup-view', query: { etapa: String(PROVIDER_STEP) } }
     }
 
     // Conta criada, mas sem perfil de tutor/passeador: retoma o cadastro na etapa 3.

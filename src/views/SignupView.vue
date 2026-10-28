@@ -9,13 +9,9 @@ import SignupStepRoles from '@/components/signup/SignupStepRoles.vue'
 import SignupStepPet from '@/components/signup/SignupStepPet.vue'
 import SignupStepProvider from '@/components/signup/SignupStepProvider.vue'
 import { useSignupWizard } from '@/composables/useSignupWizard'
-import { useAuthStore } from '@/stores/auth'
-import { homeRouteFor } from '@/router/navigation'
-import notify from '@/utils/notify'
 
 const route = useRoute()
 const router = useRouter()
-const authStore = useAuthStore()
 const wizard = useSignupWizard()
 const { step, totalSteps, stepKey, isLastStep, submitting } = wizard
 
@@ -32,6 +28,7 @@ const canGoBack = computed(() => wizard.canEnter(step.value - 1))
 const continueText = computed(() => (isLastStep.value ? 'Concluir cadastro' : 'Continuar'))
 
 wizard.resetIfSessionLost()
+wizard.resumePending()
 
 // URL -> etapa: aponta sempre para a primeira etapa permitida.
 watch(
@@ -51,16 +48,20 @@ function syncRoute() {
 }
 
 async function complete() {
-  await authStore.fetchUser()
-  wizard.reset()
-  notify.success('Cadastro concluído')
-  router.replace(homeRouteFor(authStore.mode))
+  router.replace(await wizard.complete())
 }
 
 async function onNext() {
   const wasLast = isLastStep.value
   const ok = await wizard.next()
   if (ok && wasLast) return complete()
+  syncRoute()
+}
+
+async function onSkip() {
+  const wasLast = isLastStep.value
+  wizard.skip()
+  if (wasLast) return complete()
   syncRoute()
 }
 
@@ -83,6 +84,14 @@ function onBack() {
       class="fixed inset-x-0 bottom-0 z-30 flex gap-3 border-t border-line bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:static md:z-auto md:border-0 md:bg-transparent md:p-0"
     >
       <AppButton v-if="canGoBack" text="Voltar" variant="secondary" size="lg" :disabled="submitting" @event="onBack" />
+      <AppButton
+        v-if="stepKey === 'pet'"
+        text="Pular por agora"
+        variant="secondary"
+        size="lg"
+        :disabled="submitting"
+        @event="onSkip"
+      />
       <AppButton :text="continueText" type="submit" variant="primary" size="lg" :loading="submitting" />
     </div>
   </form>

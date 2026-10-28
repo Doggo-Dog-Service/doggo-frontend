@@ -4,11 +4,15 @@ const mocks = vi.hoisted(() => ({
   auth: { user: null, createUser: vi.fn(), login: vi.fn(), fetchUser: vi.fn(), updateUser: vi.fn() },
   clients: { createClient: vi.fn() },
   postImage: vi.fn(),
+  pets: { createPet: vi.fn() },
+  providers: { createProvider: vi.fn() },
   notify: { error: vi.fn(), success: vi.fn() },
 }))
 
 vi.mock('@/stores/auth', () => ({ useAuthStore: () => mocks.auth }))
 vi.mock('@/stores/clients', () => ({ useClientStore: () => mocks.clients }))
+vi.mock('@/stores/pet', () => ({ usePetStore: () => mocks.pets }))
+vi.mock('@/stores/provider', () => ({ useProviderStore: () => mocks.providers }))
 vi.mock('@/composables/useMedia', () => ({ useMedia: () => ({ postImage: mocks.postImage }) }))
 vi.mock('@/utils/notify', () => ({ default: mocks.notify }))
 
@@ -26,6 +30,10 @@ describe('useSignupWizard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.auth.user = null
+    mocks.auth.mode = 'client'
+    localStorage.clear()
+    mocks.pets.createPet.mockResolvedValue({ id: 1 })
+    mocks.providers.createProvider.mockResolvedValue(true)
     mocks.auth.createUser.mockResolvedValue({ id: 7 })
     mocks.auth.login.mockResolvedValue(true)
     mocks.auth.fetchUser.mockResolvedValue()
@@ -294,6 +302,162 @@ describe('useSignupWizard', () => {
     it('resolveStep devolve a etapa 1 para visitante', () => {
       expect(w.resolveStep(3)).toBe(1)
       expect(w.resolveStep(1)).toBe(1)
+    })
+  })
+
+  describe('etapas de pet e passeador', () => {
+    async function reachStep3() {
+      fillAccount(w)
+      await w.next()
+      fillPersonal(w)
+      await w.next()
+    }
+    async function reachPet() {
+      await reachStep3()
+      w.roles.client = true
+      await w.next()
+    }
+    async function reachProvider({ withClient = false } = {}) {
+      await reachStep3()
+      w.roles.provider = true
+      if (withClient) w.roles.client = true
+      await w.next()
+      if (withClient) {
+        w.pet.name = 'Rex'
+        w.pet.size = 'm'
+        await w.next()
+      }
+    }
+    function fillProvider() {
+      Object.assign(w.provider, {
+        latitude: -23.5505,
+        longitude: -46.6333,
+        service_type: 2,
+        price_per_hour: '25',
+        price_per_day: '',
+        description: 'Passeios longos',
+      })
+    }
+
+    it('pet: pular avanca sem chamar a store', async () => {
+      await reachStep3()
+      w.roles.client = w.roles.provider = true
+      await w.next()
+      expect(w.skip()).toBe(true)
+      expect(mocks.pets.createPet).not.toHaveBeenCalled()
+      expect(w.step.value).toBe(5)
+    })
+
+    it('pet: exige nome e porte', async () => {
+      await reachPet()
+      expect(await w.next()).toBe(false)
+      expect(w.errors.name).toBeTruthy()
+      expect(w.errors.size).toBeTruthy()
+      expect(mocks.pets.createPet).not.toHaveBeenCalled()
+    })
+
+    it('pet: salva com o mesmo payload do PetAddModal', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: ' Rex ', breed: 'Vira-lata', size: 'm', weight: '12' })
+      expect(await w.next()).toBe(true)
+      expect(mocks.pets.createPet).toHaveBeenCalledWith({ name: 'Rex', breed: 'Vira-lata', size: 'm', weight: 12 })
+    })
+
+    it('pet: envia foto antes e inclui pet_picture', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p', photo: new File(['x'], 'p.png') })
+      mocks.postImage.mockResolvedValue({ attachment_key: 'pk' })
+      await w.next()
+      expect(mocks.pets.createPet).toHaveBeenCalledWith({ name: 'Rex', breed: '', size: 'p', pet_picture: 'pk' })
+    })
+
+    it('pet: falha na store mantem a etapa e permite repetir', async () => {
+      await reachPet()
+      Object.assign(w.pet, { name: 'Rex', size: 'p' })
+      mocks.pets.createPet.mockResolvedValueOnce(null)
+      expect(await w.next()).toBe(false)
+      expect(w.step.value).toBe(4)
+      expect(await w.next()).toBe(true)
+      expect(mocks.pets.createPet).toHaveBeenCalledTimes(2)
+    })
+
+    it('passeador: exige coordenadas, tipo e um preco', async () => {
+      await reachProvider()
+      expect(await w.next()).toBe(false)
+      expect(w.errors.location).toBeTruthy()
+      expect(w.errors.service_type).toBeTruthy()
+      expect(w.errors.price).toBeTruthy()
+      expect(mocks.providers.createProvider).not.toHaveBeenCalled()
+    })
+
+    it('passeador: chama createProvider com 6 casas', async () => {
+      await reachProvider()
+      fillProvider()
+      expect(await w.next()).toBe(true)
+      expect(mocks.providers.createProvider).toHaveBeenCalledWith({
+        fixed_latitude: '-23.550500',
+        fixed_longitude: '-46.633300',
+        service_type: 2,
+        price_per_hour: '25',
+        description: 'Passeios longos',
+      })
+    })
+
+    it('passeador: createProvider falso mantem a etapa e a pendencia', async () => {
+      await reachProvider()
+      fillProvider()
+      mocks.providers.createProvider.mockResolvedValue(false)
+      expect(await w.next()).toBe(false)
+      expect(localStorage.getItem('doggo-signup-pending')).toBeTruthy()
+    })
+
+    it('ambos os papeis: pet, passeador e conclusao', async () => {
+      await reachProvider({ withClient: true })
+      expect(w.step.value).toBe(5)
+      expect(w.stepKey.value).toBe('provider')
+      fillProvider()
+      expect(await w.next()).toBe(true)
+      mocks.auth.fetchUser.mockClear()
+      const to = await w.complete()
+      expect(mocks.auth.fetchUser).toHaveBeenCalled()
+      expect(mocks.notify.success).toHaveBeenCalledWith('Cadastro concluído')
+      expect(to).toEqual({ name: 'home-view' })
+    })
+
+    it('so passeador conclui para provider-today-view', async () => {
+      mocks.auth.mode = 'provider'
+      await reachProvider()
+      fillProvider()
+      await w.next()
+      expect(await w.complete()).toEqual({ name: 'provider-today-view' })
+    })
+
+    it('guarda pendencia de passeador e limpa apos criar', async () => {
+      await reachProvider({ withClient: true })
+      expect(JSON.parse(localStorage.getItem('doggo-signup-pending'))).toEqual({ provider: true })
+      fillProvider()
+      await w.next()
+      expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+    })
+
+    it('reset limpa a pendencia', async () => {
+      await reachProvider({ withClient: true })
+      w.reset()
+      expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+    })
+
+    it('so tutor nunca grava pendencia', async () => {
+      await reachPet()
+      expect(localStorage.getItem('doggo-signup-pending')).toBeNull()
+    })
+
+    it('retomada: tutor com pendencia abre a etapa 5', () => {
+      localStorage.setItem('doggo-signup-pending', JSON.stringify({ provider: true }))
+      mocks.auth.user = { id: 7, client_profile: { id: 1 }, provider_profile: null }
+      w.resumePending()
+      expect(w.roles.client && w.roles.provider).toBe(true)
+      expect(w.resolveStep(5)).toBe(5)
+      expect(w.stepKey.value).toBe('provider')
     })
   })
 })
