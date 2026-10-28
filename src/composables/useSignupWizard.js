@@ -5,7 +5,7 @@ import { usePetStore } from '@/stores/pet'
 import { useProviderStore } from '@/stores/provider'
 import { useMedia } from '@/composables/useMedia'
 import { onlyDigits } from '@/utils/masks'
-import { parseFieldErrors } from '@/utils/errors'
+import { parseDjangoErrors, parseFieldErrors } from '@/utils/errors'
 import notify from '@/utils/notify'
 import { homeRouteFor } from '@/router/navigation'
 import { clearSignupPending, hasPendingProvider, setProviderPending } from '@/utils/signupPending'
@@ -217,6 +217,18 @@ export function useSignupWizard() {
     return advance()
   }
 
+  // Erros de campo do backend voltam para o formulário; o toast garante feedback mesmo fora da tela.
+  function handleProviderError(error) {
+    const fields = parseFieldErrors(error?.response?.data)
+    if (fields.fixed_latitude || fields.fixed_longitude) {
+      state.errors.location = fields.fixed_latitude || fields.fixed_longitude
+    }
+    if (fields.service_type) state.errors.service_type = fields.service_type
+    if (fields.price_per_hour || fields.price_per_day) state.errors.price = fields.price_per_hour || fields.price_per_day
+    if (fields.description) state.errors.description = fields.description
+    notify.error(parseDjangoErrors(error))
+  }
+
   async function submitProvider() {
     const { latitude, longitude, service_type, price_per_hour, price_per_day, description } = state.provider
     const filled = (value) => String(value ?? '').trim() !== ''
@@ -238,7 +250,7 @@ export function useSignupWizard() {
     if (filled(price_per_day)) payload.price_per_day = price_per_day
     if (description.trim()) payload.description = description.trim()
 
-    const ok = await providerStore.createProvider(payload)
+    const ok = await providerStore.createProvider(payload, { onError: handleProviderError })
     if (!ok) return false
     clearSignupPending()
     return advance()

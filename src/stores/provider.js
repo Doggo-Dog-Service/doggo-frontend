@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import notify from '@/utils/notify'
+import { parseDjangoErrors } from '@/utils/errors'
 import * as providerService from '@/services/providerService'
 
 export const useProviderStore = defineStore('providerStore', () => {
@@ -60,15 +61,15 @@ export const useProviderStore = defineStore('providerStore', () => {
     }
   }
 
-  const createProvider = async (data) => {
+  // onError (opcional) recebe o erro bruto no lugar do toast, para o chamador mapear campos.
+  const createProvider = async (data, { onError } = {}) => {
     try {
       loading.value = true
       const newProvider = await providerService.createProvider(data)
-      if (newProvider) {
-        notify.success(`Perfil de provedor criado! Bem-vindo ${newProvider.user?.full_name}`)
-        return true
-      }
+      return !!newProvider
     } catch (error) {
+      if (onError) onError(error)
+      else notify.error(parseDjangoErrors(error))
       return false
     } finally {
       loading.value = false

@@ -62,6 +62,7 @@ onMounted(() => {
 
     <TextInput
       v-model="provider.description"
+      :error="errors.description"
       label="Sobre você"
       placeholder="Conte sua experiência com cães (opcional)"
     />

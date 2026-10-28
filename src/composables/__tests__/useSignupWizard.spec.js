@@ -400,7 +400,7 @@ describe('useSignupWizard', () => {
         service_type: 2,
         price_per_hour: '25',
         description: 'Passeios longos',
-      })
+      }, expect.any(Object))
     })
 
     it('passeador: createProvider falso mantem a etapa e a pendencia', async () => {
@@ -409,6 +409,20 @@ describe('useSignupWizard', () => {
       mocks.providers.createProvider.mockResolvedValue(false)
       expect(await w.next()).toBe(false)
       expect(localStorage.getItem('doggo-signup-pending')).toBeTruthy()
+    })
+
+    it('passeador: erro da API cai no campo, avisa e fica na etapa', async () => {
+      await reachProvider()
+      fillProvider()
+      mocks.providers.createProvider.mockImplementation(async (_, { onError }) => {
+        onError({ response: { status: 400, data: { price_per_hour: ['A valid number is required.'], fixed_latitude: ['Invalid.'] } } })
+        return false
+      })
+      expect(await w.next()).toBe(false)
+      expect(w.step.value).toBe(4)
+      expect(w.errors.price).toBe('Informe um número válido.')
+      expect(w.errors.location).toBe('Invalid.')
+      expect(mocks.notify.error).toHaveBeenCalled()
     })
 
     it('ambos os papeis: pet, passeador e conclusao', async () => {
