@@ -1,4 +1,6 @@
 <script setup>
+import UiIcon from '@/components/ui/UiIcon.vue'
+
 const props = defineProps({
   title: {
     type: String,
@@ -9,8 +11,8 @@ const props = defineProps({
     required: true,
   },
   icon: {
-    type: String,
-    default: '',
+    type: [Object, Function, String],
+    default: null,
   },
   link: {
     type: String,
@@ -28,25 +30,25 @@ const props = defineProps({
   <RouterLink
     :to="props.link"
     :class="[
-      'flex flex-col gap-2 p-3 border rounded-xl transition-all duration-200 ease-in-out active:scale-98 active:opacity-70 hover:scale-99',
-      props.type === 'default' && 'border-doggo-gray bg-white',
-      props.type === 'green' && 'border-doggo-light-green bg-green-50 text-doggo-green'
+      'flex flex-col gap-2 rounded-card border p-4 transition-colors duration-200 active:scale-98 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+      props.type === 'default' && 'border-line bg-surface hover:bg-surface-muted',
+      props.type === 'green' && 'border-primary/20 bg-primary-soft text-primary hover:border-primary/40',
     ]"
   >
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
       <span
         v-if="props.icon"
         :class="[
-          'flex flex-col items-center justify-center w-10 h-10 rounded-xl',
-          props.type === 'default' && 'bg-doggo-gray',
-          props.type === 'green' && 'bg-doggo-light-green'
+          'flex size-10 shrink-0 items-center justify-center rounded-control',
+          props.type === 'default' && 'bg-surface-muted text-fg',
+          props.type === 'green' && 'bg-surface text-primary',
         ]"
       >
-        <span :class="props.icon" class="text-xl"></span>
+        <UiIcon :icon="props.icon" :size="20" />
       </span>
-      <h2 :class="['font-semibold']">{{ props.title }}</h2>
+      <h3 class="text-subtitle">{{ props.title }}</h3>
     </div>
-    <p :class="['text-sm', props.type === 'default' && 'text-doggo-black/50']">
+    <p class="text-caption text-fg-muted">
       {{ props.description }}
     </p>
   </RouterLink>

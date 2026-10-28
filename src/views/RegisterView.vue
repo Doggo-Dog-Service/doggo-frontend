@@ -3,6 +3,7 @@ import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import AppInput from '@/components/inputs/AppInput.vue'
 import AppButton from '@/components/buttons/AppButton.vue'
 import ImageInput from '@/components/inputs/ImageInput.vue'
+import { User, Mail, FileText, Phone, Lock, Check } from 'lucide-vue-next'
 import { onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useClientStore } from '@/stores/clients'
@@ -88,18 +89,16 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 w-full p-6 md:flex-row md:gap-15">
-    <section class="w-full flex flex-col md:w-1/2 md:items-center md:gap-10">
-      <div class="w-full flex flex-col gap-5">
-        <div class="text-center">
-          <h1 class="text-doggo-black text-2xl font">Criar conta</h1>
-          <p class="text-zinc-400">Preencha os dados para começar</p>
-        </div>
-        <ImageInput label="Imagem de perfil" v-model="profilePicture" />
+  <div class="flex flex-col gap-8 md:flex-row md:gap-10">
+    <section class="flex w-full flex-col gap-6 md:w-1/2">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-title text-fg">Criar conta</h1>
+        <p class="text-body text-fg-muted">Preencha os dados para começar</p>
       </div>
-      <div class="w-full flex flex-col gap-2">
-        <h2 class="font-semibold">Tipo de conta</h2>
-        <div class="flex gap-4">
+      <ImageInput label="Imagem de perfil" v-model="profilePicture" />
+      <div class="flex w-full flex-col gap-3">
+        <h2 class="text-subtitle text-fg">Tipo de conta</h2>
+        <div class="grid grid-cols-2 gap-3">
           <ChoseButton
             text="Tutor"
             sub-text="Dono do pet"
@@ -113,8 +112,8 @@ const handleRegister = async () => {
             @select="changeProfileType('provider')"
           />
         </div>
-        <div v-if="profileType === 'provider'" class="w-full flex flex-col gap-2">
-          <h2 class="font-semibold">Tipo de serviço <span class="text-red-400">*</span></h2>
+        <div v-if="profileType === 'provider'" class="flex w-full flex-col gap-3">
+          <h2 class="text-subtitle text-fg">Tipo de serviço <span class="text-danger">*</span></h2>
           <ChoseButton
             v-for="(typeService, index) in serviceTypeStore.typeServices"
             :key="index"
@@ -126,36 +125,36 @@ const handleRegister = async () => {
         </div>
       </div>
     </section>
-    <form @submit.prevent="handleRegister" class="w-full flex flex-col gap-4 md:w-1/2">
+    <form @submit.prevent="handleRegister" class="flex w-full flex-col gap-4 md:w-1/2">
       <AppInput
-        icon="mdi mdi-account-outline"
+        :icon="User"
         label="Nome completo"
         placeholder="Seu Nome"
         v-model="userData.full_name"
         required
       />
       <AppInput
-        icon="mdi mdi-email-outline"
+        :icon="Mail"
         label="Email"
         placeholder="seu@email.com"
         v-model="userData.email"
         required
       />
       <AppInput
-        icon="mdi mdi-file-document-outline"
+        :icon="FileText"
         label="CPF"
         placeholder="-----------"
         v-model="userData.cpf"
         required
       />
       <AppInput
-        icon="mdi mdi-phone-outline"
+        :icon="Phone"
         label="Telefone"
         placeholder="-----------"
         v-model="userData.phone"
       />
       <AppInput
-        icon="mdi mdi-lock-outline"
+        :icon="Lock"
         label="Senha"
         type="password"
         placeholder="*****"
@@ -163,7 +162,7 @@ const handleRegister = async () => {
         required
       />
       <AppInput
-        icon="mdi mdi-check"
+        :icon="Check"
         label="Confirmar senha"
         type="password"
         placeholder="*****"
@@ -172,14 +171,15 @@ const handleRegister = async () => {
       />
       <AppButton
         :text="authStore.loading ? 'Registrando sua conta...' : 'Criar minha conta'"
-        mode="outline"
+        variant="primary"
+        size="lg"
         type="submit"
-        :disabled="authStore.loading"
+        :loading="authStore.loading"
       />
-      <div class="flex justify-center gap-2">
-        <p>Já possui uma conta?</p>
-        <RouterLink class="font-bold text-doggo-green" to="/auth/login">Entrar</RouterLink>
-      </div>
+      <p class="flex flex-wrap justify-center gap-2 text-body text-fg-muted">
+        Já possui uma conta?
+        <RouterLink class="font-semibold text-primary hover:underline" to="/auth/login">Entrar</RouterLink>
+      </p>
     </form>
   </div>
 </template>

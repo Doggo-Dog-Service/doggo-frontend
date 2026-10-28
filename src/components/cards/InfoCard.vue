@@ -1,8 +1,11 @@
 <script setup>
+import UiIcon from '@/components/ui/UiIcon.vue'
+
 const props = defineProps({
+  // Componente Lucide; string (classe MDI) segue aceita até as demais telas migrarem.
   icon: {
-    type: String,
-    default: '',
+    type: [Object, Function, String],
+    default: null,
   },
   info: {
     type: [String, Number],
@@ -17,12 +20,12 @@ const props = defineProps({
 
 <template>
   <div
-    class="flex flex-col items-center justify-center w-full p-2 bg-white border border-doggo-gray rounded-2xl active:scale-98 transition-all duration-200 ease-in-out"
+    class="flex w-full flex-col items-center justify-center gap-0.5 rounded-card border border-line bg-surface p-3 text-center shadow-card"
   >
-    <div class="flex justify-center gap-2 text-2xl text-doggo-green font-bold">
-      <span v-if="props.icon" :class="props.icon"></span>
+    <div class="flex items-center justify-center gap-2 text-title text-primary">
+      <UiIcon v-if="props.icon" :icon="props.icon" :size="20" />
       <p>{{ props.info }}</p>
     </div>
-    <p class="text-doggo-black/50">{{ props.description }}</p>
+    <p class="text-caption text-fg-muted">{{ props.description }}</p>
   </div>
 </template>

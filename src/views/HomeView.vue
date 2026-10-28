@@ -5,6 +5,8 @@ import SearchBar from '@/components/inputs/SearchBar.vue'
 import SearchCard from '@/components/cards/SearchCard.vue'
 import ChoseButton from '@/components/buttons/ChoseButton.vue'
 import UserCard from '@/components/cards/UserCard.vue'
+import UiEmptyState from '@/components/ui/UiEmptyState.vue'
+import { BriefcaseBusiness, Home, Loader2, MapPinOff, PawPrint } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
 import { useProviderStore } from '@/stores/provider'
 import { useAuthStore } from '@/stores/auth'
@@ -20,14 +22,14 @@ const services = [
   {
     title: 'Dog Sitter',
     description: 'Cuidador do pet na sua própria casa',
-    icon: 'mdi mdi-home',
+    icon: Home,
     type: 'green',
     link: '/',
   },
   {
     title: 'Dog Walking',
     description: 'Passeio para os pets gastarem a energia, caso sua rotina esteja muito corrida',
-    icon: 'mdi mdi-paw',
+    icon: PawPrint,
     type: 'default',
     link: '/',
   },
@@ -65,19 +67,18 @@ watch(searchBarData, (value) => {
   }, 300)
 })
 </script>
+
 <template>
-  <div
-    class="flex flex-col gap-5 p-6 mb-19 text-doggo-black lg:grid md:grid-cols-2 lg:gap-10 md:justify-start md:max-h-screen"
-  >
+  <div class="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:gap-10">
     <section class="flex flex-col gap-4">
-      <div class="flex flex-col">
-        <h1 v-if="authStore.user" class="text-2xl font-bold">
+      <div class="flex flex-col gap-1">
+        <h1 v-if="authStore.user" class="text-display text-fg">
           Olá {{ authStore.user?.full_name }}!
         </h1>
-        <h1 class="text-2xl font-bold">
-          O que seu <span class="text-doggo-green">pet</span> precisa?
+        <h1 class="text-display text-fg">
+          O que seu <span class="text-primary">pet</span> precisa?
         </h1>
-        <p class="text-doggo-black/50 font-semibold">
+        <p class="text-body text-fg-muted">
           Encontre profissionais de confiança perto de você.
         </p>
       </div>
@@ -91,29 +92,29 @@ watch(searchBarData, (value) => {
         >
           <template #list>
             <transition
-              enter-active-class="transition duration-200 ease-out"
+              enter-active-class="transition duration-200 ease-out motion-reduce:transition-none"
               enter-from-class="opacity-0 translate-y-2"
               enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition duration-150 ease-in"
+              leave-active-class="transition duration-150 ease-in motion-reduce:transition-none"
               leave-from-class="opacity-100 translate-y-0"
               leave-to-class="opacity-0 translate-y-2"
             >
               <div
                 v-if="searchedList"
-                class="absolute w-full h-100 top-16 right-0 bg-white rounded-xl border border-doggo-gray transition-all duration-200 p-3 overflow-y-auto"
+                class="absolute inset-x-0 top-full z-20 mt-2 h-96 max-h-[60dvh] overflow-y-auto rounded-card border border-line bg-surface p-3 shadow-card"
                 @mousedown.prevent
               >
                 <div
                   v-if="searchStore.loading"
-                  class="w-full h-full flex flex-col items-center justify-center"
+                  class="flex h-full w-full flex-col items-center justify-center"
+                  role="status"
+                  aria-label="Buscando"
                 >
-                  <div
-                    class="w-10 h-10 rounded-full border-l-2 border-doggo-green animate-spin"
-                  ></div>
+                  <Loader2 :size="32" :stroke-width="2" class="animate-spin text-primary" aria-hidden="true" />
                 </div>
                 <div
                   v-else-if="searchStore.searched.providers?.length > 0"
-                  class="w-full h-full flex flex-col gap-2"
+                  class="flex w-full flex-col gap-2"
                 >
                   <SearchCard
                     v-for="(provider, index) in searchStore.searched.providers"
@@ -128,7 +129,7 @@ watch(searchBarData, (value) => {
                 </div>
                 <div
                   v-else
-                  class="w-full h-full flex flex-col items-center justify-center text-doggo-green"
+                  class="flex h-full w-full flex-col items-center justify-center text-body text-fg-muted"
                 >
                   <p v-if="searchBarData.length > 0">Nenhum resultado encontrado</p>
                   <p v-else>Procure por algum provedor ou usuário</p>
@@ -138,15 +139,16 @@ watch(searchBarData, (value) => {
           </template>
         </SearchBar>
         <InfoCard
-          icon="mdi mdi-briefcase-variant"
+          class="col-span-2"
+          :icon="BriefcaseBusiness"
           :info="providerStore.totalProviders"
           :description="providerStore.totalProviders == 1 ? 'Profissional' : 'Profissionais'"
         />
       </div>
     </section>
-    <section class="flex flex-col gap-2">
-      <h2 class="text-lg font-bold">Serviços</h2>
-      <div class="grid grid-cols-2 gap-2">
+    <section class="flex flex-col gap-3">
+      <h2 class="text-title text-fg">Serviços</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ServicesCard
           v-for="(service, index) in services"
           :key="index"
@@ -158,7 +160,7 @@ watch(searchBarData, (value) => {
       </div>
     </section>
     <section class="flex flex-col gap-4">
-      <h2 class="text-lg font-bold">Perto de você</h2>
+      <h2 class="text-title text-fg">Perto de você</h2>
       <div class="flex gap-2">
         <ChoseButton
           v-for="(typeService, index) in serviceTypeStore.typeServices"
@@ -169,7 +171,7 @@ watch(searchBarData, (value) => {
         />
       </div>
       <div
-        class="flex flex-col gap-2 max-h-110 overflow-y-auto"
+        class="flex max-h-110 flex-col gap-3 overflow-y-auto"
         v-if="providerStore.providers && providerStore.providers.length > 0"
       >
         <UserCard
@@ -185,11 +187,11 @@ watch(searchBarData, (value) => {
           :classification="provider.classification"
         />
       </div>
-      <div v-else class="text-center flex flex-col items-center justify-center py-10">
-        <p class="text-xl text-doggo-green font-semibold md:text-base">
-          Não conseguimos encontrar nenhum provedor perto da sua região
-        </p>
-      </div>
+      <UiEmptyState
+        v-else
+        :icon="MapPinOff"
+        title="Não conseguimos encontrar nenhum provedor perto da sua região"
+      />
     </section>
   </div>
 </template>

@@ -37,7 +37,7 @@ watch(
 </script>
 
 <template>
-  <div v-if="provider" class="relative grid gap-10 w-full p-6 pb-28 md:grid-cols-2">
+  <div v-if="provider" class="relative grid w-full gap-8 pb-20 md:grid-cols-2">
     <ProviderProfileTop :provider="provider" />
     <InfoBar />
     <AboutComponent :description="provider.description" />
@@ -47,7 +47,7 @@ watch(
       :text="provider.full_name"
       :price="provider.price_per_hour"
       :to="`/scheduling/${provider.id}`"
-      class="fixed bottom-4 left-4 right-4 z-50 md:left-78 md:right-6"
+      class="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:bottom-6 md:left-78 md:right-8"
     />
   </div>
 </template>

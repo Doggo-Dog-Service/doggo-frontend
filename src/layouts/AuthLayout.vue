@@ -1,10 +1,30 @@
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Cadastro tem duas colunas; a localização precisa de espaço para o mapa.
+const WIDTHS = {
+  'register-view': 'max-w-3xl',
+  'register-location-view': 'max-w-5xl',
+}
+const widthClass = computed(() => WIDTHS[route.name] ?? 'max-w-md')
+const isMapPage = computed(() => route.name === 'register-location-view')
+</script>
+
 <template>
   <div class="min-h-dvh bg-canvas text-fg">
-    <div class="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-8">
+    <div :class="['mx-auto flex w-full flex-col gap-6 px-4 py-8 md:py-12', widthClass]">
       <RouterLink to="/" class="self-center rounded-control focus-visible:ring-2 focus-visible:ring-primary">
         <img class="h-10 w-auto" src="/logo.png" alt="Doggo" />
       </RouterLink>
-      <main>
+      <main
+        :class="[
+          'overflow-hidden rounded-card border border-line bg-surface shadow-card',
+          !isMapPage && 'p-6 md:p-8',
+        ]"
+      >
         <RouterView v-slot="{ Component }">
           <Transition
             mode="out-in"

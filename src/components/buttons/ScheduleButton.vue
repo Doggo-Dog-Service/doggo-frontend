@@ -17,7 +17,7 @@ const props = defineProps({
 <template>
   <RouterLink
     :to="props.to"
-    class="block bg-doggo-green text-white py-4 rounded-2xl font-semibold text-center shadow-md transition-all duration-200 cursor-pointer active:scale-98 active:opacity-70 hover:scale-99"
+    class="flex min-h-12 items-center justify-center rounded-full bg-primary px-6 py-3 text-subtitle text-primary-fg text-center shadow-card transition-all duration-200 cursor-pointer active:scale-98 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
   >
     Agendar com {{ props.text.split(' ')[0] }} · R${{ props.price }}/h
   </RouterLink>

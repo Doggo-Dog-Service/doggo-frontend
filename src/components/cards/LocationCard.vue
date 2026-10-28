@@ -1,4 +1,7 @@
 <script setup>
+import { MapPin } from 'lucide-vue-next'
+import UiBadge from '@/components/ui/UiBadge.vue'
+
 const props = defineProps({
   feature: {
     type: Object,
@@ -73,30 +76,25 @@ function handleClick() {
 <template>
   <button
     type="button"
-    class="w-full flex items-start gap-3 bg-white p-3 md:p-4 border-b border-doggo-gray last:border-b-0 text-left transition-all duration-200 cursor-pointer hover:bg-doggo-green/5 active:scale-[0.99]"
+    class="flex w-full cursor-pointer items-start gap-3 border-b border-line bg-surface p-3 text-left transition-colors duration-200 last:border-b-0 hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset md:p-4"
     @click="handleClick"
   >
     <span
-      class="flex items-center justify-center shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-lg bg-doggo-light-green text-doggo-green text-lg md:text-xl"
+      class="flex size-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary"
     >
-      <span class="mdi mdi-map-marker"></span>
+      <MapPin :size="20" :stroke-width="2" aria-hidden="true" />
     </span>
     <div class="min-w-0 flex-1">
-      <p class="text-sm md:text-base font-semibold text-doggo-black truncate">
+      <p class="truncate text-body font-semibold text-fg">
         {{ name }}
       </p>
-      <p v-if="addressLine" class="text-xs md:text-sm text-zinc-400 truncate">
+      <p v-if="addressLine" class="truncate text-caption text-fg-muted">
         {{ addressLine }}
       </p>
-      <p v-if="locationLine" class="text-xs md:text-sm text-zinc-400 truncate">
+      <p v-if="locationLine" class="truncate text-caption text-fg-muted">
         {{ locationLine }}
       </p>
     </div>
-    <span
-      v-if="osmLabel"
-      class="shrink-0 self-start text-[10px] md:text-xs leading-tight text-doggo-green bg-doggo-light-green/60 rounded-full px-2 py-0.5 mt-0.5"
-    >
-      {{ osmLabel }}
-    </span>
+    <UiBadge v-if="osmLabel" tone="brand" class="mt-0.5 shrink-0 self-start">{{ osmLabel }}</UiBadge>
   </button>
 </template>

@@ -19,15 +19,18 @@ const props = defineProps({
 <template>
   <button
     :class="[
-      'w-full text-center p-2 border rounded-2xl cursor-pointer transition-all duration-300',
-      props.selected ? 'bg-doggo-green border-doggo-green' : 'bg-white border-doggo-gray',
+      'w-full min-h-11 px-3 py-2 text-center border rounded-control cursor-pointer transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+      props.selected
+        ? 'bg-primary text-primary-fg border-primary'
+        : 'bg-surface text-fg border-line hover:bg-surface-muted',
     ]"
+    :aria-pressed="props.selected"
     @click="emits('select')"
     type="button"
   >
-    <p :class="['font-semibold text-doggo-black text-nowrap', props.selected && 'text-white']">
-      {{ props.text }}
+    <p class="text-body font-semibold">{{ props.text }}</p>
+    <p v-if="props.subText" :class="['text-caption', props.selected ? 'opacity-80' : 'text-fg-muted']">
+      {{ props.subText }}
     </p>
-    <p v-if="props.subText" :class="props.selected ? 'text-white/70' : 'text-doggo-black/70'">{{ props.subText }}</p>
   </button>
 </template>
