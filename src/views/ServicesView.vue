@@ -7,6 +7,7 @@ import AppButton from '@/components/buttons/AppButton.vue'
 import UiSkeleton from '@/components/ui/UiSkeleton.vue'
 import ServiceCard from '@/components/cards/ServiceCard.vue'
 import { serviceStatus } from '@/utils/serviceStatus'
+import { groupServices } from '@/utils/serviceGroups'
 import { filterServices, buildServiceParams } from '@/utils/serviceFilters'
 import { useServiceStore } from '@/stores/services'
 import { useAuthStore } from '@/stores/auth'
@@ -48,7 +49,23 @@ function select(statusId) {
   selectedStatus.value = statusId === selectedStatus.value ? 0 : statusId
 }
 
-const statusById = (statusId) => serviceStatus.find((status) => status.id === statusId)
+const GROUP_TITLES = [
+  { key: 'today', title: 'Hoje' },
+  { key: 'upcoming', title: 'Próximos' },
+  { key: 'past', title: 'Anteriores' },
+]
+const groups = computed(() => {
+  const grouped = groupServices(services.value)
+  return GROUP_TITLES.map(({ key, title }) => ({ key, title, items: grouped[key] })).filter(
+    (group) => group.items.length > 0,
+  )
+})
+
+// Mostra o outro participante: o tutor para o passeador e o passeador para o tutor.
+const participant = (service) =>
+  authStore.mode === 'provider'
+    ? { name: service.client_name, picture: service.client_picture }
+    : { name: service.provider_name, picture: service.provider_picture }
 
 function load() {
   return serviceStore.getServices(
@@ -103,25 +120,33 @@ watch(selectedStatus, load)
         <AppButton text="Tentar novamente" @event="load" />
       </template>
     </UiEmptyState>
-    <ul v-else-if="services.length > 0" class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-      <li v-for="service in services" :key="service.id">
-        <ServiceCard
-          :id="service.id"
-          :client-name="service.client_name"
-          :client-picture="service.client_picture"
-          :provider-name="service.provider_name"
-          :provider-picture="service.provider_picture"
-          :service-type="service.service_type"
-          :pets="service.pets"
-          :price="service.price"
-          :status="statusById(service.status)?.name"
-          :start-date-time="service.start_datetime"
-          :end-date-time="service.end_datetime"
-          :created-at="service.created_at"
-          :color="statusById(service.status)?.color"
-        />
-      </li>
-    </ul>
+    <template v-else-if="services.length > 0">
+      <section
+        v-for="group in groups"
+        :key="group.key"
+        :data-testid="`group-${group.key}`"
+        :aria-labelledby="`group-title-${group.key}`"
+        class="flex flex-col gap-3"
+      >
+        <h2 :id="`group-title-${group.key}`" class="flex items-center gap-2 text-title text-fg">
+          {{ group.title }}
+          <span data-testid="count" class="rounded-full bg-surface-muted px-2 text-caption font-semibold text-fg-muted">{{ group.items.length }}</span>
+        </h2>
+        <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <li v-for="service in group.items" :key="service.id">
+            <ServiceCard
+              :id="service.id"
+              :participant-name="participant(service).name"
+              :participant-picture="participant(service).picture"
+              :pets="service.pets"
+              :price="service.price"
+              :status="service.status"
+              :start-date-time="service.start_datetime"
+            />
+          </li>
+        </ul>
+      </section>
+    </template>
     <UiEmptyState
       v-else
       :icon="hasRouteFilter ? Footprints : SearchX"
