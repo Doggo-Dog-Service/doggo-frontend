@@ -8,8 +8,7 @@ import { useServiceStore } from '@/stores/services'
 import { navItemsFor, activeTabName, homeRouteFor } from '@/router/navigation'
 import { useTheme } from '@/composables/useTheme.js'
 
-const { preference } = useTheme()
-const isLight = computed(() => preference === 'light')
+const { isLight } = useTheme()
 
 const route = useRoute()
 const authStore = useAuthStore()

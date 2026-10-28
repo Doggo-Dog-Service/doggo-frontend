@@ -6,8 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { homeRouteFor, isTabRoute } from '@/router/navigation'
 import { useTheme } from '@/composables/useTheme.js'
 
-const { preference } = useTheme()
-const isLight = computed(() => preference === 'light')
+const { isLight } = useTheme()
 
 const route = useRoute()
 const router = useRouter()

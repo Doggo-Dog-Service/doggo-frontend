@@ -5,8 +5,7 @@ import { useSignupWizard } from '@/composables/useSignupWizard'
 import { useTheme } from '@/composables/useTheme.js'
 import AuthDog from '@/components/auth/AuthDog.vue'
 
-const { preference } = useTheme()
-const isLight = computed(() => preference === 'light')
+const { isLight } = useTheme()
 
 const route = useRoute()
 const wizard = useSignupWizard()

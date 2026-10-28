@@ -33,6 +33,8 @@ const resolved = computed(() => {
   return preference.value
 })
 
+const isLight = computed(() => resolved.value === 'light')
+
 function apply() {
   if (typeof document === 'undefined') return
   document.documentElement.classList.toggle('dark', resolved.value === 'dark')
@@ -54,5 +56,5 @@ function setPreference(value) {
 
 export function useTheme() {
   apply()
-  return { preference, resolved, setPreference }
+  return { preference, resolved, setPreference, isLight }
 }
