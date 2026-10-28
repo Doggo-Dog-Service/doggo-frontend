@@ -3,6 +3,8 @@ import { defineComponent, h } from 'vue'
 import { mount } from '@vue/test-utils'
 import { useWakeLock } from '../useWakeLock'
 
+const mounted = []
+
 function mountHost() {
   let api
   const Host = defineComponent({
@@ -12,6 +14,7 @@ function mountHost() {
     },
   })
   const wrapper = mount(Host)
+  mounted.push(wrapper)
   return { api, wrapper }
 }
 
@@ -46,6 +49,7 @@ describe('useWakeLock', () => {
   })
 
   afterEach(() => {
+    mounted.splice(0).forEach((w) => w.unmount())
     delete navigator.wakeLock
   })
 
@@ -98,5 +102,43 @@ describe('useWakeLock', () => {
     const { api } = mountHost()
     await expect(api.request()).resolves.toBeUndefined()
     expect(api.active.value).toBe(false)
+  })
+  it('release durante request pendente: libera o lock e active=false', async () => {
+    let resolve
+    request.mockImplementationOnce(() => new Promise((r) => { resolve = r }))
+    const { api } = mountHost()
+    const pending = api.request()
+    await api.release()
+    const s = makeSentinel()
+    resolve(s)
+    await pending
+    expect(s.release).toHaveBeenCalled()
+    expect(api.active.value).toBe(false)
+  })
+
+  it('unmount durante request pendente: libera o lock', async () => {
+    let resolve
+    request.mockImplementationOnce(() => new Promise((r) => { resolve = r }))
+    const { api, wrapper } = mountHost()
+    const pending = api.request()
+    wrapper.unmount()
+    const s = makeSentinel()
+    resolve(s)
+    await pending
+    expect(s.release).toHaveBeenCalled()
+    expect(api.active.value).toBe(false)
+  })
+
+  it('acquire concorrente reutiliza o request em andamento', async () => {
+    let resolve
+    request.mockImplementationOnce(() => new Promise((r) => { resolve = r }))
+    const { api } = mountHost()
+    const first = api.request()
+    setVisibility('visible')
+    const second = api.request()
+    resolve(makeSentinel())
+    await Promise.all([first, second])
+    expect(request).toHaveBeenCalledTimes(1)
+    expect(api.active.value).toBe(true)
   })
 })

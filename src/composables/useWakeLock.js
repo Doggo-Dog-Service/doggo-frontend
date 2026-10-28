@@ -6,19 +6,31 @@ export function useWakeLock() {
   let wanted = false
   let sentinel = null
 
-  async function acquire() {
-    if (!supported || sentinel) return
-    try {
-      const lock = await navigator.wakeLock.request('screen')
-      sentinel = lock
-      active.value = true
-      lock.addEventListener('release', () => {
-        if (sentinel === lock) sentinel = null
+  let pending = null
+
+  function acquire() {
+    if (!supported || sentinel) return Promise.resolve()
+    if (pending) return pending
+    pending = (async () => {
+      try {
+        const lock = await navigator.wakeLock.request('screen')
+        if (!wanted) {
+          try { await lock.release() } catch { /* já liberado */ }
+          return
+        }
+        sentinel = lock
+        active.value = true
+        lock.addEventListener('release', () => {
+          if (sentinel === lock) sentinel = null
+          active.value = false
+        })
+      } catch {
         active.value = false
-      })
-    } catch {
-      active.value = false
-    }
+      } finally {
+        pending = null
+      }
+    })()
+    return pending
   }
 
   async function request() {

@@ -8,6 +8,11 @@ describe('signalState', () => {
   it('none sem posição', () => expect(signalState(null, now)).toBe('none'))
   it('live com 10 s', () => expect(signalState(ago(10), now)).toBe('live'))
   it('stale com 45 s', () => expect(signalState(ago(45), now)).toBe('stale'))
+  it('limites: 30 s stale, 60 s stale, 29 s live', () => {
+    expect(signalState(ago(29), now)).toBe('live')
+    expect(signalState(ago(30), now)).toBe('stale')
+    expect(signalState(ago(60), now)).toBe('stale')
+  })
   it('lost com 61 s', () => expect(signalState(ago(61), now)).toBe('lost'))
   it('aceita string ISO', () => expect(signalState(ago(5).toISOString(), now)).toBe('live'))
 })
