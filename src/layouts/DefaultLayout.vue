@@ -13,13 +13,20 @@ const serviceStore = useServiceStore()
 
 const showNav = computed(() => !route.meta.hideNav)
 
-// Contador de pedidos pendentes: carrega ao entrar no modo passeador e a cada troca de rota.
+// Contador de pedidos pendentes: carrega ao entrar no modo passeador e ao abrir Pedidos.
+// A store o atualiza depois de confirmar/recusar/cancelar um serviço.
 watch(
-  () => [authStore.mode, route.fullPath],
-  () => {
-    if (authStore.mode === 'provider') serviceStore.fetchPendingCount()
+  () => authStore.mode,
+  (mode) => {
+    if (mode === 'provider') serviceStore.fetchPendingCount()
   },
   { immediate: true },
+)
+watch(
+  () => route.name,
+  (name) => {
+    if (name === 'provider-requests-view' && authStore.mode === 'provider') serviceStore.fetchPendingCount()
+  },
 )
 </script>
 
