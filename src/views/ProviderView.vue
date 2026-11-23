@@ -79,9 +79,10 @@ watch(
     <div
       v-if="canSchedule"
       data-testid="schedule-bar"
-      class="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:bottom-6 md:left-78 md:right-8"
+      class="fixed inset-x-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 md:flex md:justify-end md:bottom-6 md:left-78 md:right-8"
     >
       <ScheduleButton
+        class="md:w-80"
         :price="provider.price_per_hour"
         :to="{ name: 'scheduling-view', params: { providerId: provider.id } }"
       />
